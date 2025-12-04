@@ -13,6 +13,7 @@ import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import PageTransition from '../components/PageTransition';
 import Breadcrumbs from '../components/Layout/Breadcrumbs';
+import successSound from '../../data/sounds/success.mp3';
 import useHeaderHeight from '../hooks/useHeaderHeight';
 
 const Checkout = () => {
@@ -213,6 +214,13 @@ const Checkout = () => {
       });
       
       clearCart();
+      
+      // Play success sound
+      const audio = new Audio(successSound);
+      audio.play().catch((error) => {
+        console.log('Could not play sound:', error);
+      });
+      
       toast.success('Order placed successfully!');
       navigate(`/order-confirmation/${order.id}`);
     }

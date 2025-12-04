@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import MobileLayout from '../../components/Layout/Mobile/MobileLayout';
 import MobileCheckoutSteps from '../../components/Mobile/MobileCheckoutSteps';
 import PageTransition from '../../components/PageTransition';
+import successSound from '../../../data/sounds/success.mp3';
 
 const MobileCheckout = () => {
   const navigate = useNavigate();
@@ -184,6 +185,13 @@ const MobileCheckout = () => {
       });
       
       clearCart();
+      
+      // Play success sound
+      const audio = new Audio(successSound);
+      audio.play().catch((error) => {
+        console.log('Could not play sound:', error);
+      });
+      
       toast.success('Order placed successfully!');
       navigate(`/app/order-confirmation/${order.id}`);
     }
@@ -194,8 +202,9 @@ const MobileCheckout = () => {
       <MobileLayout showBottomNav={false} showCartBar={false}>
         <div className="w-full pb-24">
           {/* Header */}
-          <div className="px-4 py-4 bg-white border-b border-gray-200 sticky top-1 z-30">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            {/* Title Bar */}
+            <div className="px-4 py-3 flex items-center gap-3">
               <button
                 onClick={() => navigate(-1)}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -204,7 +213,10 @@ const MobileCheckout = () => {
               </button>
               <h1 className="text-xl font-bold text-gray-800">Checkout</h1>
             </div>
-            <MobileCheckoutSteps currentStep={step} totalSteps={2} />
+            {/* Steps Bar */}
+            <div className="px-4 pb-3">
+              <MobileCheckoutSteps currentStep={step} totalSteps={2} />
+            </div>
           </div>
 
           {/* Guest Checkout Option */}
