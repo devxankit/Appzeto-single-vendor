@@ -44,7 +44,7 @@ const Login = () => {
         <Header />
         <Navbar />
         <main className="w-full overflow-x-hidden" style={{ paddingTop: `${headerHeight}px` }}>
-          <div className="container mx-auto px-2 sm:px-4 py-8 sm:py-12">
+          <div className="container mx-auto px-2 sm:px-4 pt-4 sm:pt-6">
             <div className="max-w-md mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
