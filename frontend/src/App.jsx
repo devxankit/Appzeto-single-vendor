@@ -35,6 +35,7 @@ import Reviews from "./pages/admin/Reviews";
 import Analytics from "./pages/admin/Analytics";
 import Content from "./pages/admin/Content";
 import Settings from "./pages/admin/Settings";
+import More from "./pages/admin/More";
 import RouteWrapper from "./components/RouteWrapper";
 import ScrollToTop from "./components/ScrollToTop";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -129,6 +130,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductForm />} />
+          <Route path="more" element={<More />} />
           <Route path="categories" element={<Categories />} />
           <Route path="brands" element={<Brands />} />
           <Route path="orders" element={<AdminOrders />} />

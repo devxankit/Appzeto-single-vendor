@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
+import AdminBottomNav from './AdminBottomNav';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,10 +18,13 @@ const AdminLayout = () => {
         <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Page Content */}
-        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto pb-20 lg:pb-6">
           <Outlet />
         </main>
       </div>
+
+      {/* Bottom Navigation - Mobile Only */}
+      <AdminBottomNav />
     </div>
   );
 };
