@@ -192,7 +192,7 @@ const DeliveryOrderDetail = () => {
                 title="Delivery Location Map"
               />
             </div>
-            <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="mt-3">
               <button
                 onClick={() => {
                   window.open(
@@ -200,22 +200,10 @@ const DeliveryOrderDetail = () => {
                     '_blank'
                   );
                 }}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors"
               >
                 <FiNavigation />
                 Open in Google Maps
-              </button>
-              <button
-                onClick={() => {
-                  window.open(
-                    `https://www.openstreetmap.org/?mlat=${order.latitude}&mlon=${order.longitude}&zoom=15`,
-                    '_blank'
-                  );
-                }}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors"
-              >
-                <FiMapPin />
-                Open in OSM
               </button>
             </div>
           </motion.div>
