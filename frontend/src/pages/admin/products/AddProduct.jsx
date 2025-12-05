@@ -128,7 +128,7 @@ const AddProduct = () => {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 space-y-6 mt-[15px]"
+        className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 space-y-6"
       >
         {/* Basic Information */}
         <div>

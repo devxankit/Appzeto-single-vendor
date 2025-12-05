@@ -198,7 +198,7 @@ const ProductForm = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between ml-[20px] mt-[10px]">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-gray-800 mb-1 md:text-2xl md:font-bold md:mb-2">
             {isEdit ? "Edit Product" : "Create Product"}
