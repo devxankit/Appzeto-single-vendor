@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fi';
 import PageTransition from '../../components/PageTransition';
 import { formatPrice } from '../../utils/helpers';
+import toast from 'react-hot-toast';
 
 const DeliveryOrderDetail = () => {
   const { id } = useParams();
@@ -30,6 +31,8 @@ const DeliveryOrderDetail = () => {
         phone: '+1234567890',
         email: 'john.doe@example.com',
         address: '123 Main St, City, State 12345',
+        latitude: 40.7128, // New York City coordinates (example)
+        longitude: -74.0060,
         amount: 45.99,
         deliveryFee: 5.00,
         total: 50.99,
@@ -62,6 +65,7 @@ const DeliveryOrderDetail = () => {
 
   const handleAcceptOrder = () => {
     setOrder({ ...order, status: 'in-transit' });
+    toast.success('Order accepted! Map location is now available.');
   };
 
   const handleCompleteOrder = () => {
@@ -163,6 +167,59 @@ const DeliveryOrderDetail = () => {
             </div>
           )}
         </motion.div>
+
+        {/* Map - Show when order is accepted */}
+        {(order.status === 'in-transit' || order.status === 'completed') && order.latitude && order.longitude && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-white rounded-2xl p-4 shadow-sm"
+          >
+            <h2 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <FiMapPin className="text-primary-600" />
+              Delivery Location
+            </h2>
+            <div className="rounded-xl overflow-hidden border border-gray-200" style={{ height: '300px' }}>
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${order.longitude - 0.01},${order.latitude - 0.01},${order.longitude + 0.01},${order.latitude + 0.01}&layer=mapnik&marker=${order.latitude},${order.longitude}`}
+                title="Delivery Location Map"
+              />
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <button
+                onClick={() => {
+                  window.open(
+                    `https://www.google.com/maps/dir/?api=1&destination=${order.latitude},${order.longitude}`,
+                    '_blank'
+                  );
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors"
+              >
+                <FiNavigation />
+                Open in Google Maps
+              </button>
+              <button
+                onClick={() => {
+                  window.open(
+                    `https://www.openstreetmap.org/?mlat=${order.latitude}&mlon=${order.longitude}&zoom=15`,
+                    '_blank'
+                  );
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors"
+              >
+                <FiMapPin />
+                Open in OSM
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Order Items */}
         <motion.div

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
@@ -131,6 +131,7 @@ const AppRoutes = () => {
             </DeliveryProtectedRoute>
           }
         >
+          <Route index element={<Navigate to="/delivery/dashboard" replace />} />
           <Route path="dashboard" element={<DeliveryDashboard />} />
           <Route path="orders" element={<DeliveryOrders />} />
           <Route path="orders/:id" element={<DeliveryOrderDetail />} />
