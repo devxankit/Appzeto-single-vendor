@@ -33,7 +33,7 @@ const Settings = () => {
       className="space-y-6"
     >
       {/* Header */}
-      <div>
+      <div className="lg:hidden">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Settings</h1>
         <p className="text-sm sm:text-base text-gray-600">Configure your store settings</p>
       </div>

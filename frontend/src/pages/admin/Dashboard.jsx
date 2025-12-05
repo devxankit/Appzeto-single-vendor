@@ -35,7 +35,7 @@ const Dashboard = () => {
     >
       {/* Header */}
       <div className="flex flex-col gap-4">
-        <div>
+        <div className="lg:hidden">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
           <p className="text-sm sm:text-base text-gray-600">Welcome back! Here's your business overview.</p>
         </div>

@@ -169,7 +169,7 @@ const Reviews = () => {
       className="space-y-6"
     >
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
+        <div className="lg:hidden">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Reviews</h1>
           <p className="text-gray-600">Manage product reviews and ratings</p>
         </div>

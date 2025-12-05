@@ -95,7 +95,7 @@ const Categories = () => {
       <div className="space-y-3 sm:space-y-0">
         {/* Title and Button Row */}
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Categories</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 lg:hidden">Categories</h1>
           <button
             onClick={handleCreate}
             className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base flex-shrink-0"
@@ -106,7 +106,7 @@ const Categories = () => {
           </button>
         </div>
         {/* Description */}
-        <p className="text-sm sm:text-base text-gray-600">Manage your product categories</p>
+        <p className="text-sm sm:text-base text-gray-600 lg:hidden">Manage your product categories</p>
       </div>
 
       {/* Filters */}

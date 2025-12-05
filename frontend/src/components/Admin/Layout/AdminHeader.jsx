@@ -1,11 +1,45 @@
-import { FiMenu, FiBell } from 'react-icons/fi';
+import { FiMenu, FiBell, FiLogOut } from 'react-icons/fi';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuthStore } from '../../../store/adminAuthStore';
+import toast from 'react-hot-toast';
 
 const AdminHeader = ({ onMenuClick }) => {
-  const { admin } = useAdminAuthStore();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAdminAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+    navigate('/admin/login');
+  };
+
+  // Get page name from pathname
+  const getPageName = (pathname) => {
+    const path = pathname.split('/').pop() || 'dashboard';
+    const pageNames = {
+      dashboard: 'Dashboard',
+      products: 'Products',
+      categories: 'Categories',
+      brands: 'Brands',
+      orders: 'Orders',
+      customers: 'Customers',
+      inventory: 'Inventory',
+      campaigns: 'Campaigns',
+      banners: 'Banners',
+      reviews: 'Reviews',
+      analytics: 'Analytics',
+      content: 'Content',
+      settings: 'Settings',
+      more: 'More',
+    };
+    return pageNames[path] || path.charAt(0).toUpperCase() + path.slice(1);
+  };
+
+  const pageName = getPageName(location.pathname);
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
+    <header className="bg-white border-b border-gray-200 fixed top-0 left-0 lg:left-64 right-0 z-30">
       <div className="flex items-center justify-between px-4 lg:px-6 py-4">
         {/* Left: Menu Button */}
         <div className="flex items-center gap-4">
@@ -15,9 +49,15 @@ const AdminHeader = ({ onMenuClick }) => {
           >
             <FiMenu className="text-2xl text-gray-700" />
           </button>
+          
+          {/* Page Heading - Desktop Only */}
+          <div className="hidden lg:block">
+            <h1 className="text-2xl font-bold text-gray-800 mb-1">{pageName}</h1>
+            <p className="text-sm text-gray-600">Welcome back! Here's your business overview.</p>
+          </div>
         </div>
 
-        {/* Right: Notifications & User */}
+        {/* Right: Notifications & Logout */}
         <div className="flex items-center gap-4">
           {/* Notifications */}
           <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -25,18 +65,14 @@ const AdminHeader = ({ onMenuClick }) => {
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
-          {/* User Avatar */}
-          {admin && (
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 gradient-green rounded-full flex items-center justify-center text-white font-semibold">
-                {admin.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="hidden sm:block">
-                <p className="text-sm font-semibold text-gray-800">{admin.name}</p>
-                <p className="text-xs text-gray-500">{admin.role}</p>
-              </div>
-            </div>
-          )}
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-700 hover:bg-red-600 hover:text-white transition-all duration-300 border border-gray-300 hover:border-red-600"
+          >
+            <FiLogOut className="text-lg" />
+            <span className="font-medium text-sm">Logout</span>
+          </button>
         </div>
       </div>
     </header>
