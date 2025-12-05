@@ -59,22 +59,6 @@ import MobileDailyDeals from "./pages/App/DailyDeals";
 import MobileFlashSale from "./pages/App/FlashSale";
 import MobileTrackOrder from "./pages/App/TrackOrder";
 import MobileOrderConfirmation from "./pages/App/OrderConfirmation";
-// Mobile Admin Routes
-import MobileAdminLogin from "./pages/App/admin/Login";
-import MobileAdminLayout from "./components/Admin/Mobile/MobileAdminLayout";
-import MobileAdminDashboard from "./pages/App/admin/Dashboard";
-import MobileAdminProducts from "./pages/App/admin/Products";
-import MobileAdminOrders from "./pages/App/admin/Orders";
-import MobileAdminCategories from "./pages/App/admin/Categories";
-import MobileAdminSettings from "./pages/App/admin/Settings";
-import MobileAdminMore from "./pages/App/admin/More";
-import MobileAdminBrands from "./pages/App/admin/Brands";
-import MobileAdminCustomers from "./pages/App/admin/Customers";
-import MobileAdminInventory from "./pages/App/admin/Inventory";
-import MobileAdminCampaigns from "./pages/App/admin/Campaigns";
-import MobileAdminBanners from "./pages/App/admin/Banners";
-import MobileAdminReviews from "./pages/App/admin/Reviews";
-import MobileAdminAnalytics from "./pages/App/admin/Analytics";
 // Delivery Routes
 import DeliveryLogin from "./pages/delivery/Login";
 import DeliveryProtectedRoute from "./components/Delivery/DeliveryProtectedRoute";
@@ -220,36 +204,6 @@ const AppRoutes = () => {
             </RouteWrapper>
           }
         />
-        {/* Mobile Admin Routes */}
-        <Route path="/app/admin/login" element={<RouteWrapper><MobileAdminLogin /></RouteWrapper>} />
-        <Route
-          path="/app/admin"
-          element={
-            <RouteWrapper>
-              <AdminProtectedRoute>
-                <MobileAdminLayout />
-              </AdminProtectedRoute>
-            </RouteWrapper>
-          }
-        >
-          <Route index element={<Navigate to="/app/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<MobileAdminDashboard />} />
-          <Route path="products" element={<MobileAdminProducts />} />
-          <Route path="products/:id" element={<ProductForm />} />
-          <Route path="orders" element={<MobileAdminOrders />} />
-          <Route path="orders/:id" element={<OrderDetail />} />
-          <Route path="categories" element={<MobileAdminCategories />} />
-          <Route path="more" element={<MobileAdminMore />} />
-          <Route path="brands" element={<MobileAdminBrands />} />
-          <Route path="customers" element={<MobileAdminCustomers />} />
-          <Route path="inventory" element={<MobileAdminInventory />} />
-          <Route path="campaigns" element={<MobileAdminCampaigns />} />
-          <Route path="banners" element={<MobileAdminBanners />} />
-          <Route path="reviews" element={<MobileAdminReviews />} />
-          <Route path="analytics" element={<MobileAdminAnalytics />} />
-          <Route path="content" element={<Content />} />
-          <Route path="settings" element={<MobileAdminSettings />} />
-        </Route>
       </Routes>
   );
 };

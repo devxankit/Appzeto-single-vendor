@@ -65,7 +65,7 @@ const DataTable = ({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${
+                  className={`px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider ${
                     sortable && column.sortable !== false
                       ? 'cursor-pointer hover:bg-gray-100'
                       : ''
@@ -95,7 +95,7 @@ const DataTable = ({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-6 py-12 text-center text-gray-500"
+                  className="px-3 sm:px-6 py-8 sm:py-12 text-center text-gray-500"
                 >
                   No data available
                 </td>
@@ -112,7 +112,7 @@ const DataTable = ({
                   {columns.map((column) => (
                     <td
                       key={column.key}
-                      className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                      className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700"
                     >
                       {column.render
                         ? column.render(row[column.key], row)
@@ -128,8 +128,8 @@ const DataTable = ({
 
       {/* Pagination */}
       {pagination && totalPages > 1 && (
-        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-          <div className="text-sm text-gray-700">
+        <div className="bg-gray-50 px-3 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 border-t border-gray-200">
+          <div className="text-xs sm:text-sm text-gray-700">
             Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
             {Math.min(currentPage * itemsPerPage, sortedData.length)} of{' '}
             {sortedData.length} results

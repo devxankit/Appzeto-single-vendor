@@ -74,7 +74,7 @@ const Users = () => {
     >
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Users</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Admin Users</h1>
           <p className="text-gray-600">Manage admin users and permissions</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold">

@@ -99,7 +99,7 @@ const Campaigns = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Campaigns</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Campaigns</h1>
           <p className="text-gray-600">Manage promotional campaigns and offers</p>
         </div>
         <button

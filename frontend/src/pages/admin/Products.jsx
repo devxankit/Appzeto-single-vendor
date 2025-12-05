@@ -246,24 +246,24 @@ const Products = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Products</h1>
-          <p className="text-gray-600">Manage your product catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Products</h1>
+          <p className="text-sm sm:text-base text-gray-600">Manage your product catalog</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <button
             onClick={handleBulkImport}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base"
             title="Import Products (CSV)"
           >
             <FiUpload />
-            Import
+            <span>Import</span>
           </button>
           <button
             onClick={() => navigate('/admin/products/new')}
-            className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base"
           >
             <FiPlus />
-            Add Product
+            <span>Add Product</span>
           </button>
         </div>
       </div>

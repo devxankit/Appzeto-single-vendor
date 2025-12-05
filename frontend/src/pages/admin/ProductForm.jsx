@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FiSave, FiX, FiUpload, FiPlus, FiTrash2 } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { products as initialProducts } from "../../data/products";
@@ -9,15 +9,10 @@ import toast from "react-hot-toast";
 
 const ProductForm = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { id } = useParams();
   const isEdit = id && id !== "new";
 
-  // Detect if we're on mobile admin route
-  const isMobileAdmin = location.pathname.startsWith("/app/admin");
-  const productsPath = isMobileAdmin
-    ? "/app/admin/products"
-    : "/admin/products";
+  const productsPath = "/admin/products";
 
   const { categories, initialize: initCategories } = useCategoryStore();
   const { brands, initialize: initBrands } = useBrandStore();

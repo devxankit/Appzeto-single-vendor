@@ -34,8 +34,8 @@ const Settings = () => {
     >
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Settings</h1>
-        <p className="text-gray-600">Configure your store settings</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Settings</h1>
+        <p className="text-sm sm:text-base text-gray-600">Configure your store settings</p>
       </div>
 
       {/* Tabs */}
@@ -63,7 +63,7 @@ const Settings = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <ActiveComponent />
         </div>
       </div>

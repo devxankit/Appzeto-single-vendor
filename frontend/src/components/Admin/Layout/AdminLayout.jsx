@@ -17,7 +17,7 @@ const AdminLayout = () => {
         <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto">
           <Outlet />
         </main>
       </div>
