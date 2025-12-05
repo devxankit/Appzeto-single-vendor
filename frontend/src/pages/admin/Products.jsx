@@ -1,50 +1,65 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEdit, FiTrash2, FiFilter, FiX, FiUpload, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import { motion } from 'framer-motion';
-import DataTable from '../../components/Admin/DataTable';
-import ExportButton from '../../components/Admin/ExportButton';
-import Badge from '../../components/Badge';
-import ConfirmModal from '../../components/Admin/ConfirmModal';
-import { formatCurrency, generateCSV } from '../../utils/adminHelpers';
-import { formatPrice } from '../../utils/helpers';
-import { products as initialProducts } from '../../data/products';
-import { useCategoryStore } from '../../store/categoryStore';
-import { useBrandStore } from '../../store/brandStore';
-import toast from 'react-hot-toast';
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  FiPlus,
+  FiSearch,
+  FiEdit,
+  FiTrash2,
+  FiFilter,
+  FiX,
+  FiUpload,
+  FiDownload,
+  FiChevronLeft,
+  FiChevronRight,
+} from "react-icons/fi";
+import { motion } from "framer-motion";
+import DataTable from "../../components/Admin/DataTable";
+import ExportButton from "../../components/Admin/ExportButton";
+import Badge from "../../components/Badge";
+import ConfirmModal from "../../components/Admin/ConfirmModal";
+import { formatCurrency, generateCSV } from "../../utils/adminHelpers";
+import { formatPrice } from "../../utils/helpers";
+import { products as initialProducts } from "../../data/products";
+import { useCategoryStore } from "../../store/categoryStore";
+import { useBrandStore } from "../../store/brandStore";
+import toast from "react-hot-toast";
 
 const Products = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const { categories, initialize: initCategories } = useCategoryStore();
   const { brands, initialize: initBrands } = useBrandStore();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedBrand, setSelectedBrand] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedBrand, setSelectedBrand] = useState("all");
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [deleteModal, setDeleteModal] = useState({ isOpen: false, productId: null, isBulk: false });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    productId: null,
+    isBulk: false,
+  });
   const itemsPerPage = 10;
 
   // Load products from localStorage or use initial products
   useEffect(() => {
     initCategories();
     initBrands();
-    const savedProducts = localStorage.getItem('admin-products');
+    const savedProducts = localStorage.getItem("admin-products");
     if (savedProducts) {
       setProducts(JSON.parse(savedProducts));
     } else {
       setProducts(initialProducts);
-      localStorage.setItem('admin-products', JSON.stringify(initialProducts));
+      localStorage.setItem("admin-products", JSON.stringify(initialProducts));
     }
   }, []);
 
   // Save products to localStorage when they change
   const saveProducts = (newProducts) => {
     setProducts(newProducts);
-    localStorage.setItem('admin-products', JSON.stringify(newProducts));
+    localStorage.setItem("admin-products", JSON.stringify(newProducts));
   };
 
   // Filtered products
@@ -59,18 +74,22 @@ const Products = () => {
     }
 
     // Status filter
-    if (selectedStatus !== 'all') {
+    if (selectedStatus !== "all") {
       filtered = filtered.filter((product) => product.stock === selectedStatus);
     }
 
     // Category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter((product) => product.categoryId === parseInt(selectedCategory));
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (product) => product.categoryId === parseInt(selectedCategory)
+      );
     }
 
     // Brand filter
-    if (selectedBrand !== 'all') {
-      filtered = filtered.filter((product) => product.brandId === parseInt(selectedBrand));
+    if (selectedBrand !== "all") {
+      filtered = filtered.filter(
+        (product) => product.brandId === parseInt(selectedBrand)
+      );
     }
 
     return filtered;
@@ -93,13 +112,13 @@ const Products = () => {
   // Table columns
   const columns = [
     {
-      key: 'id',
-      label: 'ID',
+      key: "id",
+      label: "ID",
       sortable: true,
     },
     {
-      key: 'name',
-      label: 'Product Name',
+      key: "name",
+      label: "Product Name",
       sortable: true,
       render: (value, row) => (
         <div className="flex items-center gap-3">
@@ -108,7 +127,7 @@ const Products = () => {
             alt={value}
             className="w-10 h-10 object-cover rounded-lg"
             onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/50x50?text=Product';
+              e.target.src = "https://via.placeholder.com/50x50?text=Product";
             }}
           />
           <span className="font-medium">{value}</span>
@@ -116,38 +135,37 @@ const Products = () => {
       ),
     },
     {
-      key: 'price',
-      label: 'Price',
+      key: "price",
+      label: "Price",
       sortable: true,
       render: (value) => formatPrice(value),
     },
     {
-      key: 'stockQuantity',
-      label: 'Stock',
+      key: "stockQuantity",
+      label: "Stock",
       sortable: true,
       render: (value) => value.toLocaleString(),
     },
     {
-      key: 'stock',
-      label: 'Status',
+      key: "stock",
+      label: "Status",
       sortable: true,
       render: (value) => (
         <Badge
           variant={
-            value === 'in_stock'
-              ? 'success'
-              : value === 'low_stock'
-              ? 'warning'
-              : 'error'
-          }
-        >
-          {value.replace('_', ' ').toUpperCase()}
+            value === "in_stock"
+              ? "success"
+              : value === "low_stock"
+              ? "warning"
+              : "error"
+          }>
+          {value.replace("_", " ").toUpperCase()}
         </Badge>
       ),
     },
     {
-      key: 'actions',
-      label: 'Actions',
+      key: "actions",
+      label: "Actions",
       sortable: false,
       render: (_, row) => (
         <div className="flex items-center gap-2">
@@ -156,8 +174,7 @@ const Products = () => {
               e.stopPropagation();
               navigate(`/admin/products/${row.id}`);
             }}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          >
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
             <FiEdit />
           </button>
           <button
@@ -165,8 +182,7 @@ const Products = () => {
               e.stopPropagation();
               handleDelete(row.id);
             }}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
             <FiTrash2 />
           </button>
         </div>
@@ -181,59 +197,70 @@ const Products = () => {
   const confirmDelete = () => {
     if (deleteModal.isBulk) {
       if (selectedProducts.length === 0) {
-        toast.error('Please select products to delete');
+        toast.error("Please select products to delete");
         return;
       }
-      const newProducts = products.filter((p) => !selectedProducts.includes(p.id));
+      const newProducts = products.filter(
+        (p) => !selectedProducts.includes(p.id)
+      );
       saveProducts(newProducts);
       setSelectedProducts([]);
-      toast.success('Products deleted successfully');
+      toast.success("Products deleted successfully");
     } else {
-      const newProducts = products.filter((p) => p.id !== deleteModal.productId);
+      const newProducts = products.filter(
+        (p) => p.id !== deleteModal.productId
+      );
       saveProducts(newProducts);
-      toast.success('Product deleted successfully');
+      toast.success("Product deleted successfully");
     }
   };
 
   const handleBulkDelete = () => {
     if (selectedProducts.length === 0) {
-      toast.error('Please select products to delete');
+      toast.error("Please select products to delete");
       return;
     }
     setDeleteModal({ isOpen: true, productId: null, isBulk: true });
   };
 
   const handleBulkImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.csv';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".csv";
     input.onchange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      
+
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
           const csv = event.target.result;
-          const lines = csv.split('\n');
-          const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-          
+          const lines = csv.split("\n");
+          const headers = lines[0]
+            .split(",")
+            .map((h) => h.trim().replace(/"/g, ""));
+
           // Simple CSV parser - in production, use a proper CSV library
           const importedProducts = [];
           for (let i = 1; i < lines.length; i++) {
             if (!lines[i].trim()) continue;
-            const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+            const values = lines[i]
+              .split(",")
+              .map((v) => v.trim().replace(/"/g, ""));
             if (values.length < headers.length) continue;
-            
+
             const product = {};
             headers.forEach((header, index) => {
               product[header] = values[index];
             });
-            
+
             if (product.name && product.price) {
               importedProducts.push({
                 ...product,
-                id: Math.max(...products.map(p => p.id), 0) + importedProducts.length + 1,
+                id:
+                  Math.max(...products.map((p) => p.id), 0) +
+                  importedProducts.length +
+                  1,
                 price: parseFloat(product.price) || 0,
                 stockQuantity: parseInt(product.stockQuantity) || 0,
                 rating: 0,
@@ -241,16 +268,18 @@ const Products = () => {
               });
             }
           }
-          
+
           if (importedProducts.length > 0) {
             const newProducts = [...products, ...importedProducts];
             saveProducts(newProducts);
-            toast.success(`${importedProducts.length} products imported successfully`);
+            toast.success(
+              `${importedProducts.length} products imported successfully`
+            );
           } else {
-            toast.error('No valid products found in CSV');
+            toast.error("No valid products found in CSV");
           }
         } catch (error) {
-          toast.error('Failed to import products: ' + error.message);
+          toast.error("Failed to import products: " + error.message);
         }
       };
       reader.readAsText(file);
@@ -260,11 +289,11 @@ const Products = () => {
 
   const handleExport = () => {
     const headers = [
-      { label: 'ID', accessor: (row) => row.id },
-      { label: 'Name', accessor: (row) => row.name },
-      { label: 'Price', accessor: (row) => formatCurrency(row.price) },
-      { label: 'Stock', accessor: (row) => row.stockQuantity },
-      { label: 'Status', accessor: (row) => row.stock },
+      { label: "ID", accessor: (row) => row.id },
+      { label: "Name", accessor: (row) => row.name },
+      { label: "Price", accessor: (row) => formatCurrency(row.price) },
+      { label: "Stock", accessor: (row) => row.stockQuantity },
+      { label: "Status", accessor: (row) => row.stock },
     ];
     // Export handled by ExportButton component
   };
@@ -273,27 +302,28 @@ const Products = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+      className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Products</h1>
-          <p className="text-sm sm:text-base text-gray-600">Manage your product catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+            Products
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">
+            Manage your product catalog
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:mt-0">
           <button
             onClick={handleBulkImport}
             className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-xs sm:text-sm flex-1 sm:flex-initial"
-            title="Import Products (CSV)"
-          >
+            title="Import Products (CSV)">
             <FiUpload className="text-sm sm:text-base" />
             <span>Import</span>
           </button>
           <button
-            onClick={() => navigate('/admin/products/new')}
-            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-xs sm:text-sm flex-1 sm:flex-initial"
-          >
+            onClick={() => navigate("/admin/products/new")}
+            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-xs sm:text-sm flex-1 sm:flex-initial">
             <FiPlus className="text-sm sm:text-base" />
             <span>Add Product</span>
           </button>
@@ -307,15 +337,17 @@ const Products = () => {
           <span className="text-sm font-semibold text-gray-700">Filters</span>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
-          >
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800">
             <FiFilter className="text-base" />
-            <span>{showFilters ? 'Hide' : 'Show'}</span>
+            <span>{showFilters ? "Hide" : "Show"}</span>
           </button>
         </div>
 
         {/* Filter Content */}
-        <div className={`${showFilters ? 'block' : 'hidden'} sm:block space-y-3 sm:space-y-0`}>
+        <div
+          className={`${
+            showFilters ? "block" : "hidden"
+          } sm:block space-y-3 sm:space-y-0`}>
           {/* Search */}
           <div className="relative w-full sm:flex-1">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm sm:text-base" />
@@ -329,13 +361,12 @@ const Products = () => {
           </div>
 
           {/* Filters Row - Desktop */}
-          <div className="hidden sm:flex items-center gap-2 sm:gap-3 mt-3 sm:mt-0">
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
             {/* Status Filter */}
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0"
-            >
+              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0">
               <option value="all">All Status</option>
               <option value="in_stock">In Stock</option>
               <option value="low_stock">Low Stock</option>
@@ -346,39 +377,44 @@ const Products = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0"
-            >
+              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0">
               <option value="all">All Categories</option>
-              {categories.filter(cat => cat.isActive !== false).map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
+              {categories
+                .filter((cat) => cat.isActive !== false)
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
             </select>
 
             {/* Brand Filter */}
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0"
-            >
+              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0">
               <option value="all">All Brands</option>
-              {brands.filter(brand => brand.isActive !== false).map((brand) => (
-                <option key={brand.id} value={brand.id}>
-                  {brand.name}
-                </option>
-              ))}
+              {brands
+                .filter((brand) => brand.isActive !== false)
+                .map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
             </select>
 
             {/* Export Button */}
             <ExportButton
               data={filteredProducts}
               headers={[
-                { label: 'ID', accessor: (row) => row.id },
-                { label: 'Name', accessor: (row) => row.name },
-                { label: 'Price', accessor: (row) => formatCurrency(row.price) },
-                { label: 'Stock', accessor: (row) => row.stockQuantity },
-                { label: 'Status', accessor: (row) => row.stock },
+                { label: "ID", accessor: (row) => row.id },
+                { label: "Name", accessor: (row) => row.name },
+                {
+                  label: "Price",
+                  accessor: (row) => formatCurrency(row.price),
+                },
+                { label: "Stock", accessor: (row) => row.stockQuantity },
+                { label: "Status", accessor: (row) => row.stock },
               ]}
               filename="products"
             />
@@ -390,8 +426,7 @@ const Products = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
+              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
               <option value="all">All Status</option>
               <option value="in_stock">In Stock</option>
               <option value="low_stock">Low Stock</option>
@@ -402,28 +437,30 @@ const Products = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
+              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
               <option value="all">All Categories</option>
-              {categories.filter(cat => cat.isActive !== false).map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
+              {categories
+                .filter((cat) => cat.isActive !== false)
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
             </select>
 
             {/* Brand Filter */}
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
+              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
               <option value="all">All Brands</option>
-              {brands.filter(brand => brand.isActive !== false).map((brand) => (
-                <option key={brand.id} value={brand.id}>
-                  {brand.name}
-                </option>
-              ))}
+              {brands
+                .filter((brand) => brand.isActive !== false)
+                .map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
             </select>
 
             {/* Export Button */}
@@ -431,11 +468,14 @@ const Products = () => {
               <ExportButton
                 data={filteredProducts}
                 headers={[
-                  { label: 'ID', accessor: (row) => row.id },
-                  { label: 'Name', accessor: (row) => row.name },
-                  { label: 'Price', accessor: (row) => formatCurrency(row.price) },
-                  { label: 'Stock', accessor: (row) => row.stockQuantity },
-                  { label: 'Status', accessor: (row) => row.stock },
+                  { label: "ID", accessor: (row) => row.id },
+                  { label: "Name", accessor: (row) => row.name },
+                  {
+                    label: "Price",
+                    accessor: (row) => formatCurrency(row.price),
+                  },
+                  { label: "Stock", accessor: (row) => row.stockQuantity },
+                  { label: "Status", accessor: (row) => row.stock },
                 ]}
                 filename="products"
                 className="w-full justify-center"
@@ -452,8 +492,7 @@ const Products = () => {
             </span>
             <button
               onClick={handleBulkDelete}
-              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm"
-            >
+              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm">
               Delete Selected
             </button>
           </div>
@@ -485,8 +524,7 @@ const Products = () => {
                   key={product.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-200"
-                >
+                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
                   <div className="flex gap-4">
                     {/* Product Image */}
                     <div className="flex-shrink-0">
@@ -495,7 +533,8 @@ const Products = () => {
                         alt={product.name}
                         className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                         onError={(e) => {
-                          e.target.src = 'https://via.placeholder.com/100x100?text=Product';
+                          e.target.src =
+                            "https://via.placeholder.com/100x100?text=Product";
                         }}
                       />
                     </div>
@@ -507,24 +546,27 @@ const Products = () => {
                           <h3 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-2">
                             {product.name}
                           </h3>
-                          <p className="text-xs text-gray-500 mt-1">ID: {product.id}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            ID: {product.id}
+                          </p>
                         </div>
                         <Badge
                           variant={
-                            product.stock === 'in_stock'
-                              ? 'success'
-                              : product.stock === 'low_stock'
-                              ? 'warning'
-                              : 'error'
-                          }
-                        >
-                          {product.stock.replace('_', ' ').toUpperCase()}
+                            product.stock === "in_stock"
+                              ? "success"
+                              : product.stock === "low_stock"
+                              ? "warning"
+                              : "error"
+                          }>
+                          {product.stock.replace("_", " ").toUpperCase()}
                         </Badge>
                       </div>
 
                       <div className="flex items-center justify-between mt-3">
                         <div>
-                          <p className="text-lg font-bold text-gray-800">{formatPrice(product.price)}</p>
+                          <p className="text-lg font-bold text-gray-800">
+                            {formatPrice(product.price)}
+                          </p>
                           <p className="text-xs text-gray-500 mt-0.5">
                             Stock: {product.stockQuantity.toLocaleString()}
                           </p>
@@ -538,8 +580,7 @@ const Products = () => {
                               navigate(`/admin/products/${product.id}`);
                             }}
                             className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            aria-label="Edit product"
-                          >
+                            aria-label="Edit product">
                             <FiEdit className="text-lg" />
                           </button>
                           <button
@@ -548,8 +589,7 @@ const Products = () => {
                               handleDelete(product.id);
                             }}
                             className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            aria-label="Delete product"
-                          >
+                            aria-label="Delete product">
                             <FiTrash2 className="text-lg" />
                           </button>
                         </div>
@@ -565,16 +605,20 @@ const Products = () => {
               <div className="mt-6 bg-white rounded-xl p-4 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-gray-600">
-                    Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                    {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of{' '}
-                    {filteredProducts.length}
+                    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                    {Math.min(
+                      currentPage * itemsPerPage,
+                      filteredProducts.length
+                    )}{" "}
+                    of {filteredProducts.length}
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
                       disabled={currentPage === 1}
-                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
+                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                       <FiChevronLeft />
                     </button>
                     <div className="flex items-center gap-1">
@@ -595,20 +639,20 @@ const Products = () => {
                             onClick={() => setCurrentPage(page)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                               currentPage === page
-                                ? 'bg-primary-600 text-white'
-                                : 'text-gray-700 hover:bg-gray-100'
-                            }`}
-                          >
+                                ? "bg-primary-600 text-white"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}>
                             {page}
                           </button>
                         );
                       })}
                     </div>
                     <button
-                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                      }
                       disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
+                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                       <FiChevronRight />
                     </button>
                   </div>
@@ -622,13 +666,17 @@ const Products = () => {
       {/* Confirmation Modal */}
       <ConfirmModal
         isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false, productId: null, isBulk: false })}
+        onClose={() =>
+          setDeleteModal({ isOpen: false, productId: null, isBulk: false })
+        }
         onConfirm={confirmDelete}
-        title={deleteModal.isBulk ? 'Delete Multiple Products?' : 'Delete Product?'}
+        title={
+          deleteModal.isBulk ? "Delete Multiple Products?" : "Delete Product?"
+        }
         message={
           deleteModal.isBulk
             ? `Are you sure you want to delete ${selectedProducts.length} product(s)? This action cannot be undone.`
-            : 'Are you sure you want to delete this product? This action cannot be undone.'
+            : "Are you sure you want to delete this product? This action cannot be undone."
         }
         confirmText="Delete"
         cancelText="Cancel"
@@ -639,4 +687,3 @@ const Products = () => {
 };
 
 export default Products;
-
