@@ -72,6 +72,43 @@ const DeliveryOrderDetail = () => {
     setOrder({ ...order, status: 'completed' });
   };
 
+  const openInGoogleMaps = () => {
+    const { latitude, longitude } = order;
+    
+    // Detect platform
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isAndroid = /android/i.test(userAgent);
+    
+    if (isAndroid) {
+      // Android: Use intent URL (opens Google Maps app if installed, otherwise web)
+      const intentUrl = `intent://maps.google.com/maps?daddr=${latitude},${longitude}&directionsmode=driving#Intent;scheme=https;package=com.google.android.apps.maps;end`;
+      window.location.href = intentUrl;
+    } else if (isIOS) {
+      // iOS: Try Google Maps app URL scheme first
+      const appUrl = `comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=driving`;
+      // Universal link as fallback (opens app if installed, otherwise web)
+      const universalUrl = `https://maps.google.com/maps?daddr=${latitude},${longitude}&directionsmode=driving`;
+      
+      // Try app URL
+      const link = document.createElement('a');
+      link.href = appUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Fallback to universal link after brief delay
+      setTimeout(() => {
+        window.location.href = universalUrl;
+      }, 400);
+    } else {
+      // Desktop: Use web version
+      const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+      window.open(webUrl, '_blank');
+    }
+  };
+
   if (loading) {
     return (
       <PageTransition>
@@ -194,12 +231,7 @@ const DeliveryOrderDetail = () => {
             </div>
             <div className="mt-3">
               <button
-                onClick={() => {
-                  window.open(
-                    `https://www.google.com/maps/dir/?api=1&destination=${order.latitude},${order.longitude}`,
-                    '_blank'
-                  );
-                }}
+                onClick={openInGoogleMaps}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors"
               >
                 <FiNavigation />
