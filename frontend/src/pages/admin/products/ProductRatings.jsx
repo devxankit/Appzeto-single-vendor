@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiStar, FiSearch, FiEye } from 'react-icons/fi';
+import { FiStar, FiSearch, FiEye, FiX } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
@@ -40,6 +40,7 @@ const ProductRatings = () => {
   ]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedRating, setSelectedRating] = useState(null);
 
   const filteredRatings = ratings.filter((rating) => {
     const matchesSearch =
@@ -138,6 +139,10 @@ const ProductRatings = () => {
       sortable: false,
       render: (_, row) => (
         <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedRating(row);
+          }}
           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
           title="View Details"
         >
@@ -192,6 +197,97 @@ const ProductRatings = () => {
           itemsPerPage={10}
         />
       </div>
+
+      {/* Rating Detail Modal */}
+      {selectedRating && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedRating(null)}
+        >
+          <div 
+            className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800">Rating Details</h3>
+              <button
+                onClick={() => setSelectedRating(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <FiX className="text-xl text-gray-600" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold text-gray-600">Product</label>
+                <p className="text-base text-gray-800 mt-1">{selectedRating.productName}</p>
+                <p className="text-sm text-gray-500">ID: {selectedRating.productId}</p>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-gray-600">Customer</label>
+                <p className="text-base text-gray-800 mt-1">{selectedRating.customerName}</p>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-gray-600">Rating</label>
+                <div className="mt-1">
+                  {renderStars(selectedRating.rating)}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-gray-600">Review</label>
+                <p className="text-base text-gray-800 mt-1 whitespace-pre-wrap">
+                  {selectedRating.review}
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-gray-600">Date</label>
+                <p className="text-base text-gray-800 mt-1">
+                  {formatDateTime(selectedRating.date)}
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-gray-600">Status</label>
+                <div className="mt-1">
+                  <select
+                    value={selectedRating.status}
+                    onChange={(e) => {
+                      const newStatus = e.target.value;
+                      handleStatusChange(selectedRating.id, newStatus);
+                      setSelectedRating({ ...selectedRating, status: newStatus });
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold border ${
+                      selectedRating.status === 'approved'
+                        ? 'bg-green-100 text-green-800 border-green-200'
+                        : selectedRating.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                        : 'bg-red-100 text-red-800 border-red-200'
+                    }`}
+                  >
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setSelectedRating(null)}
+                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

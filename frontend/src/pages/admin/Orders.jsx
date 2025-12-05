@@ -153,9 +153,9 @@ const Orders = () => {
 
       {/* Filters */}
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {/* Search */}
-          <div className="relative">
+          <div className="relative flex-1 min-w-[200px]">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -170,7 +170,7 @@ const Orders = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -184,17 +184,15 @@ const Orders = () => {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap"
           >
             <option value="all">All Time</option>
             <option value="today">Today</option>
             <option value="week">Last 7 Days</option>
             <option value="month">Last 30 Days</option>
           </select>
-        </div>
 
         {/* Export Button */}
-        <div className="mt-4 flex justify-end">
           <ExportButton
             data={filteredOrders}
             headers={[

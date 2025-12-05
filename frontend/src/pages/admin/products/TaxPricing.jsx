@@ -167,8 +167,14 @@ const TaxPricing = () => {
 
       {/* Edit Tax Modal */}
       {editingTax !== null && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setEditingTax(null)}
+        >
+          <div 
+            className="bg-white rounded-xl p-6 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-lg font-bold text-gray-800 mb-4">
               {editingTax.id ? 'Edit Tax Rule' : 'Add Tax Rule'}
             </h3>
@@ -236,6 +242,99 @@ const TaxPricing = () => {
                 <button
                   type="button"
                   onClick={() => setEditingTax(null)}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Pricing Modal */}
+      {editingPricing !== null && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setEditingPricing(null)}
+        >
+          <div 
+            className="bg-white rounded-xl p-6 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-gray-800 mb-4">
+              {editingPricing.id ? 'Edit Pricing Rule' : 'Add Pricing Rule'}
+            </h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              handleSavePricing({
+                name: formData.get('name'),
+                type: formData.get('type'),
+                value: parseFloat(formData.get('value')),
+                minQuantity: formData.get('minQuantity') ? parseInt(formData.get('minQuantity')) : null,
+                applicableTo: formData.get('applicableTo') || null,
+                status: formData.get('status'),
+              });
+            }} className="space-y-4">
+              <input
+                type="text"
+                name="name"
+                defaultValue={editingPricing.name || ''}
+                placeholder="Rule Name"
+                required
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <select
+                name="type"
+                defaultValue={editingPricing.type || 'discount'}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="discount">Discount</option>
+                <option value="markup">Markup</option>
+              </select>
+              <input
+                type="number"
+                name="value"
+                defaultValue={editingPricing.value || ''}
+                placeholder="Value (%)"
+                required
+                step="0.01"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <input
+                type="number"
+                name="minQuantity"
+                defaultValue={editingPricing.minQuantity || ''}
+                placeholder="Min Quantity (optional)"
+                min="1"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <input
+                type="text"
+                name="applicableTo"
+                defaultValue={editingPricing.applicableTo || ''}
+                placeholder="Applicable To (optional, e.g., vip, category)"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <select
+                name="status"
+                defaultValue={editingPricing.status || 'active'}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <div className="flex items-center gap-2">
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditingPricing(null)}
                   className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
                 >
                   Cancel

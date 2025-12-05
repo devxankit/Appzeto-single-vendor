@@ -1,11 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FiSearch,
-  FiEdit,
-  FiTrash2,
-  FiFilter,
-} from "react-icons/fi";
+import { FiSearch, FiEdit, FiTrash2, FiFilter } from "react-icons/fi";
 import { motion } from "framer-motion";
 import DataTable from "../../../components/Admin/DataTable";
 import ExportButton from "../../../components/Admin/ExportButton";
@@ -153,9 +148,7 @@ const ManageProducts = () => {
   ];
 
   const confirmDelete = () => {
-    const newProducts = products.filter(
-      (p) => p.id !== deleteModal.productId
-    );
+    const newProducts = products.filter((p) => p.id !== deleteModal.productId);
     setProducts(newProducts);
     localStorage.setItem("admin-products", JSON.stringify(newProducts));
     setDeleteModal({ isOpen: false, productId: null });
@@ -176,16 +169,11 @@ const ManageProducts = () => {
             View, edit, and manage your product catalog
           </p>
         </div>
-        <button
-          onClick={() => navigate("/admin/products/new")}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm">
-          <span>Add New Product</span>
-        </button>
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div className="relative sm:col-span-2">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="relative flex-1 min-w-[200px]">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -199,7 +187,7 @@ const ManageProducts = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap">
             <option value="all">All Status</option>
             <option value="in_stock">In Stock</option>
             <option value="low_stock">Low Stock</option>
@@ -209,7 +197,7 @@ const ManageProducts = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap">
             <option value="all">All Categories</option>
             {categories
               .filter((cat) => cat.isActive !== false)
@@ -219,9 +207,13 @@ const ManageProducts = () => {
                 </option>
               ))}
           </select>
-        </div>
 
-        <div className="mt-4 flex justify-end">
+          <button
+            onClick={() => navigate("/admin/products/add-product")}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm whitespace-nowrap">
+            <span>Add New Product</span>
+          </button>
+
           <ExportButton
             data={filteredProducts}
             headers={[
@@ -261,4 +253,3 @@ const ManageProducts = () => {
 };
 
 export default ManageProducts;
-

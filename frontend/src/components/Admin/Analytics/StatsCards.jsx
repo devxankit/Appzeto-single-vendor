@@ -1,4 +1,5 @@
-import { FiDollarSign, FiShoppingBag, FiPackage, FiUsers } from 'react-icons/fi';
+import { FiShoppingBag, FiPackage, FiUsers } from 'react-icons/fi';
+import { IndianRupee } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatCurrency } from '../../../utils/adminHelpers';
 
@@ -8,33 +9,41 @@ const StatsCards = ({ stats }) => {
       title: 'Total Revenue',
       value: formatCurrency(stats.totalRevenue || 0),
       change: stats.revenueChange || 0,
-      icon: FiDollarSign,
-      color: 'bg-green-500',
-      bgColor: 'bg-green-50',
+      icon: IndianRupee,
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-green-500 to-emerald-600',
+      cardBg: 'bg-gradient-to-br from-green-50 to-emerald-50',
+      iconBg: 'bg-white/20',
     },
     {
       title: 'Total Orders',
       value: (stats.totalOrders || 0).toLocaleString(),
       change: stats.ordersChange || 0,
       icon: FiShoppingBag,
-      color: 'bg-blue-500',
-      bgColor: 'bg-blue-50',
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+      cardBg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
+      iconBg: 'bg-white/20',
     },
     {
       title: 'Total Products',
       value: (stats.totalProducts || 0).toLocaleString(),
       change: stats.productsChange || 0,
       icon: FiPackage,
-      color: 'bg-purple-500',
-      bgColor: 'bg-purple-50',
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-purple-500 to-violet-600',
+      cardBg: 'bg-gradient-to-br from-purple-50 to-violet-50',
+      iconBg: 'bg-white/20',
     },
     {
       title: 'Total Customers',
       value: (stats.totalCustomers || 0).toLocaleString(),
       change: stats.customersChange || 0,
       icon: FiUsers,
-      color: 'bg-orange-500',
-      bgColor: 'bg-orange-50',
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-orange-500 to-amber-600',
+      cardBg: 'bg-gradient-to-br from-orange-50 to-amber-50',
+      iconBg: 'bg-white/20',
     },
   ];
 
@@ -50,23 +59,28 @@ const StatsCards = ({ stats }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200"
+            className={`${card.cardBg} rounded-xl p-4 sm:p-6 shadow-md border-2 border-transparent hover:shadow-lg transition-all duration-300 relative overflow-hidden`}
           >
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <div className={`${card.bgColor} p-2 sm:p-3 rounded-lg`}>
-                <Icon className={`${card.color} text-white text-lg sm:text-xl`} />
+            {/* Decorative gradient overlay */}
+            <div className={`absolute top-0 right-0 w-32 h-32 ${card.bgColor} opacity-10 rounded-full -mr-16 -mt-16`}></div>
+            
+            <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
+              <div className={`${card.bgColor} ${card.iconBg} p-2 sm:p-3 rounded-lg shadow-md`}>
+                <Icon className={`${card.color} text-lg sm:text-xl`} />
               </div>
               <div
-                className={`text-xs sm:text-sm font-semibold ${
-                  isPositive ? 'text-green-600' : 'text-red-600'
+                className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded-full ${
+                  isPositive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                 }`}
               >
                 {isPositive ? '+' : ''}
                 {card.change}%
               </div>
             </div>
-            <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">{card.title}</h3>
-            <p className="text-xl sm:text-2xl font-bold text-gray-800">{card.value}</p>
+            <div className="relative z-10">
+              <h3 className="text-gray-600 text-xs sm:text-sm font-medium mb-1">{card.title}</h3>
+              <p className="text-gray-800 text-xl sm:text-2xl font-bold">{card.value}</p>
+            </div>
           </motion.div>
         );
       })}

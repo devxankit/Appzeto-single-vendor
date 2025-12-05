@@ -18,7 +18,7 @@ const AdminLayout = () => {
         <AdminHeader onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Page Content - with top padding to account for fixed header */}
-        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto pb-20 lg:pb-6 mt-16 lg:mt-20">
+        <main className="flex-1 p-3 sm:p-4 lg:p-6 overflow-y-auto pb-20 lg:pb-6 mt-11 lg:mt-[60px]">
           <Outlet />
         </main>
       </div>

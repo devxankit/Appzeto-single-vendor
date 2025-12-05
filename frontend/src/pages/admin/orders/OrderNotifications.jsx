@@ -81,31 +81,33 @@ const OrderNotifications = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Order Notifications</h1>
           <p className="text-sm sm:text-base text-gray-600">Manage order-related notifications</p>
         </div>
-        <div className="flex items-center gap-2">
-          {unreadCount > 0 && (
-            <Badge variant="warning">{unreadCount} unread</Badge>
-          )}
-          <button
-            onClick={markAllAsRead}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold text-sm"
-          >
-            Mark All Read
-          </button>
-        </div>
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <select
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
-          className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-        >
-          <option value="all">All Types</option>
-          <option value="order_placed">Order Placed</option>
-          <option value="order_cancelled">Order Cancelled</option>
-          <option value="payment_failed">Payment Failed</option>
-          <option value="order_delivered">Order Delivered</option>
-        </select>
+        <div className="flex flex-wrap items-center gap-4">
+          <select
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="all">All Types</option>
+            <option value="order_placed">Order Placed</option>
+            <option value="order_cancelled">Order Cancelled</option>
+            <option value="payment_failed">Payment Failed</option>
+            <option value="order_delivered">Order Delivered</option>
+          </select>
+          <div className="flex items-center gap-2 ml-auto">
+            {unreadCount > 0 && (
+              <Badge variant="warning">{unreadCount} unread</Badge>
+            )}
+            <button
+              onClick={markAllAsRead}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold text-sm whitespace-nowrap"
+            >
+              Mark All Read
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">

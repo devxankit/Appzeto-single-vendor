@@ -73,28 +73,30 @@ const ProductFAQs = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Product FAQs</h1>
           <p className="text-sm sm:text-base text-gray-600">Manage frequently asked questions for products</p>
         </div>
-        <button
-          onClick={() => setEditingFaq({})}
-          className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm"
-        >
-          <FiPlus />
-          <span>Add FAQ</span>
-        </button>
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <select
-          value={productFilter}
-          onChange={(e) => setProductFilter(e.target.value)}
-          className="w-full sm:w-auto px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-        >
-          <option value="all">All Products</option>
-          {uniqueProducts.map((product) => (
-            <option key={product.id} value={product.id.toString()}>
-              {product.name}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap items-center gap-4 justify-between">
+          <select
+            value={productFilter}
+            onChange={(e) => setProductFilter(e.target.value)}
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap"
+          >
+            <option value="all">All Products</option>
+            {uniqueProducts.map((product) => (
+              <option key={product.id} value={product.id.toString()}>
+                {product.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setEditingFaq({})}
+            className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm whitespace-nowrap ml-auto"
+          >
+            <FiPlus />
+            <span>Add FAQ</span>
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
