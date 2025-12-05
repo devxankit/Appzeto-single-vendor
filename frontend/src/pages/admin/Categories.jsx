@@ -23,6 +23,7 @@ const Categories = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [viewMode, setViewMode] = useState('tree'); // 'tree' or 'list'
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     initialize();
@@ -91,93 +92,166 @@ const Categories = () => {
       className="space-y-6"
     >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Categories</h1>
-          <p className="text-sm sm:text-base text-gray-600">Manage your product categories</p>
+      <div className="space-y-3 sm:space-y-0">
+        {/* Title and Button Row */}
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Categories</h1>
+          <button
+            onClick={handleCreate}
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base flex-shrink-0"
+          >
+            <FiPlus className="text-base sm:text-lg" />
+            <span className="hidden xs:inline sm:inline">Add Category</span>
+            <span className="xs:hidden">Add</span>
+          </button>
         </div>
-        <button
-          onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
-        >
-          <FiPlus />
-          Add Category
-        </button>
+        {/* Description */}
+        <p className="text-sm sm:text-base text-gray-600">Manage your product categories</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200">
+        {/* Mobile Filter Toggle */}
+        <div className="flex items-center justify-between mb-3 sm:hidden">
+          <span className="text-sm font-semibold text-gray-700">Filters</span>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
+          >
+            <FiFilter className="text-base" />
+            <span>{showFilters ? 'Hide' : 'Show'}</span>
+          </button>
+        </div>
+
+        {/* Filter Content */}
+        <div className={`${showFilters ? 'block' : 'hidden'} sm:block space-y-3 sm:space-y-0`}>
           {/* Search */}
-          <div className="relative flex-1 w-full">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <div className="relative w-full sm:flex-1">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm sm:text-base" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search categories..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm sm:text-base text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
-          {/* Status Filter */}
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+          {/* Filters Row - Desktop */}
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3 mt-3 sm:mt-0">
+            {/* Status Filter */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
 
-          {/* View Mode Toggle */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('tree')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                viewMode === 'tree'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600'
-              }`}
-            >
-              Tree View
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-white text-primary-600 shadow-sm'
-                  : 'text-gray-600'
-              }`}
-            >
-              List View
-            </button>
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('tree')}
+                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'tree'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600'
+                }`}
+              >
+                Tree View
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600'
+                }`}
+              >
+                List View
+              </button>
+            </div>
+
+            {/* Export Button */}
+            <ExportButton
+              data={filteredCategories}
+              headers={[
+                { label: 'ID', accessor: (row) => row.id },
+                { label: 'Name', accessor: (row) => row.name },
+                { label: 'Description', accessor: (row) => row.description || '' },
+                { label: 'Status', accessor: (row) => (row.isActive ? 'Active' : 'Inactive') },
+                { label: 'Parent ID', accessor: (row) => row.parentId || 'None' },
+              ]}
+              filename="categories"
+            />
           </div>
 
-          {/* Export Button */}
-          <ExportButton
-            data={filteredCategories}
-            headers={[
-              { label: 'ID', accessor: (row) => row.id },
-              { label: 'Name', accessor: (row) => row.name },
-              { label: 'Description', accessor: (row) => row.description || '' },
-              { label: 'Status', accessor: (row) => (row.isActive ? 'Active' : 'Inactive') },
-              { label: 'Parent ID', accessor: (row) => row.parentId || 'None' },
-            ]}
-            filename="categories"
-          />
+          {/* Filters Stack - Mobile */}
+          <div className="sm:hidden space-y-2 mt-3">
+            {/* Status Filter */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('tree')}
+                className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'tree'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600'
+                }`}
+              >
+                Tree View
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600'
+                }`}
+              >
+                List View
+              </button>
+            </div>
+
+            {/* Export Button */}
+            <div className="pt-1">
+              <ExportButton
+                data={filteredCategories}
+                headers={[
+                  { label: 'ID', accessor: (row) => row.id },
+                  { label: 'Name', accessor: (row) => row.name },
+                  { label: 'Description', accessor: (row) => row.description || '' },
+                  { label: 'Status', accessor: (row) => (row.isActive ? 'Active' : 'Inactive') },
+                  { label: 'Parent ID', accessor: (row) => row.parentId || 'None' },
+                ]}
+                filename="categories"
+                className="w-full justify-center"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Bulk Actions */}
         {selectedCategories.length > 0 && (
-          <div className="mt-4 p-3 bg-primary-50 rounded-lg flex items-center justify-between">
-            <span className="text-sm font-semibold text-primary-700">
+          <div className="mt-3 sm:mt-4 p-3 bg-primary-50 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <span className="text-xs sm:text-sm font-semibold text-primary-700">
               {selectedCategories.length} category(ies) selected
             </span>
             <button
               onClick={handleBulkDelete}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm"
+              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm"
             >
               Delete Selected
             </button>
@@ -186,7 +260,7 @@ const Categories = () => {
       </div>
 
       {/* Categories Display */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl p-3 sm:p-6 shadow-sm border border-gray-200">
         {filteredCategories.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500">No categories found</p>
