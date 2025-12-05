@@ -1,25 +1,33 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEdit, FiTrash2, FiFilter, FiX } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEdit, FiTrash2, FiFilter, FiX, FiUpload, FiDownload } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../components/Admin/DataTable';
 import ExportButton from '../../components/Admin/ExportButton';
 import Badge from '../../components/Badge';
-import { formatCurrency } from '../../utils/adminHelpers';
+import { formatCurrency, generateCSV } from '../../utils/adminHelpers';
 import { formatPrice } from '../../utils/helpers';
 import { products as initialProducts } from '../../data/products';
+import { useCategoryStore } from '../../store/categoryStore';
+import { useBrandStore } from '../../store/brandStore';
 import toast from 'react-hot-toast';
 
 const Products = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const { categories, initialize: initCategories } = useCategoryStore();
+  const { brands, initialize: initBrands } = useBrandStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedBrand, setSelectedBrand] = useState('all');
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
   // Load products from localStorage or use initial products
   useEffect(() => {
+    initCategories();
+    initBrands();
     const savedProducts = localStorage.getItem('admin-products');
     if (savedProducts) {
       setProducts(JSON.parse(savedProducts));
@@ -51,8 +59,18 @@ const Products = () => {
       filtered = filtered.filter((product) => product.stock === selectedStatus);
     }
 
+    // Category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter((product) => product.categoryId === parseInt(selectedCategory));
+    }
+
+    // Brand filter
+    if (selectedBrand !== 'all') {
+      filtered = filtered.filter((product) => product.brandId === parseInt(selectedBrand));
+    }
+
     return filtered;
-  }, [products, searchQuery, selectedStatus]);
+  }, [products, searchQuery, selectedStatus, selectedCategory, selectedBrand]);
 
   // Table columns
   const columns = [
@@ -153,6 +171,61 @@ const Products = () => {
     }
   };
 
+  const handleBulkImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const csv = event.target.result;
+          const lines = csv.split('\n');
+          const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+          
+          // Simple CSV parser - in production, use a proper CSV library
+          const importedProducts = [];
+          for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+            if (values.length < headers.length) continue;
+            
+            const product = {};
+            headers.forEach((header, index) => {
+              product[header] = values[index];
+            });
+            
+            if (product.name && product.price) {
+              importedProducts.push({
+                ...product,
+                id: Math.max(...products.map(p => p.id), 0) + importedProducts.length + 1,
+                price: parseFloat(product.price) || 0,
+                stockQuantity: parseInt(product.stockQuantity) || 0,
+                rating: 0,
+                reviewCount: 0,
+              });
+            }
+          }
+          
+          if (importedProducts.length > 0) {
+            const newProducts = [...products, ...importedProducts];
+            saveProducts(newProducts);
+            toast.success(`${importedProducts.length} products imported successfully`);
+          } else {
+            toast.error('No valid products found in CSV');
+          }
+        } catch (error) {
+          toast.error('Failed to import products: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   const handleExport = () => {
     const headers = [
       { label: 'ID', accessor: (row) => row.id },
@@ -176,13 +249,23 @@ const Products = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Products</h1>
           <p className="text-gray-600">Manage your product catalog</p>
         </div>
-        <button
-          onClick={() => navigate('/admin/products/new')}
-          className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
-        >
-          <FiPlus />
-          Add Product
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleBulkImport}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            title="Import Products (CSV)"
+          >
+            <FiUpload />
+            Import
+          </button>
+          <button
+            onClick={() => navigate('/admin/products/new')}
+            className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+          >
+            <FiPlus />
+            Add Product
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -210,6 +293,34 @@ const Products = () => {
             <option value="in_stock">In Stock</option>
             <option value="low_stock">Low Stock</option>
             <option value="out_of_stock">Out of Stock</option>
+          </select>
+
+          {/* Category Filter */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="all">All Categories</option>
+            {categories.filter(cat => cat.isActive !== false).map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Brand Filter */}
+          <select
+            value={selectedBrand}
+            onChange={(e) => setSelectedBrand(e.target.value)}
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="all">All Brands</option>
+            {brands.filter(brand => brand.isActive !== false).map((brand) => (
+              <option key={brand.id} value={brand.id}>
+                {brand.name}
+              </option>
+            ))}
           </select>
 
           {/* Export Button */}

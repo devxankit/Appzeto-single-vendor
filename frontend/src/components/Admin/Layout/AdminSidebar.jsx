@@ -5,7 +5,16 @@ import {
   FiShoppingBag, 
   FiLogOut,
   FiMenu,
-  FiX
+  FiX,
+  FiGrid,
+  FiTag,
+  FiUsers,
+  FiImage,
+  FiTrendingUp,
+  FiSettings,
+  FiBarChart2,
+  FiMessageSquare,
+  FiFileText
 } from 'react-icons/fi';
 import { useAdminAuthStore } from '../../../store/adminAuthStore';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +28,17 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   const menuItems = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: FiLayout },
     { path: '/admin/products', label: 'Products', icon: FiPackage },
+    { path: '/admin/categories', label: 'Categories', icon: FiGrid },
+    { path: '/admin/brands', label: 'Brands', icon: FiTag },
     { path: '/admin/orders', label: 'Orders', icon: FiShoppingBag },
+    { path: '/admin/customers', label: 'Customers', icon: FiUsers },
+    { path: '/admin/inventory', label: 'Inventory', icon: FiPackage },
+    { path: '/admin/campaigns', label: 'Campaigns', icon: FiTrendingUp },
+    { path: '/admin/banners', label: 'Banners', icon: FiImage },
+    { path: '/admin/reviews', label: 'Reviews', icon: FiMessageSquare },
+    { path: '/admin/analytics', label: 'Analytics', icon: FiBarChart2 },
+    { path: '/admin/content', label: 'Content', icon: FiFileText },
+    { path: '/admin/settings', label: 'Settings', icon: FiSettings },
   ];
 
   const handleLogout = () => {

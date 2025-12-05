@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiSave, FiX, FiUpload } from 'react-icons/fi';
+import { FiSave, FiX, FiUpload, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { products as initialProducts } from '../../data/products';
+import { useCategoryStore } from '../../store/categoryStore';
+import { useBrandStore } from '../../store/brandStore';
 import toast from 'react-hot-toast';
 
 const ProductForm = () => {
@@ -10,16 +12,42 @@ const ProductForm = () => {
   const { id } = useParams();
   const isEdit = id && id !== 'new';
 
+  const { categories, initialize: initCategories } = useCategoryStore();
+  const { brands, initialize: initBrands } = useBrandStore();
+
   const [formData, setFormData] = useState({
     name: '',
     unit: '',
     price: '',
     originalPrice: '',
     image: '',
+    images: [],
+    categoryId: null,
+    brandId: null,
     stock: 'in_stock',
     stockQuantity: '',
     flashSale: false,
+    isNew: false,
+    isFeatured: false,
+    isVisible: true,
+    description: '',
+    tags: [],
+    variants: {
+      sizes: [],
+      colors: [],
+      materials: [],
+      prices: {},
+      defaultVariant: {},
+    },
+    seoTitle: '',
+    seoDescription: '',
+    relatedProducts: [],
   });
+
+  useEffect(() => {
+    initCategories();
+    initBrands();
+  }, []);
 
   useEffect(() => {
     if (isEdit) {
@@ -34,16 +62,34 @@ const ProductForm = () => {
           price: product.price || '',
           originalPrice: product.originalPrice || product.price || '',
           image: product.image || '',
+          images: product.images || [],
+          categoryId: product.categoryId || null,
+          brandId: product.brandId || null,
           stock: product.stock || 'in_stock',
           stockQuantity: product.stockQuantity || '',
           flashSale: product.flashSale || false,
+          isNew: product.isNew || false,
+          isFeatured: product.isFeatured || false,
+          isVisible: product.isVisible !== undefined ? product.isVisible : true,
+          description: product.description || '',
+          tags: product.tags || [],
+          variants: product.variants || {
+            sizes: [],
+            colors: [],
+            materials: [],
+            prices: {},
+            defaultVariant: {},
+          },
+          seoTitle: product.seoTitle || '',
+          seoDescription: product.seoDescription || '',
+          relatedProducts: product.relatedProducts || [],
         });
       } else {
         toast.error('Product not found');
         navigate('/admin/products');
       }
     }
-  }, [id, isEdit, navigate]);
+  }, [id, isEdit, navigate, initCategories, initBrands]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -76,6 +122,8 @@ const ProductForm = () => {
               price: parseFloat(formData.price),
               originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
               stockQuantity: parseInt(formData.stockQuantity),
+              categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+              brandId: formData.brandId ? parseInt(formData.brandId) : null,
             }
           : p
       );
@@ -90,6 +138,8 @@ const ProductForm = () => {
         price: parseFloat(formData.price),
         originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
         stockQuantity: parseInt(formData.stockQuantity),
+        categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+        brandId: formData.brandId ? parseInt(formData.brandId) : null,
         rating: 0,
         reviewCount: 0,
       };
@@ -156,6 +206,59 @@ const ProductForm = () => {
                 onChange={handleChange}
                 placeholder="e.g., Piece, Kilogram, Gram"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="categoryId"
+                value={formData.categoryId || ''}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Select Category</option>
+                {categories.filter(cat => cat.isActive !== false).map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Brand
+              </label>
+              <select
+                name="brandId"
+                value={formData.brandId || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Select Brand</option>
+                {brands.filter(brand => brand.isActive !== false).map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Product description..."
               />
             </div>
           </div>
@@ -263,19 +366,144 @@ const ProductForm = () => {
           </div>
         </div>
 
+        {/* Product Variants */}
+        <div>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Product Variants</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Sizes (comma-separated)
+              </label>
+              <input
+                type="text"
+                value={formData.variants.sizes.join(', ')}
+                onChange={(e) => {
+                  const sizes = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+                  setFormData({
+                    ...formData,
+                    variants: { ...formData.variants, sizes },
+                  });
+                }}
+                placeholder="S, M, L, XL"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Colors (comma-separated)
+              </label>
+              <input
+                type="text"
+                value={formData.variants.colors.join(', ')}
+                onChange={(e) => {
+                  const colors = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+                  setFormData({
+                    ...formData,
+                    variants: { ...formData.variants, colors },
+                  });
+                }}
+                placeholder="Red, Blue, Green"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Tags</h2>
+          <div>
+            <input
+              type="text"
+              value={formData.tags.join(', ')}
+              onChange={(e) => {
+                const tags = e.target.value.split(',').map(t => t.trim()).filter(t => t);
+                setFormData({ ...formData, tags });
+              }}
+              placeholder="tag1, tag2, tag3"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+        </div>
+
+        {/* SEO */}
+        <div>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">SEO Settings</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                SEO Title
+              </label>
+              <input
+                type="text"
+                name="seoTitle"
+                value={formData.seoTitle}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="SEO optimized title"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                SEO Description
+              </label>
+              <textarea
+                name="seoDescription"
+                value={formData.seoDescription}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="SEO meta description"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Options */}
         <div>
           <h2 className="text-lg font-bold text-gray-800 mb-4">Options</h2>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="flashSale"
-              checked={formData.flashSale}
-              onChange={handleChange}
-              className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-            />
-            <span className="text-sm font-semibold text-gray-700">Flash Sale</span>
-          </label>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="flashSale"
+                checked={formData.flashSale}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-sm font-semibold text-gray-700">Flash Sale</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="isNew"
+                checked={formData.isNew}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-sm font-semibold text-gray-700">New Arrival</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="isFeatured"
+                checked={formData.isFeatured}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-sm font-semibold text-gray-700">Featured Product</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="isVisible"
+                checked={formData.isVisible}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-sm font-semibold text-gray-700">Visible to Customers</span>
+            </label>
+          </div>
         </div>
 
         {/* Actions */}
