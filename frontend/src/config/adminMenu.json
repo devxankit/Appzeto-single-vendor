@@ -60,7 +60,7 @@
   },
   {
     "title": "Stock Management",
-    "route": "/admin/stock",
+    "route": "/admin/inventory",
     "children": []
   },
   {

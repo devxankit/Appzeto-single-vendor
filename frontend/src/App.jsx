@@ -36,6 +36,72 @@ import Analytics from "./pages/admin/Analytics";
 import Content from "./pages/admin/Content";
 import Settings from "./pages/admin/Settings";
 import More from "./pages/admin/More";
+import PromoCodes from "./pages/admin/PromoCodes";
+// Orders child pages
+import AllOrders from "./pages/admin/orders/AllOrders";
+import OrderTracking from "./pages/admin/orders/OrderTracking";
+import OrderNotifications from "./pages/admin/orders/OrderNotifications";
+// Products child pages
+import ManageProducts from "./pages/admin/products/ManageProducts";
+import AddProduct from "./pages/admin/products/AddProduct";
+import BulkUpload from "./pages/admin/products/BulkUpload";
+import TaxPricing from "./pages/admin/products/TaxPricing";
+import ProductRatings from "./pages/admin/products/ProductRatings";
+import ProductFAQs from "./pages/admin/products/ProductFAQs";
+// Attribute Management child pages
+import AttributeSets from "./pages/admin/attributes/AttributeSets";
+import Attributes from "./pages/admin/attributes/Attributes";
+import AttributeValues from "./pages/admin/attributes/AttributeValues";
+// Categories child pages
+import ManageCategories from "./pages/admin/categories/ManageCategories";
+import CategoryOrder from "./pages/admin/categories/CategoryOrder";
+// Brands child pages
+import ManageBrands from "./pages/admin/brands/ManageBrands";
+// Customers child pages
+import ViewCustomers from "./pages/admin/customers/ViewCustomers";
+import CustomerAddresses from "./pages/admin/customers/Addresses";
+import Transactions from "./pages/admin/customers/Transactions";
+// Delivery Management child pages
+import DeliveryBoys from "./pages/admin/delivery/DeliveryBoys";
+import CashCollection from "./pages/admin/delivery/CashCollection";
+// Locations child pages
+import Cities from "./pages/admin/locations/Cities";
+import Zipcodes from "./pages/admin/locations/Zipcodes";
+// Offers & Sliders child pages
+import HomeSliders from "./pages/admin/offers/HomeSliders";
+import FestivalOffers from "./pages/admin/offers/FestivalOffers";
+// Notifications child pages
+import PushNotifications from "./pages/admin/notifications/PushNotifications";
+import CustomMessages from "./pages/admin/notifications/CustomMessages";
+// Support Desk child pages
+import LiveChat from "./pages/admin/support/LiveChat";
+import TicketTypes from "./pages/admin/support/TicketTypes";
+import Tickets from "./pages/admin/support/Tickets";
+// Reports child pages
+import SalesReport from "./pages/admin/reports/SalesReport";
+import InventoryReport from "./pages/admin/reports/InventoryReport";
+// Analytics & Finance child pages
+import RevenueOverview from "./pages/admin/finance/RevenueOverview";
+import ProfitLoss from "./pages/admin/finance/ProfitLoss";
+import OrderTrends from "./pages/admin/finance/OrderTrends";
+import PaymentBreakdown from "./pages/admin/finance/PaymentBreakdown";
+import TaxReports from "./pages/admin/finance/TaxReports";
+import RefundReports from "./pages/admin/finance/RefundReports";
+// Store Settings child pages
+import StoreProfile from "./pages/admin/settings/store/StoreProfile";
+import PaymentMethods from "./pages/admin/settings/store/PaymentMethods";
+import ShippingMethods from "./pages/admin/settings/store/ShippingMethods";
+// Web Settings child pages
+import Themes from "./pages/admin/settings/web/Themes";
+import Languages from "./pages/admin/settings/web/Languages";
+import SEOSettings from "./pages/admin/settings/web/SEOSettings";
+// Policies child pages
+import PrivacyPolicy from "./pages/admin/policies/PrivacyPolicy";
+import RefundPolicy from "./pages/admin/policies/RefundPolicy";
+import TermsConditions from "./pages/admin/policies/TermsConditions";
+// Firebase child pages
+import PushConfig from "./pages/admin/firebase/PushConfig";
+import Authentication from "./pages/admin/firebase/Authentication";
 import RouteWrapper from "./components/RouteWrapper";
 import ScrollToTop from "./components/ScrollToTop";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -131,19 +197,81 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductForm />} />
+          <Route path="products/manage-products" element={<ManageProducts />} />
+          <Route path="products/add-product" element={<AddProduct />} />
+          <Route path="products/bulk-upload" element={<BulkUpload />} />
+          <Route path="products/tax-pricing" element={<TaxPricing />} />
+          <Route path="products/product-ratings" element={<ProductRatings />} />
+          <Route path="products/product-faqs" element={<ProductFAQs />} />
           <Route path="more" element={<More />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="categories/manage-categories" element={<ManageCategories />} />
+          <Route path="categories/category-order" element={<CategoryOrder />} />
           <Route path="brands" element={<Brands />} />
+          <Route path="brands/manage-brands" element={<ManageBrands />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="orders/:id" element={<OrderDetail />} />
+          <Route path="orders/all-orders" element={<AllOrders />} />
+          <Route path="orders/order-tracking" element={<OrderTracking />} />
+          <Route path="orders/order-notifications" element={<OrderNotifications />} />
           <Route path="customers" element={<Customers />} />
+          <Route path="customers/view-customers" element={<ViewCustomers />} />
+          <Route path="customers/addresses" element={<CustomerAddresses />} />
+          <Route path="customers/transactions" element={<Transactions />} />
+          <Route path="attributes" element={<AttributeSets />} />
+          <Route path="attributes/attribute-sets" element={<AttributeSets />} />
+          <Route path="attributes/attributes" element={<Attributes />} />
+          <Route path="attributes/attribute-values" element={<AttributeValues />} />
+          <Route path="stock" element={<Inventory />} />
           <Route path="inventory" element={<Inventory />} />
+          <Route path="delivery" element={<DeliveryBoys />} />
+          <Route path="delivery/delivery-boys" element={<DeliveryBoys />} />
+          <Route path="delivery/cash-collection" element={<CashCollection />} />
+          <Route path="locations" element={<Cities />} />
+          <Route path="locations/cities" element={<Cities />} />
+          <Route path="locations/zipcodes" element={<Zipcodes />} />
+          <Route path="offers" element={<HomeSliders />} />
+          <Route path="offers/home-sliders" element={<HomeSliders />} />
+          <Route path="offers/festival-offers" element={<FestivalOffers />} />
+          <Route path="promocodes" element={<PromoCodes />} />
+          <Route path="notifications" element={<PushNotifications />} />
+          <Route path="notifications/push-notifications" element={<PushNotifications />} />
+          <Route path="notifications/custom-messages" element={<CustomMessages />} />
+          <Route path="support" element={<Tickets />} />
+          <Route path="support/live-chat" element={<LiveChat />} />
+          <Route path="support/ticket-types" element={<TicketTypes />} />
+          <Route path="support/tickets" element={<Tickets />} />
+          <Route path="reports" element={<SalesReport />} />
+          <Route path="reports/sales-report" element={<SalesReport />} />
+          <Route path="reports/inventory-report" element={<InventoryReport />} />
+          <Route path="finance" element={<RevenueOverview />} />
+          <Route path="finance/revenue-overview" element={<RevenueOverview />} />
+          <Route path="finance/profit-loss" element={<ProfitLoss />} />
+          <Route path="finance/order-trends" element={<OrderTrends />} />
+          <Route path="finance/payment-breakdown" element={<PaymentBreakdown />} />
+          <Route path="finance/tax-reports" element={<TaxReports />} />
+          <Route path="finance/refund-reports" element={<RefundReports />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="settings/store" element={<StoreProfile />} />
+          <Route path="settings/store/store-profile" element={<StoreProfile />} />
+          <Route path="settings/store/payment-methods" element={<PaymentMethods />} />
+          <Route path="settings/store/shipping-methods" element={<ShippingMethods />} />
+          <Route path="settings/web" element={<Themes />} />
+          <Route path="settings/web/themes" element={<Themes />} />
+          <Route path="settings/web/languages" element={<Languages />} />
+          <Route path="settings/web/seo-settings" element={<SEOSettings />} />
+          <Route path="policies" element={<PrivacyPolicy />} />
+          <Route path="policies/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="policies/refund-policy" element={<RefundPolicy />} />
+          <Route path="policies/terms-conditions" element={<TermsConditions />} />
+          <Route path="firebase" element={<PushConfig />} />
+          <Route path="firebase/push-config" element={<PushConfig />} />
+          <Route path="firebase/authentication" element={<Authentication />} />
           <Route path="campaigns" element={<Campaigns />} />
           <Route path="banners" element={<Banners />} />
           <Route path="reviews" element={<Reviews />} />
-          <Route path="analytics" element={<Analytics />} />
           <Route path="content" element={<Content />} />
-          <Route path="settings" element={<Settings />} />
         </Route>
         {/* Delivery Routes */}
         <Route path="/delivery/login" element={<DeliveryLogin />} />

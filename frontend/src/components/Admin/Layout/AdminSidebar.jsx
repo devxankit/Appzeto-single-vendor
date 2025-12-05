@@ -189,24 +189,37 @@ const AdminSidebar = ({ isOpen, onClose }) => {
               return (
                 <div key={item.title}>
                   {/* Parent Menu Item */}
-                  <div
-                    onClick={(e) => handleMenuClick(item, e)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 cursor-pointer ${
-                      isActive && !hasChildren
-                        ? 'bg-primary-600 text-white shadow-lg'
-                        : isActive && hasChildren
-                        ? 'bg-primary-600/50 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="text-lg flex-shrink-0" />
-                    <span className="font-medium flex-1 text-sm">{item.title}</span>
-                    {hasChildren && (
+                  {hasChildren ? (
+                    <div
+                      onClick={(e) => handleMenuClick(item, e)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 cursor-pointer ${
+                        isActive && hasChildren
+                          ? 'bg-primary-600/50 text-white'
+                          : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      }`}
+                    >
+                      <Icon className="text-lg flex-shrink-0" />
+                      <span className="font-medium flex-1 text-sm">{item.title}</span>
                       <span className="transition-transform duration-300" style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
                         <FiChevronDown className="text-sm" />
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <NavLink
+                      to={item.route}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        `flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                          isActive
+                            ? 'bg-primary-600 text-white shadow-lg'
+                            : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        }`
+                      }
+                    >
+                      <Icon className="text-lg flex-shrink-0" />
+                      <span className="font-medium flex-1 text-sm">{item.title}</span>
+                    </NavLink>
+                  )}
 
                   {/* Children Dropdown */}
                   {hasChildren && (
