@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import StatsCards from '../../components/Admin/Analytics/StatsCards';
-import RevenueChart from '../../components/Admin/Analytics/RevenueChart';
-import SalesChart from '../../components/Admin/Analytics/SalesChart';
+import RevenueLineChart from '../../components/Admin/Analytics/RevenueLineChart';
+import SalesBarChart from '../../components/Admin/Analytics/SalesBarChart';
+import OrderStatusPieChart from '../../components/Admin/Analytics/OrderStatusPieChart';
+import CustomerGrowthAreaChart from '../../components/Admin/Analytics/CustomerGrowthAreaChart';
+import RevenueVsOrdersChart from '../../components/Admin/Analytics/RevenueVsOrdersChart';
 import TopProducts from '../../components/Admin/Analytics/TopProducts';
 import RecentOrders from '../../components/Admin/Analytics/RecentOrders';
 import TimePeriodFilter from '../../components/Admin/Analytics/TimePeriodFilter';
@@ -56,10 +59,21 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <StatsCards stats={analyticsSummary} />
 
-      {/* Charts Row */}
+      {/* Main Charts Row - Revenue and Sales */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RevenueChart data={revenueData} period={period} />
-        <SalesChart data={revenueData} period={period} />
+        <RevenueLineChart data={revenueData} period={period} />
+        <SalesBarChart data={revenueData} period={period} />
+      </div>
+
+      {/* Secondary Charts Row - Combined and Order Status */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RevenueVsOrdersChart data={revenueData} period={period} />
+        <OrderStatusPieChart />
+      </div>
+
+      {/* Customer Growth Chart - Full Width */}
+      <div className="grid grid-cols-1 gap-6">
+        <CustomerGrowthAreaChart data={revenueData} period={period} />
       </div>
 
       {/* Products and Orders Row */}
