@@ -1,7 +1,14 @@
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiHome, FiPackage, FiMoreVertical, FiShoppingBag, FiSettings } from "react-icons/fi";
+import {
+  FiHome,
+  FiPackage,
+  FiMoreVertical,
+  FiShoppingBag,
+  FiSettings,
+  FiHexagon,
+} from "react-icons/fi";
 
 const AdminBottomNav = () => {
   const location = useLocation();
@@ -9,7 +16,7 @@ const AdminBottomNav = () => {
   const navItems = [
     { path: "/admin/dashboard", icon: FiHome, label: "Home" },
     { path: "/admin/products", icon: FiPackage, label: "Products" },
-    { path: "/admin/more", icon: FiMoreVertical, label: "More" },
+    { path: "/admin/more", icon: FiHexagon, label: "More" },
     { path: "/admin/orders", icon: FiShoppingBag, label: "Orders" },
     { path: "/admin/settings", icon: FiSettings, label: "Setting" },
   ];
@@ -31,7 +38,9 @@ const AdminBottomNav = () => {
         "/admin/analytics",
         "/admin/content",
       ];
-      return morePaths.some((morePath) => location.pathname.startsWith(morePath));
+      return morePaths.some((morePath) =>
+        location.pathname.startsWith(morePath)
+      );
     }
     return location.pathname.startsWith(path);
   };
@@ -63,14 +72,14 @@ const AdminBottomNav = () => {
             <Link
               key={item.path}
               to={item.path}
-              className="flex flex-col items-center justify-center flex-1 h-full gap-1"
-            >
+              className="flex flex-col items-center justify-center flex-1 h-full gap-1">
               <motion.div
-                className="relative flex items-center justify-center"
+                className={`relative flex items-center justify-center ${
+                  active ? "text-[#2874F0]" : "text-[#878787]"
+                }`}
                 variants={iconVariants}
                 initial="inactive"
-                animate={active ? "active" : "inactive"}
-              >
+                animate={active ? "active" : "inactive"}>
                 <Icon
                   className="text-2xl"
                   style={{
@@ -83,8 +92,7 @@ const AdminBottomNav = () => {
               <span
                 className={`text-xs font-medium ${
                   active ? "text-primary-600" : "text-gray-500"
-                }`}
-              >
+                }`}>
                 {item.label}
               </span>
             </Link>
@@ -99,4 +107,3 @@ const AdminBottomNav = () => {
 };
 
 export default AdminBottomNav;
-
