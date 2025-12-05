@@ -152,13 +152,19 @@ const Products = () => {
       render: (_, row) => (
         <div className="flex items-center gap-2">
           <button
-            onClick={() => navigate(`/admin/products/${row.id}`)}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/admin/products/${row.id}`);
+            }}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
           >
             <FiEdit />
           </button>
           <button
-            onClick={() => handleDelete(row.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(row.id);
+            }}
             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
           >
             <FiTrash2 />
@@ -461,7 +467,7 @@ const Products = () => {
           columns={columns}
           pagination={true}
           itemsPerPage={10}
-          onRowClick={(row) => navigate(`/admin/products/${row.id}/edit`)}
+          onRowClick={(row) => navigate(`/admin/products/${row.id}`)}
         />
       </div>
 
