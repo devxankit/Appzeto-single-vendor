@@ -1,36 +1,43 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FiSave, FiX, FiUpload, FiPlus, FiTrash2 } from 'react-icons/fi';
-import { motion } from 'framer-motion';
-import { products as initialProducts } from '../../data/products';
-import { useCategoryStore } from '../../store/categoryStore';
-import { useBrandStore } from '../../store/brandStore';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { FiSave, FiEdit2, FiUpload, FiPlus, FiTrash2 } from "react-icons/fi";
+import { motion } from "framer-motion";
+import { products as initialProducts } from "../../data/products";
+import { useCategoryStore } from "../../store/categoryStore";
+import { useBrandStore } from "../../store/brandStore";
+import toast from "react-hot-toast";
 
 const ProductForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
-  const isEdit = id && id !== 'new';
+  const isEdit = id && id !== "new";
+
+  // Detect if we're on mobile admin route
+  const isMobileAdmin = location.pathname.startsWith("/app/admin");
+  const productsPath = isMobileAdmin
+    ? "/app/admin/products"
+    : "/admin/products";
 
   const { categories, initialize: initCategories } = useCategoryStore();
   const { brands, initialize: initBrands } = useBrandStore();
 
   const [formData, setFormData] = useState({
-    name: '',
-    unit: '',
-    price: '',
-    originalPrice: '',
-    image: '',
+    name: "",
+    unit: "",
+    price: "",
+    originalPrice: "",
+    image: "",
     images: [],
     categoryId: null,
     brandId: null,
-    stock: 'in_stock',
-    stockQuantity: '',
+    stock: "in_stock",
+    stockQuantity: "",
     flashSale: false,
     isNew: false,
     isFeatured: false,
     isVisible: true,
-    description: '',
+    description: "",
     tags: [],
     variants: {
       sizes: [],
@@ -39,8 +46,8 @@ const ProductForm = () => {
       prices: {},
       defaultVariant: {},
     },
-    seoTitle: '',
-    seoDescription: '',
+    seoTitle: "",
+    seoDescription: "",
     relatedProducts: [],
   });
 
@@ -51,27 +58,29 @@ const ProductForm = () => {
 
   useEffect(() => {
     if (isEdit) {
-      const savedProducts = localStorage.getItem('admin-products');
-      const products = savedProducts ? JSON.parse(savedProducts) : initialProducts;
+      const savedProducts = localStorage.getItem("admin-products");
+      const products = savedProducts
+        ? JSON.parse(savedProducts)
+        : initialProducts;
       const product = products.find((p) => p.id === parseInt(id));
-      
+
       if (product) {
         setFormData({
-          name: product.name || '',
-          unit: product.unit || '',
-          price: product.price || '',
-          originalPrice: product.originalPrice || product.price || '',
-          image: product.image || '',
+          name: product.name || "",
+          unit: product.unit || "",
+          price: product.price || "",
+          originalPrice: product.originalPrice || product.price || "",
+          image: product.image || "",
           images: product.images || [],
           categoryId: product.categoryId || null,
           brandId: product.brandId || null,
-          stock: product.stock || 'in_stock',
-          stockQuantity: product.stockQuantity || '',
+          stock: product.stock || "in_stock",
+          stockQuantity: product.stockQuantity || "",
           flashSale: product.flashSale || false,
           isNew: product.isNew || false,
           isFeatured: product.isFeatured || false,
           isVisible: product.isVisible !== undefined ? product.isVisible : true,
-          description: product.description || '',
+          description: product.description || "",
           tags: product.tags || [],
           variants: product.variants || {
             sizes: [],
@@ -80,36 +89,67 @@ const ProductForm = () => {
             prices: {},
             defaultVariant: {},
           },
-          seoTitle: product.seoTitle || '',
-          seoDescription: product.seoDescription || '',
+          seoTitle: product.seoTitle || "",
+          seoDescription: product.seoDescription || "",
           relatedProducts: product.relatedProducts || [],
         });
       } else {
-        toast.error('Product not found');
-        navigate('/admin/products');
+        toast.error("Product not found");
+        navigate(productsPath);
       }
     }
-  }, [id, isEdit, navigate, initCategories, initBrands]);
+  }, [id, isEdit, navigate, initCategories, initBrands, productsPath]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     });
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check if file is an image
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select an image file");
+        return;
+      }
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          image: reader.result, // Base64 data URL
+        });
+      };
+      reader.onerror = () => {
+        toast.error("Error reading image file");
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!formData.name || !formData.price || !formData.stockQuantity) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    const savedProducts = localStorage.getItem('admin-products');
-    const products = savedProducts ? JSON.parse(savedProducts) : initialProducts;
+    const savedProducts = localStorage.getItem("admin-products");
+    const products = savedProducts
+      ? JSON.parse(savedProducts)
+      : initialProducts;
 
     if (isEdit) {
       // Update existing product
@@ -120,15 +160,19 @@ const ProductForm = () => {
               ...formData,
               id: parseInt(id),
               price: parseFloat(formData.price),
-              originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+              originalPrice: formData.originalPrice
+                ? parseFloat(formData.originalPrice)
+                : null,
               stockQuantity: parseInt(formData.stockQuantity),
-              categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+              categoryId: formData.categoryId
+                ? parseInt(formData.categoryId)
+                : null,
               brandId: formData.brandId ? parseInt(formData.brandId) : null,
             }
           : p
       );
-      localStorage.setItem('admin-products', JSON.stringify(updatedProducts));
-      toast.success('Product updated successfully');
+      localStorage.setItem("admin-products", JSON.stringify(updatedProducts));
+      toast.success("Product updated successfully");
     } else {
       // Create new product
       const newId = Math.max(...products.map((p) => p.id), 0) + 1;
@@ -136,7 +180,9 @@ const ProductForm = () => {
         id: newId,
         ...formData,
         price: parseFloat(formData.price),
-        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+        originalPrice: formData.originalPrice
+          ? parseFloat(formData.originalPrice)
+          : null,
         stockQuantity: parseInt(formData.stockQuantity),
         categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
         brandId: formData.brandId ? parseInt(formData.brandId) : null,
@@ -144,42 +190,46 @@ const ProductForm = () => {
         reviewCount: 0,
       };
       const updatedProducts = [...products, newProduct];
-      localStorage.setItem('admin-products', JSON.stringify(updatedProducts));
-      toast.success('Product created successfully');
+      localStorage.setItem("admin-products", JSON.stringify(updatedProducts));
+      toast.success("Product created successfully");
     }
 
-    navigate('/admin/products');
+    navigate(productsPath);
   };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+      className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ml-[20px] mt-[10px]">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            {isEdit ? 'Edit Product' : 'Create Product'}
+          <h1 className="text-xl font-semibold text-gray-800 mb-1 md:text-2xl md:font-bold md:mb-2">
+            {isEdit ? "Edit Product" : "Create Product"}
           </h1>
-          <p className="text-gray-600">
-            {isEdit ? 'Update product information' : 'Add a new product to your catalog'}
+          <p className="text-xs text-gray-600 md:text-sm">
+            {isEdit
+              ? "Update product information"
+              : "Add a new product to your catalog"}
           </p>
         </div>
         <button
-          onClick={() => navigate('/admin/products')}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <FiX className="text-xl text-gray-600" />
+          onClick={() => navigate(productsPath)}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <FiEdit2 className="text-xl text-gray-600" />
         </button>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 space-y-6">
         {/* Basic Information */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Basic Information</h2>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">
+            Basic Information
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -215,17 +265,18 @@ const ProductForm = () => {
               </label>
               <select
                 name="categoryId"
-                value={formData.categoryId || ''}
+                value={formData.categoryId || ""}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="">Select Category</option>
-                {categories.filter(cat => cat.isActive !== false).map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
+                {categories
+                  .filter((cat) => cat.isActive !== false)
+                  .map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -235,16 +286,17 @@ const ProductForm = () => {
               </label>
               <select
                 name="brandId"
-                value={formData.brandId || ''}
+                value={formData.brandId || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="">Select Brand</option>
-                {brands.filter(brand => brand.isActive !== false).map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
+                {brands
+                  .filter((brand) => brand.isActive !== false)
+                  .map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -306,25 +358,42 @@ const ProductForm = () => {
           <h2 className="text-lg font-bold text-gray-800 mb-4">Image</h2>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Image URL
+              Upload Image
             </label>
-            <input
-              type="text"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="/images/products/product-image.png"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-            {formData.image && (
-              <img
-                src={formData.image}
-                alt="Preview"
-                className="mt-4 w-32 h-32 object-cover rounded-lg border border-gray-200"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="image-upload"
               />
+              <label
+                htmlFor="image-upload"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors">
+                <FiUpload className="text-xl text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  {formData.image ? "Change Image" : "Choose Image to Upload"}
+                </span>
+              </label>
+            </div>
+            {formData.image && (
+              <div className="mt-4">
+                <img
+                  src={formData.image}
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, image: "" })}
+                  className="mt-2 text-sm text-red-600 hover:text-red-700 font-medium">
+                  Remove Image
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -356,8 +425,7 @@ const ProductForm = () => {
                 name="stock"
                 value={formData.stock}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option value="in_stock">In Stock</option>
                 <option value="low_stock">Low Stock</option>
                 <option value="out_of_stock">Out of Stock</option>
@@ -368,7 +436,9 @@ const ProductForm = () => {
 
         {/* Product Variants */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Product Variants</h2>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">
+            Product Variants
+          </h2>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -376,9 +446,12 @@ const ProductForm = () => {
               </label>
               <input
                 type="text"
-                value={formData.variants.sizes.join(', ')}
+                value={formData.variants.sizes.join(", ")}
                 onChange={(e) => {
-                  const sizes = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+                  const sizes = e.target.value
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter((s) => s);
                   setFormData({
                     ...formData,
                     variants: { ...formData.variants, sizes },
@@ -394,9 +467,12 @@ const ProductForm = () => {
               </label>
               <input
                 type="text"
-                value={formData.variants.colors.join(', ')}
+                value={formData.variants.colors.join(", ")}
                 onChange={(e) => {
-                  const colors = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+                  const colors = e.target.value
+                    .split(",")
+                    .map((c) => c.trim())
+                    .filter((c) => c);
                   setFormData({
                     ...formData,
                     variants: { ...formData.variants, colors },
@@ -415,9 +491,12 @@ const ProductForm = () => {
           <div>
             <input
               type="text"
-              value={formData.tags.join(', ')}
+              value={formData.tags.join(", ")}
               onChange={(e) => {
-                const tags = e.target.value.split(',').map(t => t.trim()).filter(t => t);
+                const tags = e.target.value
+                  .split(",")
+                  .map((t) => t.trim())
+                  .filter((t) => t);
                 setFormData({ ...formData, tags });
               }}
               placeholder="tag1, tag2, tag3"
@@ -471,7 +550,9 @@ const ProductForm = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">Flash Sale</span>
+              <span className="text-sm font-semibold text-gray-700">
+                Flash Sale
+              </span>
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -481,7 +562,9 @@ const ProductForm = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">New Arrival</span>
+              <span className="text-sm font-semibold text-gray-700">
+                New Arrival
+              </span>
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -491,7 +574,9 @@ const ProductForm = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">Featured Product</span>
+              <span className="text-sm font-semibold text-gray-700">
+                Featured Product
+              </span>
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -501,7 +586,9 @@ const ProductForm = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">Visible to Customers</span>
+              <span className="text-sm font-semibold text-gray-700">
+                Visible to Customers
+              </span>
             </label>
           </div>
         </div>
@@ -510,17 +597,15 @@ const ProductForm = () => {
         <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
           <button
             type="button"
-            onClick={() => navigate('/admin/products')}
-            className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
-          >
+            onClick={() => navigate(productsPath)}
+            className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold">
             Cancel
           </button>
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
-          >
+            className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold">
             <FiSave />
-            {isEdit ? 'Update Product' : 'Create Product'}
+            {isEdit ? "Update Product" : "Create Product"}
           </button>
         </div>
       </form>
@@ -529,4 +614,3 @@ const ProductForm = () => {
 };
 
 export default ProductForm;
-

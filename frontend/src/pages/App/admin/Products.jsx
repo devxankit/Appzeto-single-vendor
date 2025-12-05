@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiPlus, FiSearch, FiEdit, FiTrash2, FiFilter } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEdit, FiTrash2, FiFilter, FiEdit2 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { products as initialProducts } from '../../../data/products';
@@ -115,7 +115,7 @@ const MobileAdminProducts = () => {
                 }}
                 className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
               >
-                <FiFilter className="text-xl" />
+                <FiEdit2 className="text-xl" />
               </button>
             </div>
           </motion.div>

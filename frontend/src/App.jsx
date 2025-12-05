@@ -36,6 +36,7 @@ import Analytics from "./pages/admin/Analytics";
 import Content from "./pages/admin/Content";
 import Settings from "./pages/admin/Settings";
 import RouteWrapper from "./components/RouteWrapper";
+import ScrollToTop from "./components/ScrollToTop";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderDetailPage from "./pages/OrderDetail";
 import TrackOrder from "./pages/TrackOrder";
@@ -262,6 +263,7 @@ function App() {
           v7_relativeSplatPath: true,
         }}
       >
+        <ScrollToTop />
         <AppRoutes />
       <CartDrawer />
       <Toaster
