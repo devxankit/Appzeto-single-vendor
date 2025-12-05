@@ -12,7 +12,7 @@ const defaultSettings = {
     address: '',
     businessHours: 'Mon-Fri 9AM-6PM',
     timezone: 'UTC',
-    currency: 'USD',
+    currency: 'INR',
     language: 'en',
   },
   payment: {

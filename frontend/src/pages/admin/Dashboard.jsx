@@ -9,6 +9,7 @@ import TimePeriodFilter from '../../components/Admin/Analytics/TimePeriodFilter'
 import ExportButton from '../../components/Admin/ExportButton';
 import { generateRevenueData, mockOrders, topProducts, getAnalyticsSummary } from '../../data/adminMockData';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrency } from '../../utils/adminHelpers';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Dashboard = () => {
   const handleExport = () => {
     const headers = [
       { label: 'Date', accessor: (row) => row.date },
-      { label: 'Revenue', accessor: (row) => `$${row.revenue.toFixed(2)}` },
+      { label: 'Revenue', accessor: (row) => formatCurrency(row.revenue) },
       { label: 'Orders', accessor: (row) => row.orders },
     ];
     // Export functionality will be handled by ExportButton component
@@ -44,7 +45,7 @@ const Dashboard = () => {
             data={revenueData}
             headers={[
               { label: 'Date', accessor: (row) => row.date },
-              { label: 'Revenue', accessor: (row) => `$${row.revenue.toFixed(2)}` },
+              { label: 'Revenue', accessor: (row) => formatCurrency(row.revenue) },
               { label: 'Orders', accessor: (row) => row.orders },
             ]}
             filename="revenue_report"

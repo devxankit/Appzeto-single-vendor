@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiX, FiSave, FiCalendar } from 'react-icons/fi';
 import { useCampaignStore } from '../../../store/campaignStore';
 import { products as initialProducts } from '../../../data/products';
+import { formatPrice } from '../../../utils/helpers';
 import toast from 'react-hot-toast';
 
 const CampaignForm = ({ campaign, onClose, onSave }) => {
@@ -282,7 +283,7 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                       />
                       <div className="flex-1">
                         <p className="font-semibold text-gray-800">{product.name}</p>
-                        <p className="text-xs text-gray-500">${product.price}</p>
+                        <p className="text-xs text-gray-500">{formatPrice(product.price)}</p>
                       </div>
                     </label>
                   ))}
