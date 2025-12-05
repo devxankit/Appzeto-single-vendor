@@ -39,7 +39,7 @@ const StatsCards = ({ stats }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       {cards.map((card, index) => {
         const Icon = card.icon;
         const isPositive = card.change >= 0;
@@ -50,14 +50,14 @@ const StatsCards = ({ stats }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+            className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`${card.bgColor} p-3 rounded-lg`}>
-                <Icon className={`${card.color} text-white text-xl`} />
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className={`${card.bgColor} p-2 sm:p-3 rounded-lg`}>
+                <Icon className={`${card.color} text-white text-lg sm:text-xl`} />
               </div>
               <div
-                className={`text-sm font-semibold ${
+                className={`text-xs sm:text-sm font-semibold ${
                   isPositive ? 'text-green-600' : 'text-red-600'
                 }`}
               >
@@ -65,8 +65,8 @@ const StatsCards = ({ stats }) => {
                 {card.change}%
               </div>
             </div>
-            <h3 className="text-gray-500 text-sm font-medium mb-1">{card.title}</h3>
-            <p className="text-2xl font-bold text-gray-800">{card.value}</p>
+            <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">{card.title}</h3>
+            <p className="text-xl sm:text-2xl font-bold text-gray-800">{card.value}</p>
           </motion.div>
         );
       })}

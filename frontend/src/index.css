@@ -50,6 +50,43 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+/* Custom scrollbar responsive - hide on mobile, show on desktop */
+.scrollbar-responsive {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-responsive::-webkit-scrollbar {
+  display: none;
+}
+
+/* Show scrollbar on desktop (md breakpoint and above) */
+@media (min-width: 768px) {
+  .scrollbar-responsive {
+    -ms-overflow-style: auto;
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+}
+
 /* Writing vertical */
 .writing-vertical-rl {
   writing-mode: vertical-rl;
