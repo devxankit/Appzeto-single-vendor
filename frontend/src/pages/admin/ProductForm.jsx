@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { FiSave, FiEdit2, FiUpload, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiSave, FiX, FiUpload, FiPlus, FiTrash2 } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { products as initialProducts } from "../../data/products";
 import { useCategoryStore } from "../../store/categoryStore";
@@ -82,12 +82,12 @@ const ProductForm = () => {
           isVisible: product.isVisible !== undefined ? product.isVisible : true,
           description: product.description || "",
           tags: product.tags || [],
-          variants: product.variants || {
-            sizes: [],
-            colors: [],
-            materials: [],
-            prices: {},
-            defaultVariant: {},
+          variants: {
+            sizes: product.variants?.sizes || [],
+            colors: product.variants?.colors || [],
+            materials: product.variants?.materials || [],
+            prices: product.variants?.prices || {},
+            defaultVariant: product.variants?.defaultVariant || {},
           },
           seoTitle: product.seoTitle || "",
           seoDescription: product.seoDescription || "",
@@ -217,7 +217,7 @@ const ProductForm = () => {
         <button
           onClick={() => navigate(productsPath)}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-          <FiEdit2 className="text-xl text-gray-600" />
+          <FiX className="text-xl text-gray-600" />
         </button>
       </div>
 
@@ -446,7 +446,7 @@ const ProductForm = () => {
               </label>
               <input
                 type="text"
-                value={formData.variants.sizes.join(", ")}
+                value={(formData.variants?.sizes || []).join(", ")}
                 onChange={(e) => {
                   const sizes = e.target.value
                     .split(",")
@@ -467,7 +467,7 @@ const ProductForm = () => {
               </label>
               <input
                 type="text"
-                value={formData.variants.colors.join(", ")}
+                value={(formData.variants?.colors || []).join(", ")}
                 onChange={(e) => {
                   const colors = e.target.value
                     .split(",")
@@ -491,7 +491,7 @@ const ProductForm = () => {
           <div>
             <input
               type="text"
-              value={formData.tags.join(", ")}
+              value={(formData.tags || []).join(", ")}
               onChange={(e) => {
                 const tags = e.target.value
                   .split(",")
