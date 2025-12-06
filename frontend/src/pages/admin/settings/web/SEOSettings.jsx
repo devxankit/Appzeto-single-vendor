@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FiSave, FiSearch } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
+import AnimatedSelect from '../../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const SEOSettings = () => {
