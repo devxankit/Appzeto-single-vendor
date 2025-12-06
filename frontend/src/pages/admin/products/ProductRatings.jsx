@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { FiStar, FiSearch, FiEye, FiX } from 'react-icons/fi';
+import { FiStar, FiSearch, FiEye, FiX, FiTrash2 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
+import ConfirmModal from '../../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatDateTime } from '../../../utils/adminHelpers';
+import toast from 'react-hot-toast';
 
 const ProductRatings = () => {
   const [ratings, setRatings] = useState([
@@ -41,6 +44,7 @@ const ProductRatings = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedRating, setSelectedRating] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, ratingId: null });
 
   const filteredRatings = ratings.filter((rating) => {
     const matchesSearch =
@@ -56,6 +60,14 @@ const ProductRatings = () => {
 
   const handleStatusChange = (id, newStatus) => {
     setRatings(ratings.map((r) => (r.id === id ? { ...r, status: newStatus } : r)));
+  };
+
+  const handleDelete = () => {
+    if (deleteModal.ratingId) {
+      setRatings(ratings.filter((r) => r.id !== deleteModal.ratingId));
+      toast.success('Rating deleted successfully');
+      setDeleteModal({ isOpen: false, ratingId: null });
+    }
   };
 
   const renderStars = (rating) => {
@@ -116,21 +128,16 @@ const ProductRatings = () => {
       label: 'Status',
       sortable: true,
       render: (value, row) => (
-        <select
+        <AnimatedSelect
           value={value}
           onChange={(e) => handleStatusChange(row.id, e.target.value)}
-          className={`px-3 py-1 rounded-lg text-xs font-semibold border ${
-            value === 'approved'
-              ? 'bg-green-100 text-green-800 border-green-200'
-              : value === 'pending'
-              ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-              : 'bg-red-100 text-red-800 border-red-200'
-          }`}
-        >
-          <option value="approved">Approved</option>
-          <option value="pending">Pending</option>
-          <option value="rejected">Rejected</option>
-        </select>
+          options={[
+            { value: 'approved', label: 'Approved' },
+            { value: 'pending', label: 'Pending' },
+            { value: 'rejected', label: 'Rejected' },
+          ]}
+          className="min-w-[120px]"
+        />
       ),
     },
     {
@@ -138,16 +145,28 @@ const ProductRatings = () => {
       label: 'Actions',
       sortable: false,
       render: (_, row) => (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setSelectedRating(row);
-          }}
-          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          title="View Details"
-        >
-          <FiEye />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedRating(row);
+            }}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="View Details"
+          >
+            <FiEye />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteModal({ isOpen: true, ratingId: row.id });
+            }}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Delete Rating"
+          >
+            <FiTrash2 />
+          </button>
+        </div>
       ),
     },
   ];
@@ -163,33 +182,33 @@ const ProductRatings = () => {
         <p className="text-sm sm:text-base text-gray-600">Manage customer reviews and ratings</p>
       </div>
 
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by product, customer, or review..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="mb-6 pb-6 border-b border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="relative">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by product, customer, or review..."
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+
+            <AnimatedSelect
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'approved', label: 'Approved' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'rejected', label: 'Rejected' },
+              ]}
+              className="min-w-[140px]"
             />
           </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-          </select>
         </div>
-      </div>
-
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <DataTable
           data={filteredRatings}
           columns={columns}
@@ -254,25 +273,20 @@ const ProductRatings = () => {
               <div>
                 <label className="text-sm font-semibold text-gray-600">Status</label>
                 <div className="mt-1">
-                  <select
+                  <AnimatedSelect
                     value={selectedRating.status}
                     onChange={(e) => {
                       const newStatus = e.target.value;
                       handleStatusChange(selectedRating.id, newStatus);
                       setSelectedRating({ ...selectedRating, status: newStatus });
                     }}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold border ${
-                      selectedRating.status === 'approved'
-                        ? 'bg-green-100 text-green-800 border-green-200'
-                        : selectedRating.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                        : 'bg-red-100 text-red-800 border-red-200'
-                    }`}
-                  >
-                    <option value="approved">Approved</option>
-                    <option value="pending">Pending</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
+                    options={[
+                      { value: 'approved', label: 'Approved' },
+                      { value: 'pending', label: 'Pending' },
+                      { value: 'rejected', label: 'Rejected' },
+                    ]}
+                    className="min-w-[120px]"
+                  />
                 </div>
               </div>
 
@@ -288,6 +302,18 @@ const ProductRatings = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, ratingId: null })}
+        onConfirm={handleDelete}
+        title="Delete Rating"
+        message="Are you sure you want to delete this rating? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
     </motion.div>
   );
 };

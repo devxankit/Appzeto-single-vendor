@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiPlus, FiSearch, FiEdit, FiTrash2, FiEye, FiEyeOff, FiCalendar } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useCampaignStore } from '../../store/campaignStore';
 import CampaignForm from '../../components/Admin/Campaigns/CampaignForm';
 import ExportButton from '../../components/Admin/ExportButton';
+import Pagination from '../../components/Admin/Pagination';
 import Badge from '../../components/Badge';
+import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatDateTime } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
@@ -21,35 +23,53 @@ const Campaigns = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     initialize();
   }, []);
 
   // Filtered campaigns
-  const filteredCampaigns = campaigns.filter((campaign) => {
-    const matchesSearch =
-      !searchQuery ||
-      campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (campaign.description &&
-        campaign.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredCampaigns = useMemo(() => {
+    return campaigns.filter((campaign) => {
+      const matchesSearch =
+        !searchQuery ||
+        campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (campaign.description &&
+          campaign.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesType = selectedType === 'all' || campaign.type === selectedType;
+      const matchesType = selectedType === 'all' || campaign.type === selectedType;
 
-    const now = new Date();
-    const isActive = campaign.isActive &&
-      new Date(campaign.startDate) <= now &&
-      new Date(campaign.endDate) >= now;
+      const now = new Date();
+      const isActive = campaign.isActive &&
+        new Date(campaign.startDate) <= now &&
+        new Date(campaign.endDate) >= now;
 
-    const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'active' && isActive) ||
-      (selectedStatus === 'inactive' && !isActive) ||
-      (selectedStatus === 'upcoming' && new Date(campaign.startDate) > now) ||
-      (selectedStatus === 'ended' && new Date(campaign.endDate) < now);
+      const matchesStatus =
+        selectedStatus === 'all' ||
+        (selectedStatus === 'active' && isActive) ||
+        (selectedStatus === 'inactive' && !isActive) ||
+        (selectedStatus === 'upcoming' && new Date(campaign.startDate) > now) ||
+        (selectedStatus === 'ended' && new Date(campaign.endDate) < now);
 
-    return matchesSearch && matchesType && matchesStatus;
-  });
+      return matchesSearch && matchesType && matchesStatus;
+    });
+  }, [campaigns, searchQuery, selectedType, selectedStatus]);
+
+  // Pagination
+  const paginatedCampaigns = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCampaigns.slice(startIndex, endIndex);
+  }, [filteredCampaigns, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredCampaigns.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedType, selectedStatus]);
 
   const handleCreate = () => {
     setEditingCampaign(null);
@@ -127,29 +147,29 @@ const Campaigns = () => {
           </div>
 
           {/* Type Filter */}
-          <select
+          <AnimatedSelect
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Types</option>
-            <option value="flash_sale">Flash Sale</option>
-            <option value="daily_deal">Daily Deal</option>
-            <option value="special_offer">Special Offer</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Types' },
+              { value: 'flash_sale', label: 'Flash Sale' },
+              { value: 'daily_deal', label: 'Daily Deal' },
+              { value: 'special_offer', label: 'Special Offer' },
+            ]}
+            className="min-w-[140px]"
+          />
 
           {/* Status Filter */}
-          <select
+          <AnimatedSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="ended">Ended</option>
-            <option value="inactive">Inactive</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'inactive', label: 'Inactive' },
+            ]}
+            className="min-w-[140px]"
+          />
 
           {/* Export Button */}
           <ExportButton
@@ -169,13 +189,15 @@ const Campaigns = () => {
       </div>
 
       {/* Campaigns Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-6">
         {filteredCampaigns.length === 0 ? (
-          <div className="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200">
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
             <p className="text-gray-500">No campaigns found</p>
           </div>
         ) : (
-          filteredCampaigns.map((campaign) => {
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedCampaigns.map((campaign) => {
             const status = getCampaignStatus(campaign);
             return (
               <div
@@ -251,7 +273,16 @@ const Campaigns = () => {
                 </div>
               </div>
             );
-          })
+          })}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredCampaigns.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </div>
 

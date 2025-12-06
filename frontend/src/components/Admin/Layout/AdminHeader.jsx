@@ -39,7 +39,12 @@ const AdminHeader = ({ onMenuClick }) => {
   const pageName = getPageName(location.pathname);
 
   return (
-    <header className="bg-white border-b border-gray-200 fixed top-0 left-0 lg:left-64 right-0 z-30">
+    <header 
+      className="bg-white border-b border-gray-200 fixed top-0 left-0 lg:left-64 right-0 z-30"
+      style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+      }}
+    >
       <div className="flex items-center justify-between px-4 lg:px-6 py-4">
         {/* Left: Menu Button */}
         <div className="flex items-center gap-4">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiSearch, FiFilter } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useCustomerStore } from '../../store/customerStore';
@@ -6,6 +6,8 @@ import CustomerCard from '../../components/Admin/Customers/CustomerCard';
 import CustomerDetail from '../../components/Admin/Customers/CustomerDetail';
 import ExportButton from '../../components/Admin/ExportButton';
 import DataTable from '../../components/Admin/DataTable';
+import Pagination from '../../components/Admin/Pagination';
+import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency } from '../../utils/adminHelpers';
 
 const Customers = () => {
@@ -16,26 +18,45 @@ const Customers = () => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     initialize();
   }, []);
 
   // Filtered customers
-  const filteredCustomers = customers.filter((customer) => {
-    const matchesSearch =
-      !searchQuery ||
-      customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (customer.phone && customer.phone.includes(searchQuery));
+  const filteredCustomers = useMemo(() => {
+    return customers.filter((customer) => {
+      const matchesSearch =
+        !searchQuery ||
+        customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (customer.phone && customer.phone.includes(searchQuery));
 
-    const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'active' && customer.status === 'active') ||
-      (selectedStatus === 'blocked' && customer.status === 'blocked');
+      const matchesStatus =
+        selectedStatus === 'all' ||
+        (selectedStatus === 'active' && customer.status === 'active') ||
+        (selectedStatus === 'blocked' && customer.status === 'blocked');
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    });
+  }, [customers, searchQuery, selectedStatus]);
+
+  // Pagination for grid view
+  const paginatedCustomers = useMemo(() => {
+    if (viewMode !== 'grid') return filteredCustomers;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCustomers.slice(startIndex, endIndex);
+  }, [filteredCustomers, currentPage, itemsPerPage, viewMode]);
+
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedStatus]);
 
   const handleViewCustomer = (customer) => {
     setSelectedCustomer(customer);
@@ -144,15 +165,16 @@ const Customers = () => {
           </div>
 
           {/* Status Filter */}
-          <select
+          <AnimatedSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="blocked">Blocked</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'blocked', label: 'Blocked' },
+            ]}
+            className="min-w-[140px]"
+          />
 
           {/* View Mode Toggle */}
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
@@ -202,15 +224,25 @@ const Customers = () => {
             <p className="text-gray-500">No customers found</p>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCustomers.map((customer) => (
-              <CustomerCard
-                key={customer.id}
-                customer={customer}
-                onView={handleViewCustomer}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {paginatedCustomers.map((customer) => (
+                <CustomerCard
+                  key={customer.id}
+                  customer={customer}
+                  onView={handleViewCustomer}
+                />
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredCustomers.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              className="mt-6"
+            />
+          </>
         ) : (
           <DataTable
             data={filteredCustomers}

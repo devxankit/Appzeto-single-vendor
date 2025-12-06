@@ -6,6 +6,8 @@ import DataTable from "../../../components/Admin/DataTable";
 import ExportButton from "../../../components/Admin/ExportButton";
 import Badge from "../../../components/Badge";
 import ConfirmModal from "../../../components/Admin/ConfirmModal";
+import ProductFormModal from "../../../components/Admin/ProductFormModal";
+import AnimatedSelect from "../../../components/Admin/AnimatedSelect";
 import { formatCurrency } from "../../../utils/adminHelpers";
 import { formatPrice } from "../../../utils/helpers";
 import { products as initialProducts } from "../../../data/products";
@@ -26,10 +28,18 @@ const ManageProducts = () => {
     isOpen: false,
     productId: null,
   });
+  const [productFormModal, setProductFormModal] = useState({
+    isOpen: false,
+    productId: null,
+  });
 
   useEffect(() => {
     initCategories();
     initBrands();
+    loadProducts();
+  }, []);
+
+  const loadProducts = () => {
     const savedProducts = localStorage.getItem("admin-products");
     if (savedProducts) {
       setProducts(JSON.parse(savedProducts));
@@ -37,7 +47,7 @@ const ManageProducts = () => {
       setProducts(initialProducts);
       localStorage.setItem("admin-products", JSON.stringify(initialProducts));
     }
-  }, []);
+  };
 
   const filteredProducts = useMemo(() => {
     let filtered = products;
@@ -129,7 +139,7 @@ const ManageProducts = () => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/admin/products/${row.id}`);
+              setProductFormModal({ isOpen: true, productId: row.id });
             }}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
             <FiEdit />
@@ -171,70 +181,74 @@ const ManageProducts = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="relative flex-1 min-w-[200px]">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </div>
-
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap">
-            <option value="all">All Status</option>
-            <option value="in_stock">In Stock</option>
-            <option value="low_stock">Low Stock</option>
-            <option value="out_of_stock">Out of Stock</option>
-          </select>
-
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap">
-            <option value="all">All Categories</option>
-            {categories
-              .filter((cat) => cat.isActive !== false)
-              .map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-          </select>
-
-          <button
-            onClick={() => navigate("/admin/products/add-product")}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm whitespace-nowrap">
-            <span>Add New Product</span>
-          </button>
-
-          <ExportButton
-            data={filteredProducts}
-            headers={[
-              { label: "ID", accessor: (row) => row.id },
-              { label: "Name", accessor: (row) => row.name },
-              { label: "Price", accessor: (row) => formatCurrency(row.price) },
-              { label: "Stock", accessor: (row) => row.stockQuantity },
-              { label: "Status", accessor: (row) => row.stock },
-            ]}
-            filename="products"
-          />
-        </div>
-      </div>
-
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        {/* Filters Section */}
+        <div className="mb-6 pb-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
+            <div className="relative flex-1 w-full sm:min-w-[200px]">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products..."
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
+              />
+            </div>
+
+            <AnimatedSelect
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'in_stock', label: 'In Stock' },
+                { value: 'low_stock', label: 'Low Stock' },
+                { value: 'out_of_stock', label: 'Out of Stock' },
+              ]}
+              className="w-full sm:w-auto min-w-[140px]"
+            />
+
+            <AnimatedSelect
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              options={[
+                { value: 'all', label: 'All Categories' },
+                ...categories
+                  .filter((cat) => cat.isActive !== false)
+                  .map((cat) => ({ value: String(cat.id), label: cat.name })),
+              ]}
+              className="w-full sm:w-auto min-w-[160px]"
+            />
+
+            <button
+              onClick={() => setProductFormModal({ isOpen: true, productId: "new" })}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base whitespace-nowrap">
+              <span>Add New Product</span>
+            </button>
+
+            <div className="w-full sm:w-auto">
+              <ExportButton
+                data={filteredProducts}
+                headers={[
+                  { label: "ID", accessor: (row) => row.id },
+                  { label: "Name", accessor: (row) => row.name },
+                  { label: "Price", accessor: (row) => formatCurrency(row.price) },
+                  { label: "Stock", accessor: (row) => row.stockQuantity },
+                  { label: "Status", accessor: (row) => row.stock },
+                ]}
+                filename="products"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* DataTable */}
         <DataTable
           data={filteredProducts}
           columns={columns}
           pagination={true}
           itemsPerPage={10}
-          onRowClick={(row) => navigate(`/admin/products/${row.id}`)}
+          onRowClick={(row) => setProductFormModal({ isOpen: true, productId: row.id })}
         />
       </div>
 
@@ -247,6 +261,15 @@ const ManageProducts = () => {
         confirmText="Delete"
         cancelText="Cancel"
         type="danger"
+      />
+
+      <ProductFormModal
+        isOpen={productFormModal.isOpen}
+        onClose={() => setProductFormModal({ isOpen: false, productId: null })}
+        productId={productFormModal.productId}
+        onSuccess={() => {
+          loadProducts();
+        }}
       />
     </motion.div>
   );

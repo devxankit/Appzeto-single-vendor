@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiBell, FiCheck, FiX, FiSend } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import Badge from '../../../components/Badge';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatDateTime } from '../../../utils/adminHelpers';
 
 const OrderNotifications = () => {
@@ -85,17 +86,18 @@ const OrderNotifications = () => {
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
         <div className="flex flex-wrap items-center gap-4">
-          <select
+          <AnimatedSelect
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Types</option>
-            <option value="order_placed">Order Placed</option>
-            <option value="order_cancelled">Order Cancelled</option>
-            <option value="payment_failed">Payment Failed</option>
-            <option value="order_delivered">Order Delivered</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Types' },
+              { value: 'order_placed', label: 'Order Placed' },
+              { value: 'order_cancelled', label: 'Order Cancelled' },
+              { value: 'payment_failed', label: 'Payment Failed' },
+              { value: 'order_delivered', label: 'Order Delivered' },
+            ]}
+            className="min-w-[140px]"
+          />
           <div className="flex items-center gap-2 ml-auto">
             {unreadCount > 0 && (
               <Badge variant="warning">{unreadCount} unread</Badge>

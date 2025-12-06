@@ -204,7 +204,7 @@ const DeliveryOrders = () => {
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <FiPackage />
-                      <span>{order.items} items</span>
+                      <span>{Array.isArray(order.items) ? order.items.length : (typeof order.items === 'number' ? order.items : 0)} items</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <FiClock />

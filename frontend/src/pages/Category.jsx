@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { FiFilter, FiGrid, FiList, FiLoader } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { products } from '../data/products';
-import { categories } from '../data/categories';
+import { categories as fallbackCategories } from '../data/categories';
+import { useCategoryStore } from '../store/categoryStore';
 import { formatPrice } from '../utils/helpers';
 import Header from '../components/Layout/Header';
 import Navbar from '../components/Layout/Navbar';
@@ -17,7 +18,25 @@ import useHeaderHeight from '../hooks/useHeaderHeight';
 const Category = () => {
   const { id } = useParams();
   const categoryId = parseInt(id);
-  const category = categories.find((cat) => cat.id === categoryId);
+  const { categories, initialize, getCategoryById, getCategoriesByParent } = useCategoryStore();
+  
+  // Initialize store on mount
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get category from store or fallback
+  const category = useMemo(() => {
+    const cat = getCategoryById(categoryId);
+    return cat || fallbackCategories.find((cat) => cat.id === categoryId);
+  }, [categoryId, categories, getCategoryById]);
+
+  // Get subcategories for this category
+  const subcategories = useMemo(() => {
+    if (!categoryId) return [];
+    return getCategoriesByParent(categoryId).filter(cat => cat.isActive !== false);
+  }, [categoryId, categories, getCategoriesByParent]);
+
   const headerHeight = useHeaderHeight();
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('default'); // default, price-low, price-high, rating

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { FiChevronDown, FiChevronRight, FiEdit, FiTrash2, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiChevronDown, FiChevronRight, FiEdit, FiTrash2, FiEye, FiEyeOff, FiPlus } from 'react-icons/fi';
 import { useCategoryStore } from '../../../store/categoryStore';
 import Badge from '../../Badge';
 import toast from 'react-hot-toast';
 
-const CategoryTree = ({ categories, onEdit, onDelete, level = 0 }) => {
+const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 0 }) => {
   const { toggleCategoryStatus } = useCategoryStore();
   const [expanded, setExpanded] = useState({});
 
@@ -68,9 +68,16 @@ const CategoryTree = ({ categories, onEdit, onDelete, level = 0 }) => {
               {/* Category Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-1">
+                  <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-gray-900 text-base leading-tight line-clamp-1">
                     {category.name}
                   </h3>
+                    {hasChildren && (
+                      <p className="text-[10px] text-gray-500 mt-0.5">
+                        {children.length} subcategor{children.length !== 1 ? 'ies' : 'y'}
+                      </p>
+                    )}
+                  </div>
                   <Badge 
                     variant={category.isActive ? 'success' : 'error'} 
                     className="flex-shrink-0 text-[10px] px-2 py-0.5"
@@ -88,6 +95,16 @@ const CategoryTree = ({ categories, onEdit, onDelete, level = 0 }) => {
 
             {/* Action Buttons - Horizontal Layout */}
             <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+              {onAddSubcategory && (
+                <button
+                  onClick={() => onAddSubcategory(category.id)}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors active:scale-95"
+                  title="Add Subcategory"
+                >
+                  <FiPlus className="text-sm" />
+                  <span>Add Sub</span>
+                </button>
+              )}
               <button
                 onClick={() => toggleCategoryStatus(category.id)}
                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors active:scale-95"
@@ -148,7 +165,14 @@ const CategoryTree = ({ categories, onEdit, onDelete, level = 0 }) => {
               />
             )}
             <div className="flex-1">
+              <div className="flex items-center gap-2">
               <p className="font-semibold text-gray-800">{category.name}</p>
+                {hasChildren && (
+                  <Badge variant="info" className="text-[10px] px-1.5 py-0.5">
+                    {children.length}
+                  </Badge>
+                )}
+              </div>
               {category.description && (
                 <p className="text-xs text-gray-500">{category.description}</p>
               )}
@@ -157,6 +181,15 @@ const CategoryTree = ({ categories, onEdit, onDelete, level = 0 }) => {
               {category.isActive ? 'Active' : 'Inactive'}
             </Badge>
             <div className="flex items-center gap-2">
+              {onAddSubcategory && (
+                <button
+                  onClick={() => onAddSubcategory(category.id)}
+                  className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                  title="Add Subcategory"
+                >
+                  <FiPlus />
+                </button>
+              )}
               <button
                 onClick={() => toggleCategoryStatus(category.id)}
                 className="p-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"

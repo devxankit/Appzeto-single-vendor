@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiX, FiSave, FiCalendar } from 'react-icons/fi';
 import { useCampaignStore } from '../../../store/campaignStore';
 import { products as initialProducts } from '../../../data/products';
+import AnimatedSelect from '../AnimatedSelect';
 import { formatPrice } from '../../../utils/helpers';
 import toast from 'react-hot-toast';
 
@@ -111,7 +112,7 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">
             {isEdit ? 'Edit Campaign' : 'Create Campaign'}
@@ -148,17 +149,17 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Campaign Type <span className="text-red-500">*</span>
                 </label>
-                <select
+                <AnimatedSelect
                   name="type"
                   value={formData.type}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="flash_sale">Flash Sale</option>
-                  <option value="daily_deal">Daily Deal</option>
-                  <option value="special_offer">Special Offer</option>
-                </select>
+                  options={[
+                    { value: 'flash_sale', label: 'Flash Sale' },
+                    { value: 'daily_deal', label: 'Daily Deal' },
+                    { value: 'special_offer', label: 'Special Offer' },
+                  ]}
+                />
               </div>
 
               <div>
@@ -185,16 +186,16 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Discount Type <span className="text-red-500">*</span>
                 </label>
-                <select
+                <AnimatedSelect
                   name="discountType"
                   value={formData.discountType}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="percentage">Percentage</option>
-                  <option value="fixed">Fixed Amount</option>
-                </select>
+                  options={[
+                    { value: 'percentage', label: 'Percentage' },
+                    { value: 'fixed', label: 'Fixed Amount' },
+                  ]}
+                />
               </div>
 
               <div>
@@ -257,7 +258,7 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
           {/* Products */}
           <div>
             <h3 className="text-lg font-bold text-gray-800 mb-4">Select Products</h3>
-            <div className="border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
+            <div className="border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto scrollbar-admin">
               {products.length === 0 ? (
                 <p className="text-gray-500 text-center py-4">No products available</p>
               ) : (

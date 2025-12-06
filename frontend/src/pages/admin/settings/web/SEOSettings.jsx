@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FiSave, FiSearch } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const SEOSettings = () => {
@@ -125,16 +126,16 @@ const SEOSettings = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Robots</label>
-              <select
+              <AnimatedSelect
                 value={seoSettings.robots}
                 onChange={(e) => setSeoSettings({ ...seoSettings, robots: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="index, follow">Index, Follow</option>
-                <option value="noindex, follow">No Index, Follow</option>
-                <option value="index, nofollow">Index, No Follow</option>
-                <option value="noindex, nofollow">No Index, No Follow</option>
-              </select>
+                options={[
+                  { value: 'index, follow', label: 'Index, Follow' },
+                  { value: 'noindex, follow', label: 'No Index, Follow' },
+                  { value: 'index, nofollow', label: 'Index, No Follow' },
+                  { value: 'noindex, nofollow', label: 'No Index, No Follow' },
+                ]}
+              />
             </div>
           </div>
 

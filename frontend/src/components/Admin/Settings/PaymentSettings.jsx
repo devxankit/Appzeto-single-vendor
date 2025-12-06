@@ -80,15 +80,16 @@ const PaymentSettings = () => {
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Gateway Provider
           </label>
-          <select
+          <AnimatedSelect
             name="paymentGateway"
             value={formData.paymentGateway || "stripe"}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-            <option value="stripe">Stripe</option>
-            <option value="paypal">PayPal</option>
-            <option value="razorpay">Razorpay</option>
-          </select>
+            options={[
+              { value: 'stripe', label: 'Stripe' },
+              { value: 'paypal', label: 'PayPal' },
+              { value: 'razorpay', label: 'Razorpay' },
+            ]}
+          />
         </div>
 
         {formData.paymentGateway === "stripe" && (

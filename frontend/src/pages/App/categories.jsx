@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiFilter, FiX } from "react-icons/fi";
 import MobileLayout from "../../components/Layout/Mobile/MobileLayout";
-import { categories } from "../../data/categories";
+import { categories as fallbackCategories } from "../../data/categories";
 import { products } from "../../data/products";
+import { useCategoryStore } from "../../store/categoryStore";
 import PageTransition from "../../components/PageTransition";
 import LazyImage from "../../components/LazyImage";
 import ProductCard from "../../components/ProductCard";
@@ -14,11 +15,24 @@ const MobileCategories = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const defaultHeaderHeight = useMobileHeaderHeight();
+  const { categories, initialize, getCategoriesByParent, getRootCategories } = useCategoryStore();
+  
+  // Initialize store on mount
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get root categories (categories without parent)
+  const rootCategories = useMemo(() => {
+    const roots = getRootCategories();
+    return roots.length > 0 ? roots : fallbackCategories;
+  }, [categories, getRootCategories]);
+
   // Header is hidden on categories page, so use 0
   const headerHeight =
     location.pathname === "/app/categories" ? 0 : defaultHeaderHeight;
   const [selectedCategoryId, setSelectedCategoryId] = useState(
-    categories[0]?.id || null
+    rootCategories[0]?.id || null
   );
   const categoryListRef = useRef(null);
   const activeCategoryRef = useRef(null);
@@ -34,7 +48,14 @@ const MobileCategories = () => {
     minRating: "",
   });
 
-  // Category to product keywords mapping
+  // Get subcategories for selected category
+  const subcategories = useMemo(() => {
+    if (!selectedCategoryId) return [];
+    const subcats = getCategoriesByParent(selectedCategoryId);
+    return subcats.filter(cat => cat.isActive !== false);
+  }, [selectedCategoryId, categories, getCategoriesByParent]);
+
+  // Category to product keywords mapping (fallback for product filtering)
   const categoryMap = {
     1: [
       "t-shirt",
@@ -57,62 +78,14 @@ const MobileCategories = () => {
     6: ["athletic", "running", "track", "sporty"],
   };
 
-  // Subcategories mapping for each category
-  const subcategories = {
-    1: [
-      "T-Shirts & Tops",
-      "Jeans & Trousers",
-      "Dresses & Kurtis",
-      "Hoodies & Jackets",
-    ],
-    2: ["Sneakers", "Sandals & Slippers", "Formal Shoes", "Sports Shoes"],
-    3: ["Backpacks", "Handbags", "Sling Bags", "Travel & Duffel Bags"],
-    4: ["Necklaces", "Earrings", "Rings", "Bracelets & Bangles"],
-    5: ["Watches", "Sunglasses", "Belts", "Wallets"],
-    6: [
-      "Gym Wear",
-      "Sports Shoes",
-      "Fitness Accessories",
-      "Yoga & Training Gear",
-    ],
-  };
-
-  // Subcategory to keywords mapping for product filtering
-  const subcategoryKeywords = {
-    "T-Shirts & Tops": ["t-shirt", "shirt", "top", "tee"],
-    "Jeans & Trousers": ["jeans", "trouser", "pants", "denim"],
-    "Dresses & Kurtis": ["dress", "kurti", "gown", "maxi"],
-    "Hoodies & Jackets": ["hoodie", "jacket", "blazer", "cardigan", "sweater"],
-    Sneakers: ["sneaker", "sneakers"],
-    "Sandals & Slippers": ["sandal", "slipper", "flip"],
-    "Formal Shoes": ["formal", "oxford", "loafer", "dress shoe"],
-    "Sports Shoes": ["sport", "athletic", "running", "training"],
-    Backpacks: ["backpack", "rucksack"],
-    Handbags: ["handbag", "bag", "purse", "tote"],
-    "Sling Bags": ["sling", "crossbody", "messenger"],
-    "Travel & Duffel Bags": ["travel", "duffel", "duffle", "luggage"],
-    Necklaces: ["necklace", "pendant", "chain"],
-    Earrings: ["earring", "ear ring"],
-    Rings: ["ring"],
-    "Bracelets & Bangles": ["bracelet", "bangle", "cuff"],
-    Watches: ["watch", "wristwatch", "timepiece"],
-    Sunglasses: ["sunglass", "sunglasses", "shades"],
-    Belts: ["belt"],
-    Wallets: ["wallet", "purse"],
-    "Gym Wear": ["gym", "athletic", "workout", "training"],
-    "Fitness Accessories": ["fitness", "gym", "workout", "resistance"],
-    "Yoga & Training Gear": ["yoga", "mat", "training", "fitness"],
-  };
-
   // Reset selected subcategory when category changes
   useEffect(() => {
-    if (selectedCategoryId && subcategories[selectedCategoryId]) {
-      const firstSubcategory = subcategories[selectedCategoryId][0];
-      setSelectedSubcategory(firstSubcategory);
+    if (subcategories.length > 0) {
+      setSelectedSubcategory(subcategories[0].id);
     } else {
       setSelectedSubcategory(null);
     }
-  }, [selectedCategoryId]);
+  }, [selectedCategoryId, subcategories]);
 
   // Filter products based on selected category, subcategory, search query, and filters
   const filteredProducts = useMemo(() => {
@@ -125,14 +98,17 @@ const MobileCategories = () => {
     });
 
     // Further filter by subcategory if one is selected
-    if (selectedSubcategory && subcategoryKeywords[selectedSubcategory]) {
-      const subcategoryKeywordsList = subcategoryKeywords[selectedSubcategory];
-      filtered = filtered.filter((product) => {
-        const productName = product.name.toLowerCase();
-        return subcategoryKeywordsList.some((keyword) =>
-          productName.includes(keyword)
-        );
-      });
+    if (selectedSubcategory) {
+      const subcategory = subcategories.find(sub => sub.id === selectedSubcategory);
+      if (subcategory) {
+        // Use subcategory name for keyword matching (fallback approach)
+        const subcategoryName = subcategory.name.toLowerCase();
+        filtered = filtered.filter((product) => {
+          const productName = product.name.toLowerCase();
+          return productName.includes(subcategoryName.split(' ')[0]) || 
+                 productName.includes(subcategoryName.split(' & ')[0]);
+        });
+      }
     }
 
     // Filter by search query
@@ -162,7 +138,7 @@ const MobileCategories = () => {
     }
 
     return filtered;
-  }, [selectedCategoryId, selectedSubcategory, searchQuery, filters]);
+  }, [selectedCategoryId, selectedSubcategory, subcategories, searchQuery, filters]);
 
   // Mark initial mount as complete after first render
   useEffect(() => {
@@ -240,7 +216,7 @@ const MobileCategories = () => {
     };
   }, [showFilters]);
 
-  const selectedCategory = categories.find(
+  const selectedCategory = rootCategories.find(
     (cat) => cat.id === selectedCategoryId
   );
 
@@ -252,7 +228,7 @@ const MobileCategories = () => {
   const contentHeight = `calc(100vh - 80px)`;
 
   // Handle empty categories
-  if (categories.length === 0) {
+  if (rootCategories.length === 0) {
     return (
       <PageTransition>
         <MobileLayout showBottomNav={true} showCartBar={true}>
@@ -469,7 +445,7 @@ const MobileCategories = () => {
                 maxHeight: `calc(${contentHeight} - ${headerSectionHeight}px)`,
               }}>
               <div className="pb-[190px]">
-                {categories.map((category) => {
+                {rootCategories.map((category) => {
                   const isActive = category.id === selectedCategoryId;
                   return (
                     <div
@@ -531,9 +507,7 @@ const MobileCategories = () => {
               }}>
               <div className="p-3">
                 {/* Subcategory Selector - Above product cards */}
-                {selectedCategoryId &&
-                  subcategories[selectedCategoryId] &&
-                  subcategories[selectedCategoryId].length > 0 && (
+                {subcategories.length > 0 && (
                     <div className="mb-3 pb-3 border-b border-gray-200">
                       <div
                         className="overflow-x-auto scrollbar-hide -mx-3 px-3"
@@ -542,15 +516,15 @@ const MobileCategories = () => {
                           WebkitOverflowScrolling: "touch",
                         }}>
                         <div className="flex gap-1.5">
-                          {subcategories[selectedCategoryId].map(
+                          {subcategories.map(
                             (subcategory) => {
                               const isActive =
-                                selectedSubcategory === subcategory;
+                                selectedSubcategory === subcategory.id;
                               return (
                                 <motion.button
-                                  key={subcategory}
+                                  key={subcategory.id}
                                   onClick={() =>
-                                    setSelectedSubcategory(subcategory)
+                                    setSelectedSubcategory(subcategory.id)
                                   }
                                   whileTap={{ scale: 0.97 }}
                                   className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 whitespace-nowrap border ${
@@ -559,7 +533,7 @@ const MobileCategories = () => {
                                       : "bg-gray-50 text-gray-600 border-gray-200 active:bg-gray-100"
                                   }`}
                                   style={{ willChange: "transform" }}>
-                                  {subcategory}
+                                  {subcategory.name}
                                 </motion.button>
                               );
                             }

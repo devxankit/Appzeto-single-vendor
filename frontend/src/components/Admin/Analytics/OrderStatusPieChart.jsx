@@ -77,13 +77,13 @@ const OrderStatusPieChart = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200"
     >
-      <div className="mb-6">
-        <h3 className="text-lg font-bold text-gray-800">Order Status</h3>
-        <p className="text-sm text-gray-500 mt-1">Distribution of order statuses</p>
+      <div className="mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-bold text-gray-800">Order Status</h3>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">Distribution of order statuses</p>
       </div>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={250} minHeight={200}>
         <PieChart>
           <Pie
             data={statusData}
@@ -91,8 +91,8 @@ const OrderStatusPieChart = () => {
             cy="50%"
             labelLine={false}
             label={renderCustomLabel}
-            outerRadius={100}
-            innerRadius={60}
+            outerRadius={80}
+            innerRadius={50}
             fill="#8884d8"
             dataKey="value"
             animationBegin={0}

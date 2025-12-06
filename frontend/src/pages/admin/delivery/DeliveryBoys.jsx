@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const DeliveryBoys = () => {
@@ -13,6 +14,7 @@ const DeliveryBoys = () => {
       name: 'John Doe',
       phone: '+1234567890',
       email: 'john@example.com',
+      address: '123 Main St, New York, NY 10001',
       vehicleType: 'Bike',
       vehicleNumber: 'BIKE-123',
       status: 'active',
@@ -24,6 +26,7 @@ const DeliveryBoys = () => {
       name: 'Jane Smith',
       phone: '+1234567891',
       email: 'jane@example.com',
+      address: '456 Oak Ave, Los Angeles, CA 90001',
       vehicleType: 'Car',
       vehicleNumber: 'CAR-456',
       status: 'active',
@@ -35,6 +38,7 @@ const DeliveryBoys = () => {
       name: 'Bob Johnson',
       phone: '+1234567892',
       email: 'bob@example.com',
+      address: '789 Pine Rd, Chicago, IL 60601',
       vehicleType: 'Bike',
       vehicleNumber: 'BIKE-789',
       status: 'inactive',
@@ -52,7 +56,8 @@ const DeliveryBoys = () => {
       !searchQuery ||
       boy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       boy.phone.includes(searchQuery) ||
-      boy.email.toLowerCase().includes(searchQuery.toLowerCase());
+      boy.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (boy.address && boy.address.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesStatus = statusFilter === 'all' || boy.status === statusFilter;
 
@@ -78,16 +83,41 @@ const DeliveryBoys = () => {
 
   const columns = [
     {
+      key: 'id',
+      label: 'ID',
+      sortable: true,
+      render: (value) => <span className="font-semibold text-gray-800">{value}</span>,
+    },
+    {
       key: 'name',
       label: 'Name',
       sortable: true,
       render: (value, row) => (
         <div>
           <p className="font-semibold text-gray-800">{value}</p>
-          <p className="text-xs text-gray-500 flex items-center gap-1">
-            <FiPhone className="text-xs" />
-            {row.phone}
-          </p>
+          <p className="text-xs text-gray-500">{row.email}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'phone',
+      label: 'Mobile No',
+      sortable: true,
+      render: (value) => (
+        <div className="flex items-center gap-2">
+          <FiPhone className="text-gray-500 text-sm" />
+          <span className="text-gray-800">{value}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'address',
+      label: 'Address',
+      sortable: true,
+      render: (value) => (
+        <div className="flex items-start gap-2 max-w-xs">
+          <FiMapPin className="text-gray-500 text-sm mt-0.5 flex-shrink-0" />
+          <span className="text-gray-800 text-sm break-words">{value || 'N/A'}</span>
         </div>
       ),
     },
@@ -106,6 +136,7 @@ const DeliveryBoys = () => {
       key: 'totalDeliveries',
       label: 'Deliveries',
       sortable: true,
+      render: (value) => <span className="text-gray-800">{value}</span>,
     },
     {
       key: 'rating',
@@ -172,20 +203,21 @@ const DeliveryBoys = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, phone, or email..."
+              placeholder="Search by name, phone, email, or address..."
               className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
-          <select
+          <AnimatedSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'inactive', label: 'Inactive' },
+            ]}
+            className="min-w-[140px]"
+          />
         </div>
       </div>
 
@@ -212,6 +244,7 @@ const DeliveryBoys = () => {
                   name: formData.get('name'),
                   phone: formData.get('phone'),
                   email: formData.get('email'),
+                  address: formData.get('address'),
                   vehicleType: formData.get('vehicleType'),
                   vehicleNumber: formData.get('vehicleNumber'),
                   status: formData.get('status'),
@@ -245,15 +278,30 @@ const DeliveryBoys = () => {
                 required
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
-                name="vehicleType"
-                defaultValue={editingBoy.vehicleType || 'Bike'}
+              <input
+                type="text"
+                name="address"
+                defaultValue={editingBoy.address || ''}
+                placeholder="Address (e.g., 123 Main St, City, State 12345)"
+                required
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="Bike">Bike</option>
-                <option value="Car">Car</option>
-                <option value="Scooter">Scooter</option>
-              </select>
+              />
+              <AnimatedSelect
+                name="vehicleType"
+                value={editingBoy.vehicleType || 'Bike'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const vehicleTypeInput = form.querySelector('[name="vehicleType"]');
+                    if (vehicleTypeInput) vehicleTypeInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'Bike', label: 'Bike' },
+                  { value: 'Car', label: 'Car' },
+                  { value: 'Scooter', label: 'Scooter' },
+                ]}
+              />
               <input
                 type="text"
                 name="vehicleNumber"
@@ -262,14 +310,21 @@ const DeliveryBoys = () => {
                 required
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
+              <AnimatedSelect
                 name="status"
-                defaultValue={editingBoy.status || 'active'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                value={editingBoy.status || 'active'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const statusInput = form.querySelector('[name="status"]');
+                    if (statusInput) statusInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'active', label: 'Active' },
+                  { value: 'inactive', label: 'Inactive' },
+                ]}
+              />
               <div className="flex items-center gap-2">
                 <button
                   type="submit"

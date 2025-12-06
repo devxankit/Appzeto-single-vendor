@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiPlus, FiSearch, FiEdit, FiTrash2, FiEye, FiEyeOff, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useBannerStore } from '../../store/bannerStore';
 import BannerForm from '../../components/Admin/Banners/BannerForm';
 import ExportButton from '../../components/Admin/ExportButton';
+import Pagination from '../../components/Admin/Pagination';
 import Badge from '../../components/Badge';
 import { formatDateTime } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
@@ -22,30 +23,48 @@ const Banners = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [editingBanner, setEditingBanner] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     initialize();
   }, []);
 
   // Filtered banners
-  const filteredBanners = banners
-    .filter((banner) => {
-      const matchesSearch =
-        !searchQuery ||
-        banner.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (banner.subtitle &&
-          banner.subtitle.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredBanners = useMemo(() => {
+    return banners
+      .filter((banner) => {
+        const matchesSearch =
+          !searchQuery ||
+          banner.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (banner.subtitle &&
+            banner.subtitle.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const matchesType = selectedType === 'all' || banner.type === selectedType;
+        const matchesType = selectedType === 'all' || banner.type === selectedType;
 
-      const matchesStatus =
-        selectedStatus === 'all' ||
-        (selectedStatus === 'active' && banner.isActive) ||
-        (selectedStatus === 'inactive' && !banner.isActive);
+        const matchesStatus =
+          selectedStatus === 'all' ||
+          (selectedStatus === 'active' && banner.isActive) ||
+          (selectedStatus === 'inactive' && !banner.isActive);
 
-      return matchesSearch && matchesType && matchesStatus;
-    })
-    .sort((a, b) => a.order - b.order);
+        return matchesSearch && matchesType && matchesStatus;
+      })
+      .sort((a, b) => a.order - b.order);
+  }, [banners, searchQuery, selectedType, selectedStatus]);
+
+  // Pagination
+  const paginatedBanners = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredBanners.slice(startIndex, endIndex);
+  }, [filteredBanners, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredBanners.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedType, selectedStatus]);
 
   const handleCreate = () => {
     setEditingBanner(null);
@@ -131,26 +150,28 @@ const Banners = () => {
           </div>
 
           {/* Type Filter */}
-          <select
+          <AnimatedSelect
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Types</option>
-            <option value="hero">Hero Banners</option>
-            <option value="promotional">Promotional Banners</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Types' },
+              { value: 'hero', label: 'Hero Banners' },
+              { value: 'promotional', label: 'Promotional Banners' },
+            ]}
+            className="min-w-[140px]"
+          />
 
           {/* Status Filter */}
-          <select
+          <AnimatedSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'inactive', label: 'Inactive' },
+            ]}
+            className="min-w-[140px]"
+          />
 
           {/* Export Button */}
           <ExportButton
@@ -169,13 +190,18 @@ const Banners = () => {
       </div>
 
       {/* Banners Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-6">
         {filteredBanners.length === 0 ? (
-          <div className="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200">
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
             <p className="text-gray-500">No banners found</p>
           </div>
         ) : (
-          filteredBanners.map((banner, index) => (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedBanners.map((banner, index) => {
+                // Find the index in filteredBanners for move up/down functionality
+                const filteredIndex = filteredBanners.findIndex((b) => b.id === banner.id);
+                return (
             <div
               key={banner.id}
               className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
@@ -223,7 +249,7 @@ const Banners = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleMoveUp(banner)}
-                    disabled={index === 0}
+                    disabled={filteredIndex === 0}
                     className="flex-1 p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Move Up"
                   >
@@ -231,7 +257,7 @@ const Banners = () => {
                   </button>
                   <button
                     onClick={() => handleMoveDown(banner)}
-                    disabled={index === filteredBanners.length - 1}
+                    disabled={filteredIndex === filteredBanners.length - 1}
                     className="flex-1 p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Move Down"
                   >
@@ -259,7 +285,17 @@ const Banners = () => {
                 </div>
               </div>
             </div>
-          ))
+                );
+              })}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredBanners.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </div>
 

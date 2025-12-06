@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiPlus, FiSearch, FiTrash2, FiFilter } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useCategoryStore } from '../../store/categoryStore';
 import CategoryForm from '../../components/Admin/Categories/CategoryForm';
 import CategoryTree from '../../components/Admin/Categories/CategoryTree';
 import ExportButton from '../../components/Admin/ExportButton';
+import Pagination from '../../components/Admin/Pagination';
+import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
@@ -22,36 +24,64 @@ const Categories = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [parentCategoryId, setParentCategoryId] = useState(null);
   const [viewMode, setViewMode] = useState('tree'); // 'tree' or 'list'
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     initialize();
   }, []);
 
   // Filtered categories
-  const filteredCategories = categories.filter((category) => {
-    const matchesSearch =
-      !searchQuery ||
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (category.description &&
-        category.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredCategories = useMemo(() => {
+    return categories.filter((category) => {
+      const matchesSearch =
+        !searchQuery ||
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (category.description &&
+          category.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'active' && category.isActive) ||
-      (selectedStatus === 'inactive' && !category.isActive);
+      const matchesStatus =
+        selectedStatus === 'all' ||
+        (selectedStatus === 'active' && category.isActive) ||
+        (selectedStatus === 'inactive' && !category.isActive);
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    });
+  }, [categories, searchQuery, selectedStatus]);
+
+  // Pagination for list view
+  const paginatedCategories = useMemo(() => {
+    if (viewMode !== 'list') return filteredCategories;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCategories.slice(startIndex, endIndex);
+  }, [filteredCategories, currentPage, itemsPerPage, viewMode]);
+
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedStatus]);
 
   const handleCreate = () => {
     setEditingCategory(null);
+    setParentCategoryId(null);
+    setShowForm(true);
+  };
+
+  const handleAddSubcategory = (parentId) => {
+    setEditingCategory(null);
+    setParentCategoryId(parentId);
     setShowForm(true);
   };
 
   const handleEdit = (category) => {
     setEditingCategory(category);
+    setParentCategoryId(null);
     setShowForm(true);
   };
 
@@ -79,6 +109,7 @@ const Categories = () => {
   const handleFormClose = () => {
     setShowForm(false);
     setEditingCategory(null);
+    setParentCategoryId(null);
   };
 
   const handleFormSave = () => {
@@ -140,15 +171,16 @@ const Categories = () => {
           {/* Filters Row - Desktop */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-3 mt-3 sm:mt-0">
             {/* Status Filter */}
-            <select
+            <AnimatedSelect
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+              className="flex-shrink-0 min-w-[140px]"
+            />
 
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
@@ -191,15 +223,15 @@ const Categories = () => {
           {/* Filters Stack - Mobile */}
           <div className="sm:hidden space-y-2 mt-3">
             {/* Status Filter */}
-            <select
+            <AnimatedSelect
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+            />
 
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
@@ -270,59 +302,72 @@ const Categories = () => {
             categories={filteredCategories}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onAddSubcategory={handleAddSubcategory}
           />
         ) : (
-          <div className="space-y-2">
-            {filteredCategories.map((category) => (
-              <div
-                key={category.id}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(category.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedCategories([...selectedCategories, category.id]);
-                    } else {
-                      setSelectedCategories(
-                        selectedCategories.filter((id) => id !== category.id)
-                      );
-                    }
-                  }}
-                  className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                />
-                {category.image && (
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-10 h-10 object-cover rounded-lg"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
+          <>
+            <div className="space-y-2">
+              {paginatedCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedCategories([...selectedCategories, category.id]);
+                      } else {
+                        setSelectedCategories(
+                          selectedCategories.filter((id) => id !== category.id)
+                        );
+                      }
                     }}
+                    className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
                   />
-                )}
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">{category.name}</p>
-                  {category.description && (
-                    <p className="text-xs text-gray-500">{category.description}</p>
+                  {category.image && (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-10 h-10 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
                   )}
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-800">{category.name}</p>
+                    {category.description && (
+                      <p className="text-xs text-gray-500">{category.description}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleEdit(category)}
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    <FiSearch className="text-lg" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(category.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <FiTrash2 className="text-lg" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleEdit(category)}
-                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  <FiSearch className="text-lg" />
-                </button>
-                <button
-                  onClick={() => handleDelete(category.id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <FiTrash2 className="text-lg" />
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            {viewMode === 'list' && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredCategories.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                className="mt-4"
+              />
+            )}
+          </>
         )}
       </div>
 
@@ -330,6 +375,7 @@ const Categories = () => {
       {showForm && (
         <CategoryForm
           category={editingCategory}
+          parentId={parentCategoryId}
           onClose={handleFormClose}
           onSave={handleFormSave}
         />

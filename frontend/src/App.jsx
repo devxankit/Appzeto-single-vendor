@@ -25,6 +25,8 @@ import Products from "./pages/admin/Products";
 import ProductForm from "./pages/admin/ProductForm";
 import AdminOrders from "./pages/admin/Orders";
 import OrderDetail from "./pages/admin/OrderDetail";
+import ReturnRequests from "./pages/admin/ReturnRequests";
+import ReturnRequestDetail from "./pages/admin/ReturnRequestDetail";
 import Categories from "./pages/admin/Categories";
 import Brands from "./pages/admin/Brands";
 import Customers from "./pages/admin/Customers";
@@ -41,6 +43,7 @@ import PromoCodes from "./pages/admin/PromoCodes";
 import AllOrders from "./pages/admin/orders/AllOrders";
 import OrderTracking from "./pages/admin/orders/OrderTracking";
 import OrderNotifications from "./pages/admin/orders/OrderNotifications";
+import Invoice from "./pages/admin/orders/Invoice";
 // Products child pages
 import ManageProducts from "./pages/admin/products/ManageProducts";
 import AddProduct from "./pages/admin/products/AddProduct";
@@ -61,6 +64,7 @@ import ManageBrands from "./pages/admin/brands/ManageBrands";
 import ViewCustomers from "./pages/admin/customers/ViewCustomers";
 import CustomerAddresses from "./pages/admin/customers/Addresses";
 import Transactions from "./pages/admin/customers/Transactions";
+import CustomerDetailPage from "./pages/admin/customers/CustomerDetailPage";
 // Delivery Management child pages
 import DeliveryBoys from "./pages/admin/delivery/DeliveryBoys";
 import CashCollection from "./pages/admin/delivery/CashCollection";
@@ -211,13 +215,17 @@ const AppRoutes = () => {
           <Route path="brands/manage-brands" element={<ManageBrands />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="orders/:id" element={<OrderDetail />} />
+          <Route path="orders/:id/invoice" element={<Invoice />} />
           <Route path="orders/all-orders" element={<AllOrders />} />
           <Route path="orders/order-tracking" element={<OrderTracking />} />
           <Route path="orders/order-notifications" element={<OrderNotifications />} />
+          <Route path="return-requests" element={<ReturnRequests />} />
+          <Route path="return-requests/:id" element={<ReturnRequestDetail />} />
           <Route path="customers" element={<Customers />} />
           <Route path="customers/view-customers" element={<ViewCustomers />} />
           <Route path="customers/addresses" element={<CustomerAddresses />} />
           <Route path="customers/transactions" element={<Transactions />} />
+          <Route path="customers/:id" element={<CustomerDetailPage />} />
           <Route path="attributes" element={<AttributeSets />} />
           <Route path="attributes/attribute-sets" element={<AttributeSets />} />
           <Route path="attributes/attributes" element={<Attributes />} />

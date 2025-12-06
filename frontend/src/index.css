@@ -87,6 +87,89 @@ body::-webkit-scrollbar {
   }
 }
 
+/* Nano stylish scrollbar for admin panel */
+.scrollbar-nano {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.scrollbar-nano::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-nano::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.scrollbar-nano::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(156, 163, 175, 0.6) 0%, rgba(107, 114, 128, 0.6) 100%);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.scrollbar-nano::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(107, 114, 128, 0.8) 0%, rgba(75, 85, 99, 0.8) 100%);
+  width: 6px;
+}
+
+.scrollbar-nano::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, rgba(75, 85, 99, 0.9) 0%, rgba(55, 65, 81, 0.9) 100%);
+}
+
+/* Horizontal nano scrollbar */
+.scrollbar-nano::-webkit-scrollbar:horizontal {
+  height: 4px;
+}
+
+.scrollbar-nano::-webkit-scrollbar-thumb:horizontal:hover {
+  height: 6px;
+}
+
+/* Admin panel specific scrollbar - slightly thicker for better visibility */
+.scrollbar-admin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(40, 116, 240, 0.4) transparent;
+}
+
+.scrollbar-admin::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-track {
+  background: rgba(243, 244, 246, 0.5);
+  border-radius: 10px;
+  margin: 2px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(40, 116, 240, 0.5) 0%, rgba(71, 135, 247, 0.5) 100%);
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(40, 116, 240, 0.7) 0%, rgba(71, 135, 247, 0.7) 100%);
+  width: 7px;
+  box-shadow: 0 0 8px rgba(40, 116, 240, 0.3);
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, rgba(40, 116, 240, 0.9) 0%, rgba(71, 135, 247, 0.9) 100%);
+}
+
+/* Horizontal admin scrollbar */
+.scrollbar-admin::-webkit-scrollbar:horizontal {
+  height: 5px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb:horizontal:hover {
+  height: 7px;
+}
+
 /* Writing vertical */
 .writing-vertical-rl {
   writing-mode: vertical-rl;

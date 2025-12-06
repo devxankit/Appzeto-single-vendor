@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiPlus, FiSearch, FiEdit, FiTrash2, FiEye, FiEyeOff, FiFilter } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useBrandStore } from '../../store/brandStore';
 import BrandForm from '../../components/Admin/Brands/BrandForm';
 import ExportButton from '../../components/Admin/ExportButton';
+import Pagination from '../../components/Admin/Pagination';
 import Badge from '../../components/Badge';
 import toast from 'react-hot-toast';
 
@@ -22,26 +23,44 @@ const Brands = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     initialize();
   }, []);
 
   // Filtered brands
-  const filteredBrands = brands.filter((brand) => {
-    const matchesSearch =
-      !searchQuery ||
-      brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (brand.description &&
-        brand.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredBrands = useMemo(() => {
+    return brands.filter((brand) => {
+      const matchesSearch =
+        !searchQuery ||
+        brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (brand.description &&
+          brand.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'active' && brand.isActive) ||
-      (selectedStatus === 'inactive' && !brand.isActive);
+      const matchesStatus =
+        selectedStatus === 'all' ||
+        (selectedStatus === 'active' && brand.isActive) ||
+        (selectedStatus === 'inactive' && !brand.isActive);
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    });
+  }, [brands, searchQuery, selectedStatus]);
+
+  // Pagination
+  const paginatedBrands = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredBrands.slice(startIndex, endIndex);
+  }, [filteredBrands, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredBrands.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedStatus]);
 
   const handleCreate = () => {
     setEditingBrand(null);
@@ -138,15 +157,16 @@ const Brands = () => {
           {/* Filters Row - Desktop */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-3 mt-3 sm:mt-0">
             {/* Status Filter */}
-            <select
+            <AnimatedSelect
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+              className="flex-shrink-0 min-w-[140px]"
+            />
 
             {/* Export Button */}
             <ExportButton
@@ -165,15 +185,15 @@ const Brands = () => {
           {/* Filters Stack - Mobile */}
           <div className="sm:hidden space-y-2 mt-3">
             {/* Status Filter */}
-            <select
+            <AnimatedSelect
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+            />
 
             {/* Export Button */}
             <div className="pt-1">
@@ -216,8 +236,9 @@ const Brands = () => {
             <p className="text-gray-500">No brands found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-            {filteredBrands.map((brand) => (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+              {paginatedBrands.map((brand) => (
               <div
                 key={brand.id}
                 className="border border-gray-200 rounded-xl p-3 sm:p-4 hover:shadow-lg transition-shadow"
@@ -294,8 +315,17 @@ const Brands = () => {
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredBrands.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              className="mt-6"
+            />
+          </>
         )}
       </div>
 

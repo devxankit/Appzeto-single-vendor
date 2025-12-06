@@ -1,11 +1,24 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { gsapAnimations } from '../../utils/animations';
 import CategoryCard from '../CategoryCard';
-import { categories } from '../../data/categories';
+import { categories as fallbackCategories } from '../../data/categories';
+import { useCategoryStore } from '../../store/categoryStore';
 
 const CategoriesSection = () => {
   const sectionRef = useRef(null);
+  const { categories, initialize, getRootCategories } = useCategoryStore();
+
+  // Initialize store on mount
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get root categories (categories without parent) or fallback
+  const displayCategories = useMemo(() => {
+    const roots = getRootCategories().filter(cat => cat.isActive !== false);
+    return roots.length > 0 ? roots : fallbackCategories;
+  }, [categories, getRootCategories]);
 
   useEffect(() => {
     if (sectionRef.current) {
@@ -23,7 +36,7 @@ const CategoriesSection = () => {
 
         {/* Categories Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5 lg:gap-6 relative z-[1]">
-          {categories.map((category, index) => (
+          {displayCategories.map((category, index) => (
             <motion.div
               key={category.id}
               initial={{ opacity: 0, y: 20 }}

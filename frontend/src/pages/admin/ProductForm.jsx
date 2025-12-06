@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { products as initialProducts } from "../../data/products";
 import { useCategoryStore } from "../../store/categoryStore";
 import { useBrandStore } from "../../store/brandStore";
+import CategorySelector from "../../components/Admin/CategorySelector";
+import AnimatedSelect from "../../components/Admin/AnimatedSelect";
 import toast from "react-hot-toast";
 
 const ProductForm = () => {
@@ -25,6 +27,7 @@ const ProductForm = () => {
     image: "",
     images: [],
     categoryId: null,
+    subcategoryId: null,
     brandId: null,
     stock: "in_stock",
     stockQuantity: "",
@@ -52,7 +55,7 @@ const ProductForm = () => {
   }, []);
 
   useEffect(() => {
-    if (isEdit) {
+    if (isEdit && categories.length > 0) {
       const savedProducts = localStorage.getItem("admin-products");
       const products = savedProducts
         ? JSON.parse(savedProducts)
@@ -60,6 +63,12 @@ const ProductForm = () => {
       const product = products.find((p) => p.id === parseInt(id));
 
       if (product) {
+        // Determine if categoryId is a subcategory
+        const category = categories.find(
+          (cat) => cat.id === product.categoryId
+        );
+        const isSubcategory = category && category.parentId;
+
         setFormData({
           name: product.name || "",
           unit: product.unit || "",
@@ -67,7 +76,12 @@ const ProductForm = () => {
           originalPrice: product.originalPrice || product.price || "",
           image: product.image || "",
           images: product.images || [],
-          categoryId: product.categoryId || null,
+          categoryId: isSubcategory
+            ? category.parentId
+            : product.categoryId || null,
+          subcategoryId: isSubcategory
+            ? product.categoryId
+            : product.subcategoryId || null,
           brandId: product.brandId || null,
           stock: product.stock || "in_stock",
           stockQuantity: product.stockQuantity || "",
@@ -93,7 +107,7 @@ const ProductForm = () => {
         navigate(productsPath);
       }
     }
-  }, [id, isEdit, navigate, initCategories, initBrands, productsPath]);
+  }, [id, isEdit, navigate, categories, productsPath]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -146,6 +160,13 @@ const ProductForm = () => {
       ? JSON.parse(savedProducts)
       : initialProducts;
 
+    // Determine final categoryId - use subcategoryId if selected, otherwise categoryId
+    const finalCategoryId = formData.subcategoryId
+      ? parseInt(formData.subcategoryId)
+      : formData.categoryId
+      ? parseInt(formData.categoryId)
+      : null;
+
     if (isEdit) {
       // Update existing product
       const updatedProducts = products.map((p) =>
@@ -159,8 +180,9 @@ const ProductForm = () => {
                 ? parseFloat(formData.originalPrice)
                 : null,
               stockQuantity: parseInt(formData.stockQuantity),
-              categoryId: formData.categoryId
-                ? parseInt(formData.categoryId)
+              categoryId: finalCategoryId,
+              subcategoryId: formData.subcategoryId
+                ? parseInt(formData.subcategoryId)
                 : null,
               brandId: formData.brandId ? parseInt(formData.brandId) : null,
             }
@@ -179,7 +201,10 @@ const ProductForm = () => {
           ? parseFloat(formData.originalPrice)
           : null,
         stockQuantity: parseInt(formData.stockQuantity),
-        categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+        categoryId: finalCategoryId,
+        subcategoryId: formData.subcategoryId
+          ? parseInt(formData.subcategoryId)
+          : null,
         brandId: formData.brandId ? parseInt(formData.brandId) : null,
         rating: 0,
         reviewCount: 0,
@@ -258,41 +283,30 @@ const ProductForm = () => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Category <span className="text-red-500">*</span>
               </label>
-              <select
-                name="categoryId"
-                value={formData.categoryId || ""}
+              <CategorySelector
+                value={formData.categoryId}
+                subcategoryId={formData.subcategoryId}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <option value="">Select Category</option>
-                {categories
-                  .filter((cat) => cat.isActive !== false)
-                  .map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-              </select>
+              />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Brand
               </label>
-              <select
+              <AnimatedSelect
                 name="brandId"
                 value={formData.brandId || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <option value="">Select Brand</option>
-                {brands
-                  .filter((brand) => brand.isActive !== false)
-                  .map((brand) => (
-                    <option key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </option>
-                  ))}
-              </select>
+                placeholder="Select Brand"
+                options={[
+                  { value: "", label: "Select Brand" },
+                  ...brands
+                    .filter((brand) => brand.isActive !== false)
+                    .map((brand) => ({ value: String(brand.id), label: brand.name })),
+                ]}
+              />
             </div>
 
             <div className="md:col-span-2">
@@ -416,15 +430,16 @@ const ProductForm = () => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Stock Status
               </label>
-              <select
+              <AnimatedSelect
                 name="stock"
                 value={formData.stock}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                <option value="in_stock">In Stock</option>
-                <option value="low_stock">Low Stock</option>
-                <option value="out_of_stock">Out of Stock</option>
-              </select>
+                options={[
+                  { value: 'in_stock', label: 'In Stock' },
+                  { value: 'low_stock', label: 'Low Stock' },
+                  { value: 'out_of_stock', label: 'Out of Stock' },
+                ]}
+              />
             </div>
           </div>
         </div>

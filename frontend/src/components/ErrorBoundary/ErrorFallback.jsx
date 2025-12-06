@@ -1,6 +1,5 @@
 import { FiAlertCircle, FiRefreshCw, FiHome } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 
 const ErrorFallback = ({ error, errorInfo, onReset, fallback }) => {
   // Allow custom fallback UI
@@ -9,6 +8,10 @@ const ErrorFallback = ({ error, errorInfo, onReset, fallback }) => {
   }
 
   const isDevelopment = import.meta.env.DEV;
+
+  const handleGoHome = () => {
+    window.location.href = '/';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 flex items-center justify-center p-4">
@@ -57,13 +60,13 @@ const ErrorFallback = ({ error, errorInfo, onReset, fallback }) => {
             <FiRefreshCw />
             Try Again
           </button>
-          <Link
-            to="/"
+          <button
+            onClick={handleGoHome}
             className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
           >
             <FiHome />
             Go Home
-          </Link>
+          </button>
         </div>
       </motion.div>
     </div>

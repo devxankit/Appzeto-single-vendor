@@ -3,6 +3,7 @@ import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const Attributes = () => {
@@ -152,32 +153,53 @@ const Attributes = () => {
                 required
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
+              <AnimatedSelect
                 name="type"
-                defaultValue={editingAttribute.type || 'select'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="select">Select</option>
-                <option value="text">Text</option>
-                <option value="number">Number</option>
-                <option value="boolean">Boolean</option>
-              </select>
-              <select
+                value={editingAttribute.type || 'select'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const typeInput = form.querySelector('[name="type"]');
+                    if (typeInput) typeInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'select', label: 'Select' },
+                  { value: 'text', label: 'Text' },
+                  { value: 'number', label: 'Number' },
+                  { value: 'boolean', label: 'Boolean' },
+                ]}
+              />
+              <AnimatedSelect
                 name="required"
-                defaultValue={editingAttribute.required ? 'true' : 'false'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="false">Optional</option>
-                <option value="true">Required</option>
-              </select>
-              <select
+                value={editingAttribute.required ? 'true' : 'false'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const requiredInput = form.querySelector('[name="required"]');
+                    if (requiredInput) requiredInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'false', label: 'Optional' },
+                  { value: 'true', label: 'Required' },
+                ]}
+              />
+              <AnimatedSelect
                 name="status"
-                defaultValue={editingAttribute.status || 'active'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                value={editingAttribute.status || 'active'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const statusInput = form.querySelector('[name="status"]');
+                    if (statusInput) statusInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'active', label: 'Active' },
+                  { value: 'inactive', label: 'Inactive' },
+                ]}
+              />
               <div className="flex items-center gap-2">
                 <button
                   type="submit"

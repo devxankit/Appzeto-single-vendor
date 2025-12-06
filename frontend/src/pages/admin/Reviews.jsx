@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import DataTable from '../../components/Admin/DataTable';
 import ExportButton from '../../components/Admin/ExportButton';
 import Badge from '../../components/Badge';
+import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatDateTime } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
@@ -187,16 +188,17 @@ const Reviews = () => {
               className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
-          <select
+          <AnimatedSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'approved', label: 'Approved' },
+              { value: 'pending', label: 'Pending' },
+              { value: 'rejected', label: 'Rejected' },
+            ]}
+            className="min-w-[140px]"
+          />
           <ExportButton
             data={filteredReviews}
             headers={[

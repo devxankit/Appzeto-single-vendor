@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { FiX, FiSave, FiUpload } from 'react-icons/fi';
 import { useCategoryStore } from '../../../store/categoryStore';
+import AnimatedSelect from '../AnimatedSelect';
 import toast from 'react-hot-toast';
 
-const CategoryForm = ({ category, onClose, onSave }) => {
-  const { categories, createCategory, updateCategory } = useCategoryStore();
+const CategoryForm = ({ category, parentId, onClose, onSave }) => {
+  const { categories, createCategory, updateCategory, getCategoryById } = useCategoryStore();
   const isEdit = !!category;
+  const isSubcategory = !isEdit && parentId !== null;
+  const parentCategory = parentId ? getCategoryById(parentId) : (category?.parentId ? getCategoryById(category.parentId) : null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,8 +29,17 @@ const CategoryForm = ({ category, onClose, onSave }) => {
         isActive: category.isActive !== undefined ? category.isActive : true,
         order: category.order || 0,
       });
+    } else if (parentId !== null) {
+      setFormData({
+        name: '',
+        description: '',
+        image: '',
+        parentId: parentId,
+        isActive: true,
+        order: 0,
+      });
     }
-  }, [category]);
+  }, [category, parentId]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -68,11 +80,23 @@ const CategoryForm = ({ category, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">
-            {isEdit ? 'Edit Category' : 'Create Category'}
-          </h2>
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-gray-800">
+              {isEdit ? 'Edit Category' : isSubcategory ? 'Create Subcategory' : 'Create Category'}
+            </h2>
+            {isSubcategory && parentCategory && (
+              <p className="text-sm text-gray-600 mt-1">
+                Parent: <span className="font-semibold text-gray-800">{parentCategory.name}</span>
+              </p>
+            )}
+            {isEdit && parentCategory && (
+              <p className="text-sm text-gray-600 mt-1">
+                Parent: <span className="font-semibold text-gray-800">{parentCategory.name}</span>
+              </p>
+            )}
+          </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -119,19 +143,32 @@ const CategoryForm = ({ category, onClose, onSave }) => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Parent Category
                 </label>
-                <select
-                  name="parentId"
-                  value={formData.parentId || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">None (Root Category)</option>
-                  {getAvailableParents().map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                {isSubcategory || (isEdit && category.parentId) ? (
+                  <div className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-700 font-medium">
+                        {parentCategory ? parentCategory.name : 'None'}
+                      </span>
+                      {isSubcategory && (
+                        <span className="text-xs text-gray-500">(Cannot be changed)</span>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <AnimatedSelect
+                    name="parentId"
+                    value={formData.parentId || ''}
+                    onChange={handleChange}
+                    placeholder="None (Root Category)"
+                    options={[
+                      { value: '', label: 'None (Root Category)' },
+                      ...getAvailableParents().map((cat) => ({
+                        value: String(cat.id),
+                        label: cat.name,
+                      })),
+                    ]}
+                  />
+                )}
               </div>
             </div>
           </div>

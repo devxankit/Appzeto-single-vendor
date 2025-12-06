@@ -47,14 +47,14 @@ const RevenueVsOrdersChart = ({ data, period = 'month' }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+      className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200"
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
         <div>
-          <h3 className="text-lg font-bold text-gray-800">Revenue vs Orders</h3>
-          <p className="text-sm text-gray-500 mt-1">Compare revenue and order volume</p>
+          <h3 className="text-base sm:text-lg font-bold text-gray-800">Revenue vs Orders</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">Compare revenue and order volume</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
             <span className="text-xs text-gray-600">Revenue</span>
@@ -65,8 +65,9 @@ const RevenueVsOrdersChart = ({ data, period = 'month' }) => {
           </div>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart data={filteredData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+      <div className="w-full overflow-x-auto scrollbar-admin">
+        <ResponsiveContainer width="100%" height={250} minHeight={200}>
+          <ComposedChart data={filteredData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
           <defs>
             <linearGradient id="colorRevenueBar" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
@@ -77,25 +78,30 @@ const RevenueVsOrdersChart = ({ data, period = 'month' }) => {
           <XAxis
             dataKey="dateLabel"
             stroke="#6b7280"
-            fontSize={12}
+            fontSize={10}
             tickLine={false}
             axisLine={false}
+            angle={-45}
+            textAnchor="end"
+            height={60}
           />
           <YAxis
             yAxisId="left"
             stroke="#6b7280"
-            fontSize={12}
+            fontSize={10}
             tickLine={false}
             axisLine={false}
             tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}
+            width={50}
           />
           <YAxis
             yAxisId="right"
             orientation="right"
             stroke="#6b7280"
-            fontSize={12}
+            fontSize={10}
             tickLine={false}
             axisLine={false}
+            width={50}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
@@ -116,13 +122,14 @@ const RevenueVsOrdersChart = ({ data, period = 'month' }) => {
             type="monotone"
             dataKey="orders"
             stroke="#f59e0b"
-            strokeWidth={3}
-            dot={{ fill: '#f59e0b', r: 4 }}
-            activeDot={{ r: 6 }}
+            strokeWidth={2}
+            dot={{ fill: '#f59e0b', r: 3 }}
+            activeDot={{ r: 5 }}
             name="Orders"
           />
         </ComposedChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </div>
     </motion.div>
   );
 };

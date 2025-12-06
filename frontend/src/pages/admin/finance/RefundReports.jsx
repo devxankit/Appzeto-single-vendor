@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
 import ExportButton from '../../../components/Admin/ExportButton';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatCurrency, formatDateTime } from '../../../utils/adminHelpers';
 
 const RefundReports = () => {
@@ -141,16 +142,17 @@ const RefundReports = () => {
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
         <div className="flex items-center justify-between">
-          <select
+          <AnimatedSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'completed', label: 'Completed' },
+              { value: 'pending', label: 'Pending' },
+              { value: 'rejected', label: 'Rejected' },
+            ]}
+            className="min-w-[140px]"
+          />
           <ExportButton
             data={filteredRefunds}
             headers={[

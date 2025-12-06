@@ -3,6 +3,7 @@ import { FiSearch, FiDollarSign } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatCurrency, formatDateTime } from '../../../utils/adminHelpers';
 import { mockOrders } from '../../../data/adminMockData';
 
@@ -174,16 +175,17 @@ const Transactions = () => {
             />
           </div>
 
-          <select
+          <AnimatedSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="failed">Failed</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'completed', label: 'Completed' },
+              { value: 'pending', label: 'Pending' },
+              { value: 'failed', label: 'Failed' },
+            ]}
+            className="min-w-[140px]"
+          />
         </div>
       </div>
 

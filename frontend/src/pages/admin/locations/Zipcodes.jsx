@@ -3,6 +3,7 @@ import { FiPlus, FiSearch, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const Zipcodes = () => {
@@ -175,14 +176,21 @@ const Zipcodes = () => {
                 required
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
+              <AnimatedSelect
                 name="deliveryAvailable"
-                defaultValue={editingZipcode.deliveryAvailable ? 'true' : 'false'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="true">Delivery Available</option>
-                <option value="false">Delivery Not Available</option>
-              </select>
+                value={editingZipcode.deliveryAvailable ? 'true' : 'false'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const deliveryInput = form.querySelector('[name="deliveryAvailable"]');
+                    if (deliveryInput) deliveryInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'true', label: 'Delivery Available' },
+                  { value: 'false', label: 'Delivery Not Available' },
+                ]}
+              />
               <div className="flex items-center gap-2">
                 <button
                   type="submit"

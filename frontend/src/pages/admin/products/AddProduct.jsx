@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiSave, FiUpload } from "react-icons/fi";
+import { FiSave, FiUpload, FiX } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { products as initialProducts } from "../../../data/products";
 import { useCategoryStore } from "../../../store/categoryStore";
 import { useBrandStore } from "../../../store/brandStore";
+import CategorySelector from "../../../components/Admin/CategorySelector";
+import AnimatedSelect from "../../../components/Admin/AnimatedSelect";
 import toast from "react-hot-toast";
 
 const AddProduct = () => {
@@ -20,13 +22,23 @@ const AddProduct = () => {
     image: "",
     images: [],
     categoryId: null,
+    subcategoryId: null,
     brandId: null,
     stock: "in_stock",
     stockQuantity: "",
+    totalAllowedQuantity: "",
+    minimumOrderQuantity: "",
+    warrantyPeriod: "",
+    guaranteePeriod: "",
+    hsnCode: "",
     flashSale: false,
     isNew: false,
     isFeatured: false,
     isVisible: true,
+    codAllowed: true,
+    returnable: true,
+    cancelable: true,
+    taxIncluded: false,
     description: "",
     tags: [],
     variants: {
@@ -83,6 +95,55 @@ const AddProduct = () => {
     }
   };
 
+  const handleGalleryUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    // Validate all files
+    const validFiles = files.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} is not an image file`);
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} size should be less than 5MB`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length === 0) return;
+
+    // Read all valid files
+    const readers = validFiles.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readers)
+      .then((results) => {
+        setFormData({
+          ...formData,
+          images: [...formData.images, ...results],
+        });
+        toast.success(`${validFiles.length} image(s) added to gallery`);
+      })
+      .catch(() => {
+        toast.error("Error reading image files");
+      });
+  };
+
+  const removeGalleryImage = (index) => {
+    setFormData({
+      ...formData,
+      images: formData.images.filter((_, i) => i !== index),
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -97,6 +158,13 @@ const AddProduct = () => {
       ? JSON.parse(savedProducts)
       : initialProducts;
 
+    // Determine final categoryId - use subcategoryId if selected, otherwise categoryId
+    const finalCategoryId = formData.subcategoryId
+      ? parseInt(formData.subcategoryId)
+      : formData.categoryId
+      ? parseInt(formData.categoryId)
+      : null;
+
     // Create new product
     const newId = Math.max(...products.map((p) => p.id), 0) + 1;
     const newProduct = {
@@ -107,7 +175,19 @@ const AddProduct = () => {
         ? parseFloat(formData.originalPrice)
         : null,
       stockQuantity: parseInt(formData.stockQuantity),
-      categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+      totalAllowedQuantity: formData.totalAllowedQuantity
+        ? parseInt(formData.totalAllowedQuantity)
+        : null,
+      minimumOrderQuantity: formData.minimumOrderQuantity
+        ? parseInt(formData.minimumOrderQuantity)
+        : null,
+      warrantyPeriod: formData.warrantyPeriod || null,
+      guaranteePeriod: formData.guaranteePeriod || null,
+      hsnCode: formData.hsnCode || null,
+      categoryId: finalCategoryId,
+      subcategoryId: formData.subcategoryId
+        ? parseInt(formData.subcategoryId)
+        : null,
       brandId: formData.brandId ? parseInt(formData.brandId) : null,
       rating: 0,
       reviewCount: 0,
@@ -123,21 +203,19 @@ const AddProduct = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+      className="space-y-3">
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 space-y-6"
-      >
+        className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 space-y-4">
         {/* Basic Information */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">
+          <h2 className="text-base font-bold text-gray-800 mb-2">
             Basic Information
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Product Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -146,13 +224,13 @@ const AddProduct = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 placeholder="Enter product name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Unit
               </label>
               <input
@@ -161,63 +239,50 @@ const AddProduct = () => {
                 value={formData.unit}
                 onChange={handleChange}
                 placeholder="e.g., Piece, Kilogram, Gram, Pair"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Category <span className="text-red-500">*</span>
               </label>
-              <select
-                name="categoryId"
-                value={formData.categoryId || ""}
+              <CategorySelector
+                value={formData.categoryId}
+                subcategoryId={formData.subcategoryId}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">Select Category</option>
-                {categories
-                  .filter((cat) => cat.isActive !== false)
-                  .map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-              </select>
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Brand
               </label>
-              <select
+              <AnimatedSelect
                 name="brandId"
                 value={formData.brandId || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">Select Brand</option>
-                {brands
-                  .filter((brand) => brand.isActive !== false)
-                  .map((brand) => (
-                    <option key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </option>
-                  ))}
-              </select>
+                placeholder="Select Brand"
+                options={[
+                  { value: "", label: "Select Brand" },
+                  ...brands
+                    .filter((brand) => brand.isActive !== false)
+                    .map((brand) => ({ value: String(brand.id), label: brand.name })),
+                ]}
+              />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Description
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 placeholder="Enter product description..."
               />
             </div>
@@ -226,10 +291,10 @@ const AddProduct = () => {
 
         {/* Pricing */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Pricing</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-base font-bold text-gray-800 mb-2">Pricing</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Price <span className="text-red-500">*</span>
               </label>
               <input
@@ -240,13 +305,13 @@ const AddProduct = () => {
                 required
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 placeholder="0.00"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Original Price (for discount)
               </label>
               <input
@@ -256,66 +321,136 @@ const AddProduct = () => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 placeholder="0.00"
               />
             </div>
           </div>
         </div>
 
-        {/* Image */}
-        <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Product Image</h2>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Upload Image
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-                id="image-upload"
-              />
-              <label
-                htmlFor="image-upload"
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors"
-              >
-                <FiUpload className="text-xl text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">
-                  {formData.image ? "Change Image" : "Choose Image to Upload"}
-                </span>
-              </label>
-            </div>
-            {formData.image && (
-              <div className="mt-4">
-                <img
-                  src={formData.image}
-                  alt="Preview"
-                  className="w-32 h-32 object-cover rounded-lg border border-gray-200"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, image: "" })}
-                  className="mt-2 text-sm text-red-600 hover:text-red-700 font-medium"
-                >
-                  Remove Image
-                </button>
+        {/* Product Media */}
+        <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-3 sm:p-4 border-2 border-primary-200 shadow-lg">
+          <h2 className="text-base font-bold text-primary-800 mb-3 flex items-center gap-2">
+            <FiUpload className="text-lg" />
+            Product Media
+          </h2>
+
+          <div className="space-y-3">
+            {/* Main Image */}
+            <div className="bg-white rounded-lg p-3 border border-primary-200">
+              <h3 className="text-sm font-semibold text-gray-800 mb-2">
+                Main Image
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Upload Main Image
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="main-image-upload"
+                  />
+                  <label
+                    htmlFor="main-image-upload"
+                    className="flex items-center justify-center gap-2 w-full px-3 py-2 border-2 border-dashed border-primary-300 rounded-lg cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors bg-white">
+                    <FiUpload className="text-base text-primary-600" />
+                    <span className="text-xs font-medium text-gray-700">
+                      {formData.image
+                        ? "Change Main Image"
+                        : "Choose Main Image"}
+                    </span>
+                  </label>
+                </div>
+                {formData.image && (
+                  <div className="mt-2 flex items-start gap-3">
+                    <img
+                      src={formData.image}
+                      alt="Main Preview"
+                      className="w-24 h-24 object-cover rounded-lg border-2 border-primary-300 shadow-md"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, image: "" })}
+                      className="mt-1 px-3 py-1.5 text-xs text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors font-medium">
+                      Remove Image
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
+            {/* Product Gallery */}
+            <div className="bg-white rounded-lg p-3 border border-primary-200">
+              <h3 className="text-sm font-semibold text-gray-800 mb-2">
+                Product Gallery
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Upload Gallery Images (Multiple)
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleGalleryUpload}
+                    className="hidden"
+                    id="gallery-upload"
+                  />
+                  <label
+                    htmlFor="gallery-upload"
+                    className="flex items-center justify-center gap-2 w-full px-3 py-2 border-2 border-dashed border-primary-300 rounded-lg cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors bg-white">
+                    <FiUpload className="text-base text-primary-600" />
+                    <span className="text-xs font-medium text-gray-700">
+                      Choose Gallery Images
+                    </span>
+                  </label>
+                </div>
+                {formData.images && formData.images.length > 0 && (
+                  <div className="mt-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                      {formData.images.map((img, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={img}
+                            alt={`Gallery ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border-2 border-primary-300 shadow-md"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(index)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            title="Remove image">
+                            <FiX className="text-xs" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">
+                      {formData.images.length} image(s) in gallery
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Inventory */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Inventory</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-base font-bold text-gray-800 mb-2">Inventory</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Stock Quantity <span className="text-red-500">*</span>
               </label>
               <input
@@ -325,37 +460,117 @@ const AddProduct = () => {
                 onChange={handleChange}
                 required
                 min="0"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 placeholder="0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Stock Status
               </label>
-              <select
+              <AnimatedSelect
                 name="stock"
                 value={formData.stock}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="in_stock">In Stock</option>
-                <option value="low_stock">Low Stock</option>
-                <option value="out_of_stock">Out of Stock</option>
-              </select>
+                options={[
+                  { value: 'in_stock', label: 'In Stock' },
+                  { value: 'low_stock', label: 'Low Stock' },
+                  { value: 'out_of_stock', label: 'Out of Stock' },
+                ]}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Product Information */}
+        <div>
+          <h2 className="text-base font-bold text-gray-800 mb-2">
+            Additional Product Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Total Allowed Quantity
+              </label>
+              <input
+                type="number"
+                name="totalAllowedQuantity"
+                value={formData.totalAllowedQuantity}
+                onChange={handleChange}
+                min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                placeholder="Enter total allowed quantity"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Minimum Order Quantity
+              </label>
+              <input
+                type="number"
+                name="minimumOrderQuantity"
+                value={formData.minimumOrderQuantity}
+                onChange={handleChange}
+                min="1"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                placeholder="Enter minimum order quantity"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Warranty Period
+              </label>
+              <input
+                type="text"
+                name="warrantyPeriod"
+                value={formData.warrantyPeriod}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                placeholder="e.g., 1 Year, 6 Months"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Guarantee Period
+              </label>
+              <input
+                type="text"
+                name="guaranteePeriod"
+                value={formData.guaranteePeriod}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                placeholder="e.g., 1 Year, 6 Months"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                HSN Code
+              </label>
+              <input
+                type="text"
+                name="hsnCode"
+                value={formData.hsnCode}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                placeholder="Enter HSN Code"
+              />
             </div>
           </div>
         </div>
 
         {/* Product Variants */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">
+          <h2 className="text-base font-bold text-gray-800 mb-2">
             Product Variants
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Sizes (comma-separated)
               </label>
               <input
@@ -372,11 +587,11 @@ const AddProduct = () => {
                   });
                 }}
                 placeholder="S, M, L, XL"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Colors (comma-separated)
               </label>
               <input
@@ -393,7 +608,7 @@ const AddProduct = () => {
                   });
                 }}
                 placeholder="Red, Blue, Green, Black"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               />
             </div>
           </div>
@@ -401,7 +616,7 @@ const AddProduct = () => {
 
         {/* Tags */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Tags</h2>
+          <h2 className="text-base font-bold text-gray-800 mb-2">Tags</h2>
           <div>
             <input
               type="text"
@@ -414,7 +629,7 @@ const AddProduct = () => {
                 setFormData({ ...formData, tags });
               }}
               placeholder="tag1, tag2, tag3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
             />
             <p className="mt-1 text-xs text-gray-500">
               Separate tags with commas
@@ -424,10 +639,12 @@ const AddProduct = () => {
 
         {/* SEO */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">SEO Settings</h2>
-          <div className="space-y-4">
+          <h2 className="text-base font-bold text-gray-800 mb-2">
+            SEO Settings
+          </h2>
+          <div className="space-y-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 SEO Title
               </label>
               <input
@@ -435,20 +652,20 @@ const AddProduct = () => {
                 name="seoTitle"
                 value={formData.seoTitle}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 placeholder="SEO optimized title"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
                 SEO Description
               </label>
               <textarea
                 name="seoDescription"
                 value={formData.seoDescription}
                 onChange={handleChange}
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 placeholder="SEO meta description"
               />
             </div>
@@ -457,9 +674,11 @@ const AddProduct = () => {
 
         {/* Options */}
         <div>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Product Options</h2>
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 cursor-pointer">
+          <h2 className="text-base font-bold text-gray-800 mb-2">
+            Product Options
+          </h2>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 name="flashSale"
@@ -467,11 +686,11 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-gray-700">
                 Flash Sale
               </span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 name="isNew"
@@ -479,11 +698,11 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-gray-700">
                 New Arrival
               </span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 name="isFeatured"
@@ -491,11 +710,11 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-gray-700">
                 Featured Product
               </span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 name="isVisible"
@@ -503,26 +722,81 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
               />
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-xs font-semibold text-gray-700">
                 Visible to Customers
               </span>
             </label>
           </div>
         </div>
 
+        {/* Product Settings */}
+        <div>
+          <h2 className="text-base font-bold text-gray-800 mb-2">
+            Product Settings
+          </h2>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="codAllowed"
+                checked={formData.codAllowed}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-xs font-semibold text-gray-700">
+                COD Allowed
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="returnable"
+                checked={formData.returnable}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-xs font-semibold text-gray-700">
+                Returnable
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="cancelable"
+                checked={formData.cancelable}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-xs font-semibold text-gray-700">
+                Cancelable
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="taxIncluded"
+                checked={formData.taxIncluded}
+                onChange={handleChange}
+                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+              />
+              <span className="text-xs font-semibold text-gray-700">
+                Tax Included in Prices
+              </span>
+            </label>
+          </div>
+        </div>
+
         {/* Actions */}
-        <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-3 border-t border-gray-200">
           <button
             type="button"
             onClick={() => navigate("/admin/products/manage-products")}
-            className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
-          >
+            className="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold text-sm">
             Cancel
           </button>
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
-          >
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm">
             <FiSave />
             Create Product
           </button>

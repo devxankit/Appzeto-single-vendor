@@ -1,14 +1,28 @@
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { formatCurrency, getStatusColor } from '../../../utils/adminHelpers';
 import Badge from '../../Badge';
+import Pagination from '../Pagination';
 
 const TopProducts = ({ products }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return products.slice(startIndex, endIndex);
+  }, [products, currentPage]);
+
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
       <h3 className="text-lg font-bold text-gray-800 mb-6">Top Selling Products</h3>
-      <div className="max-h-96 overflow-y-auto scrollbar-responsive md:pr-2">
-        <div className="space-y-4">
-          {products.map((product, index) => (
+      <div className="space-y-4">
+        {paginatedProducts.map((product, index) => {
+          const globalIndex = (currentPage - 1) * itemsPerPage + index;
+          return (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, x: -20 }}
@@ -18,7 +32,7 @@ const TopProducts = ({ products }) => {
             >
               <div className="flex items-center gap-4 flex-1 min-w-0">
                 <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold flex-shrink-0">
-                  {index + 1}
+                  {globalIndex + 1}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-gray-800 truncate">{product.name}</h4>
@@ -39,9 +53,19 @@ const TopProducts = ({ products }) => {
                 <p className="text-xs text-gray-500">Stock: {product.stock}</p>
               </div>
             </motion.div>
-          ))}
-        </div>
+          );
+        })}
       </div>
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={products.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          className="mt-4"
+        />
+      )}
     </div>
   );
 };

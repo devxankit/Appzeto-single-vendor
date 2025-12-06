@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiPlus, FiEdit, FiTrash2, FiSave } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatCurrency } from '../../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
@@ -206,32 +207,53 @@ const TaxPricing = () => {
                 step="0.01"
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
+              <AnimatedSelect
                 name="type"
-                defaultValue={editingTax.type || 'percentage'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="percentage">Percentage</option>
-                <option value="fixed">Fixed Amount</option>
-              </select>
-              <select
+                value={editingTax.type || 'percentage'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const typeInput = form.querySelector('[name="type"]');
+                    if (typeInput) typeInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'percentage', label: 'Percentage' },
+                  { value: 'fixed', label: 'Fixed Amount' },
+                ]}
+              />
+              <AnimatedSelect
                 name="applicableTo"
-                defaultValue={editingTax.applicableTo || 'all'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="all">All Products</option>
-                <option value="electronics">Electronics</option>
-                <option value="clothing">Clothing</option>
-                <option value="services">Services</option>
-              </select>
-              <select
+                value={editingTax.applicableTo || 'all'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const applicableInput = form.querySelector('[name="applicableTo"]');
+                    if (applicableInput) applicableInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'all', label: 'All Products' },
+                  { value: 'electronics', label: 'Electronics' },
+                  { value: 'clothing', label: 'Clothing' },
+                  { value: 'services', label: 'Services' },
+                ]}
+              />
+              <AnimatedSelect
                 name="status"
-                defaultValue={editingTax.status || 'active'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                value={editingTax.status || 'active'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const statusInput = form.querySelector('[name="status"]');
+                    if (statusInput) statusInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'active', label: 'Active' },
+                  { value: 'inactive', label: 'Inactive' },
+                ]}
+              />
               <div className="flex items-center gap-2">
                 <button
                   type="submit"
@@ -285,14 +307,21 @@ const TaxPricing = () => {
                 required
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
+              <AnimatedSelect
                 name="type"
-                defaultValue={editingPricing.type || 'discount'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="discount">Discount</option>
-                <option value="markup">Markup</option>
-              </select>
+                value={editingPricing.type || 'discount'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const typeInput = form.querySelector('[name="type"]');
+                    if (typeInput) typeInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'discount', label: 'Discount' },
+                  { value: 'markup', label: 'Markup' },
+                ]}
+              />
               <input
                 type="number"
                 name="value"
@@ -317,14 +346,21 @@ const TaxPricing = () => {
                 placeholder="Applicable To (optional, e.g., vip, category)"
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
+              <AnimatedSelect
                 name="status"
-                defaultValue={editingPricing.status || 'active'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                value={editingPricing.status || 'active'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const statusInput = form.querySelector('[name="status"]');
+                    if (statusInput) statusInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'active', label: 'Active' },
+                  { value: 'inactive', label: 'Inactive' },
+                ]}
+              />
               <div className="flex items-center gap-2">
                 <button
                   type="submit"

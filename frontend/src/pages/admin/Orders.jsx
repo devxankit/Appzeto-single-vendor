@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import DataTable from '../../components/Admin/DataTable';
 import ExportButton from '../../components/Admin/ExportButton';
 import Badge from '../../components/Badge';
+import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency, formatDateTime } from '../../utils/adminHelpers';
 import { mockOrders } from '../../data/adminMockData';
 
@@ -114,7 +115,10 @@ const Orders = () => {
       key: 'items',
       label: 'Items',
       sortable: true,
-      render: (value) => <span>{value} items</span>,
+      render: (value) => {
+        const count = Array.isArray(value) ? value.length : (typeof value === 'number' ? value : 0);
+        return <span>{count} items</span>;
+      },
     },
     {
       key: 'status',
@@ -153,59 +157,63 @@ const Orders = () => {
 
       {/* Filters */}
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
           {/* Search */}
-          <div className="relative flex-1 min-w-[200px]">
+          <div className="relative flex-1 w-full sm:min-w-[200px]">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by ID, name, or email..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
             />
           </div>
 
           {/* Status Filter */}
-          <select
+          <AnimatedSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'pending', label: 'Pending' },
+              { value: 'processing', label: 'Processing' },
+              { value: 'shipped', label: 'Shipped' },
+              { value: 'delivered', label: 'Delivered' },
+              { value: 'cancelled', label: 'Cancelled' },
+            ]}
+            className="w-full sm:w-auto min-w-[140px]"
+          />
 
           {/* Date Filter */}
-          <select
+          <AnimatedSelect
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap"
-          >
-            <option value="all">All Time</option>
-            <option value="today">Today</option>
-            <option value="week">Last 7 Days</option>
-            <option value="month">Last 30 Days</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Time' },
+              { value: 'today', label: 'Today' },
+              { value: 'week', label: 'Last 7 Days' },
+              { value: 'month', label: 'Last 30 Days' },
+            ]}
+            className="w-full sm:w-auto min-w-[140px]"
+          />
 
         {/* Export Button */}
-          <ExportButton
-            data={filteredOrders}
-            headers={[
-              { label: 'Order ID', accessor: (row) => row.id },
-              { label: 'Customer', accessor: (row) => row.customer.name },
-              { label: 'Email', accessor: (row) => row.customer.email },
-              { label: 'Date', accessor: (row) => formatDateTime(row.date) },
-              { label: 'Total', accessor: (row) => formatCurrency(row.total) },
-              { label: 'Items', accessor: (row) => row.items },
-              { label: 'Status', accessor: (row) => row.status },
-            ]}
-            filename="orders"
-          />
+          <div className="w-full sm:w-auto">
+            <ExportButton
+              data={filteredOrders}
+              headers={[
+                { label: 'Order ID', accessor: (row) => row.id },
+                { label: 'Customer', accessor: (row) => row.customer.name },
+                { label: 'Email', accessor: (row) => row.customer.email },
+                { label: 'Date', accessor: (row) => formatDateTime(row.date) },
+                { label: 'Total', accessor: (row) => formatCurrency(row.total) },
+                { label: 'Items', accessor: (row) => row.items },
+                { label: 'Status', accessor: (row) => row.status },
+              ]}
+              filename="orders"
+            />
+          </div>
         </div>
       </div>
 

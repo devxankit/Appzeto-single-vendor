@@ -5,6 +5,7 @@ import DataTable from '../../components/Admin/DataTable';
 import ExportButton from '../../components/Admin/ExportButton';
 import Badge from '../../components/Badge';
 import ConfirmModal from '../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency, formatDateTime } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
@@ -246,16 +247,17 @@ const PromoCodes = () => {
             />
           </div>
 
-          <select
+          <AnimatedSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="expired">Expired</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'inactive', label: 'Inactive' },
+              { value: 'expired', label: 'Expired' },
+            ]}
+            className="min-w-[140px]"
+          />
         </div>
 
         <div className="mt-4 flex justify-end">
@@ -326,14 +328,21 @@ const PromoCodes = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                  <select
+                  <AnimatedSelect
                     name="type"
-                    defaultValue={editingCode.type || 'percentage'}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="percentage">Percentage</option>
-                    <option value="fixed">Fixed Amount</option>
-                  </select>
+                    value={editingCode.type || 'percentage'}
+                    onChange={(e) => {
+                      const form = e.target.closest('form');
+                      if (form) {
+                        const typeInput = form.querySelector('[name="type"]');
+                        if (typeInput) typeInput.value = e.target.value;
+                      }
+                    }}
+                    options={[
+                      { value: 'percentage', label: 'Percentage' },
+                      { value: 'fixed', label: 'Fixed Amount' },
+                    ]}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Discount Value</label>
@@ -415,14 +424,21 @@ const PromoCodes = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                <select
+                <AnimatedSelect
                   name="status"
-                  defaultValue={editingCode.status || 'active'}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                  value={editingCode.status || 'active'}
+                  onChange={(e) => {
+                    const form = e.target.closest('form');
+                    if (form) {
+                      const statusInput = form.querySelector('[name="status"]');
+                      if (statusInput) statusInput.value = e.target.value;
+                    }
+                  }}
+                  options={[
+                    { value: 'active', label: 'Active' },
+                    { value: 'inactive', label: 'Inactive' },
+                  ]}
+                />
               </div>
 
               <div className="flex items-center gap-2">

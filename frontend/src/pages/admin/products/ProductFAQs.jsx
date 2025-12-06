@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FiPlus, FiEdit, FiTrash2, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const ProductFAQs = () => {
@@ -77,18 +78,18 @@ const ProductFAQs = () => {
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
         <div className="flex flex-wrap items-center gap-4 justify-between">
-          <select
+          <AnimatedSelect
             value={productFilter}
             onChange={(e) => setProductFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 whitespace-nowrap"
-          >
-            <option value="all">All Products</option>
-            {uniqueProducts.map((product) => (
-              <option key={product.id} value={product.id.toString()}>
-                {product.name}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: 'all', label: 'All Products' },
+              ...uniqueProducts.map((product) => ({
+                value: product.id.toString(),
+                label: product.name,
+              })),
+            ]}
+            className="min-w-[160px] whitespace-nowrap"
+          />
           <button
             onClick={() => setEditingFaq({})}
             className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm whitespace-nowrap ml-auto"
@@ -227,14 +228,21 @@ const ProductFAQs = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <select
+                  <AnimatedSelect
                     name="status"
-                    defaultValue={editingFaq?.status || 'active'}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
+                    value={editingFaq?.status || 'active'}
+                    onChange={(e) => {
+                      const form = e.target.closest('form');
+                      if (form) {
+                        const statusInput = form.querySelector('[name="status"]');
+                        if (statusInput) statusInput.value = e.target.value;
+                      }
+                    }}
+                    options={[
+                      { value: 'active', label: 'Active' },
+                      { value: 'inactive', label: 'Inactive' },
+                    ]}
+                  />
                 </div>
               </div>
               <div className="flex items-center gap-2">

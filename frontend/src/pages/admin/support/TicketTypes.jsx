@@ -3,6 +3,7 @@ import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const TicketTypes = () => {
@@ -142,14 +143,21 @@ const TicketTypes = () => {
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
-              <select
+              <AnimatedSelect
                 name="status"
-                defaultValue={editingType.status || 'active'}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                value={editingType.status || 'active'}
+                onChange={(e) => {
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const statusInput = form.querySelector('[name="status"]');
+                    if (statusInput) statusInput.value = e.target.value;
+                  }
+                }}
+                options={[
+                  { value: 'active', label: 'Active' },
+                  { value: 'inactive', label: 'Inactive' },
+                ]}
+              />
               <div className="flex items-center gap-2">
                 <button
                   type="submit"

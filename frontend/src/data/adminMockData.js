@@ -36,7 +36,11 @@ export const mockOrders = [
     date: '2024-01-20T14:22:00',
     status: 'shipped',
     total: 890.25,
-    items: 3,
+    items: [
+      { id: 2, productId: 2, name: 'Slim Fit Blue Jeans', quantity: 1, price: 79.99, image: '/images/products/blue jeans.png' },
+      { id: 3, productId: 3, name: 'Floral Summer Dress', quantity: 1, price: 59.99, image: '/images/products/summer dress.png' },
+      { id: 5, productId: 5, name: 'Casual Canvas Sneakers', quantity: 1, price: 49.99, image: '/images/products/sneakers.png' }
+    ],
   },
   {
     id: 'ORD-003',
@@ -88,6 +92,109 @@ export const mockCustomers = [
   { id: 3, name: 'Bob Johnson', email: 'bob@example.com', orders: 15, totalSpent: 7800.00 },
 ];
 
+// Mock return requests
+export const mockReturnRequests = [
+  {
+    id: 'RET-001',
+    orderId: 'ORD-001',
+    customer: { name: 'John Doe', email: 'john@example.com', phone: '+1234567890' },
+    requestDate: '2024-01-20T10:30:00',
+    items: [
+      { id: 1, name: 'Classic White T-Shirt', quantity: 1, price: 500, reason: 'Defective', image: '/api/placeholder/100/100' }
+    ],
+    reason: 'Product Defective',
+    description: 'Product arrived damaged with holes in the fabric',
+    refundAmount: 500,
+    status: 'pending',
+    refundStatus: 'pending',
+    createdAt: '2024-01-20T10:30:00',
+    updatedAt: '2024-01-20T10:30:00',
+  },
+  {
+    id: 'RET-002',
+    orderId: 'ORD-002',
+    customer: { name: 'Jane Smith', email: 'jane@example.com', phone: '+1234567891' },
+    requestDate: '2024-01-18T14:22:00',
+    items: [
+      { id: 2, name: 'Slim Fit Blue Jeans', quantity: 1, price: 890, reason: 'Wrong Size', image: '/api/placeholder/100/100' }
+    ],
+    reason: 'Wrong Size',
+    description: 'Ordered size M but received size L',
+    refundAmount: 890,
+    status: 'approved',
+    refundStatus: 'processed',
+    createdAt: '2024-01-18T14:22:00',
+    updatedAt: '2024-01-19T09:15:00',
+  },
+  {
+    id: 'RET-003',
+    orderId: 'ORD-003',
+    customer: { name: 'Bob Johnson', email: 'bob@example.com', phone: '+1234567892' },
+    requestDate: '2024-01-22T09:15:00',
+    items: [
+      { id: 3, name: 'Floral Summer Dress', quantity: 1, price: 450, reason: 'Not as Described', image: '/api/placeholder/100/100' },
+      { id: 4, name: 'Leather Crossbody Bag', quantity: 1, price: 800, reason: 'Defective', image: '/api/placeholder/100/100' }
+    ],
+    reason: 'Not as Described',
+    description: 'Products do not match the description and images on the website',
+    refundAmount: 1250,
+    status: 'processing',
+    refundStatus: 'pending',
+    createdAt: '2024-01-22T09:15:00',
+    updatedAt: '2024-01-22T11:30:00',
+  },
+  {
+    id: 'RET-004',
+    orderId: 'ORD-004',
+    customer: { name: 'Alice Brown', email: 'alice@example.com', phone: '+1234567893' },
+    requestDate: '2024-01-10T16:45:00',
+    items: [
+      { id: 5, name: 'Casual Canvas Sneakers', quantity: 1, price: 320, reason: 'Defective', image: '/api/placeholder/100/100' }
+    ],
+    reason: 'Product Defective',
+    description: 'Sole came off after first wear',
+    refundAmount: 320,
+    status: 'rejected',
+    refundStatus: 'pending',
+    createdAt: '2024-01-10T16:45:00',
+    updatedAt: '2024-01-12T10:20:00',
+    rejectionReason: 'Product was used and damaged by customer',
+  },
+  {
+    id: 'RET-005',
+    orderId: 'ORD-005',
+    customer: { name: 'Charlie Wilson', email: 'charlie@example.com', phone: '+1234567894' },
+    requestDate: '2024-01-15T11:20:00',
+    items: [
+      { id: 6, name: 'Classic White T-Shirt', quantity: 2, price: 500, reason: 'Wrong Size', image: '/api/placeholder/100/100' },
+      { id: 7, name: 'Slim Fit Blue Jeans', quantity: 1, price: 890, reason: 'Defective', image: '/api/placeholder/100/100' }
+    ],
+    reason: 'Wrong Size',
+    description: 'Both items are smaller than expected',
+    refundAmount: 1890,
+    status: 'completed',
+    refundStatus: 'processed',
+    createdAt: '2024-01-15T11:20:00',
+    updatedAt: '2024-01-17T14:00:00',
+  },
+  {
+    id: 'RET-006',
+    orderId: 'ORD-006',
+    customer: { name: 'Diana Prince', email: 'diana@example.com', phone: '+1234567895' },
+    requestDate: '2024-01-21T13:10:00',
+    items: [
+      { id: 8, name: 'Floral Summer Dress', quantity: 1, price: 650, reason: 'Not as Described', image: '/api/placeholder/100/100' }
+    ],
+    reason: 'Not as Described',
+    description: 'Color is completely different from the website image',
+    refundAmount: 650,
+    status: 'pending',
+    refundStatus: 'pending',
+    createdAt: '2024-01-21T13:10:00',
+    updatedAt: '2024-01-21T13:10:00',
+  },
+];
+
 // Analytics summary
 export const getAnalyticsSummary = () => {
   const revenueData = generateRevenueData(30);
@@ -113,6 +220,7 @@ export default {
   mockOrders,
   topProducts,
   mockCustomers,
+  mockReturnRequests,
   getAnalyticsSummary,
 };
 

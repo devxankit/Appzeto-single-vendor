@@ -3,6 +3,7 @@ import { FiSearch, FiEye, FiMessageSquare } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatDateTime } from '../../../utils/adminHelpers';
 
 const Tickets = () => {
@@ -157,17 +158,18 @@ const Tickets = () => {
             />
           </div>
 
-          <select
+          <AnimatedSelect
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="open">Open</option>
-            <option value="in_progress">In Progress</option>
-            <option value="resolved">Resolved</option>
-            <option value="closed">Closed</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'open', label: 'Open' },
+              { value: 'in_progress', label: 'In Progress' },
+              { value: 'resolved', label: 'Resolved' },
+              { value: 'closed', label: 'Closed' },
+            ]}
+            className="min-w-[140px]"
+          />
         </div>
       </div>
 

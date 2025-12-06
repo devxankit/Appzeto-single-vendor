@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import React from 'react';
 import { FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const DataTable = ({
@@ -56,9 +57,73 @@ const DataTable = ({
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
+  // Get primary columns (exclude actions for mobile card view)
+  const primaryColumns = columns.filter(col => col.key !== 'actions');
+  const actionsColumn = columns.find(col => col.key === 'actions');
+
   return (
     <div className={`bg-white rounded-xl shadow-sm overflow-hidden ${className}`}>
-      <div className="overflow-x-auto">
+      {/* Mobile Card View - Show on mobile, hide on desktop */}
+      <div className="md:hidden">
+        {paginatedData.length === 0 ? (
+          <div className="px-4 py-12 text-center text-gray-500">
+            No data available
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {paginatedData.map((row, index) => (
+              <div
+                key={row.id || index}
+                onClick={() => onRowClick && onRowClick(row)}
+                className={`p-4 ${
+                  onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''
+                } transition-colors`}
+              >
+                <div className="space-y-2.5">
+                  {primaryColumns.map((column) => {
+                    const rawValue = row[column.key];
+                    const value = column.render
+                      ? column.render(rawValue, row)
+                      : rawValue;
+                    
+                    // Skip rendering if value is empty/null
+                    if (!value && value !== 0) return null;
+                    
+                    // Ensure value is renderable (not an object/array)
+                    let displayValue = value;
+                    if (typeof value === 'object' && value !== null && !React.isValidElement(value)) {
+                      if (Array.isArray(value)) {
+                        displayValue = `${value.length} items`;
+                      } else {
+                        displayValue = JSON.stringify(value);
+                      }
+                    }
+                    
+                    return (
+                      <div key={column.key} className="flex items-start gap-2">
+                        <span className="text-xs font-semibold text-gray-600 flex-shrink-0 min-w-[80px] sm:min-w-[100px]">
+                          {column.label}:
+                        </span>
+                        <span className="text-sm text-gray-800 break-words flex-1">
+                          {displayValue}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {actionsColumn && (
+                    <div className="pt-2 border-t border-gray-100 mt-3">
+                      {actionsColumn.render(null, row)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View - Hide on mobile, show on desktop */}
+      <div className="hidden md:block overflow-x-auto scrollbar-admin">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -109,16 +174,30 @@ const DataTable = ({
                     onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''
                   } transition-colors`}
                 >
-                  {columns.map((column) => (
-                    <td
-                      key={column.key}
-                      className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700"
-                    >
-                      {column.render
-                        ? column.render(row[column.key], row)
-                        : row[column.key]}
-                    </td>
-                  ))}
+                  {columns.map((column) => {
+                    const rawValue = row[column.key];
+                    let displayValue = column.render
+                      ? column.render(rawValue, row)
+                      : rawValue;
+                    
+                    // Ensure value is renderable (not an object/array)
+                    if (typeof displayValue === 'object' && displayValue !== null && !React.isValidElement(displayValue)) {
+                      if (Array.isArray(displayValue)) {
+                        displayValue = `${displayValue.length} items`;
+                      } else {
+                        displayValue = JSON.stringify(displayValue);
+                      }
+                    }
+                    
+                    return (
+                      <td
+                        key={column.key}
+                        className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700"
+                      >
+                        {displayValue}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             )}

@@ -148,7 +148,11 @@ export const useCategoryStore = create(
 
       // Get categories by parent
       getCategoriesByParent: (parentId) => {
-        return get().categories.filter((cat) => cat.parentId === parentId);
+        const parentIdNum = parentId ? parseInt(parentId) : null;
+        return get().categories.filter((cat) => {
+          const catParentId = cat.parentId ? parseInt(cat.parentId) : null;
+          return catParentId === parentIdNum;
+        });
       },
 
       // Get root categories

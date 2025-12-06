@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiSearch, FiFilter } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useCustomerStore } from '../../../store/customerStore';
 import CustomerCard from '../../../components/Admin/Customers/CustomerCard';
 import CustomerDetail from '../../../components/Admin/Customers/CustomerDetail';
 import DataTable from '../../../components/Admin/DataTable';
+import Pagination from '../../../components/Admin/Pagination';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatCurrency } from '../../../utils/adminHelpers';
 
 const ViewCustomers = () => {
@@ -14,25 +16,44 @@ const ViewCustomers = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     initialize();
   }, []);
 
-  const filteredCustomers = customers.filter((customer) => {
-    const matchesSearch =
-      !searchQuery ||
-      customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (customer.phone && customer.phone.includes(searchQuery));
+  const filteredCustomers = useMemo(() => {
+    return customers.filter((customer) => {
+      const matchesSearch =
+        !searchQuery ||
+        customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (customer.phone && customer.phone.includes(searchQuery));
 
-    const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'active' && customer.status === 'active') ||
-      (selectedStatus === 'blocked' && customer.status === 'blocked');
+      const matchesStatus =
+        selectedStatus === 'all' ||
+        (selectedStatus === 'active' && customer.status === 'active') ||
+        (selectedStatus === 'blocked' && customer.status === 'blocked');
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    });
+  }, [customers, searchQuery, selectedStatus]);
+
+  // Pagination for grid view
+  const paginatedCustomers = useMemo(() => {
+    if (viewMode !== 'grid') return filteredCustomers;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCustomers.slice(startIndex, endIndex);
+  }, [filteredCustomers, currentPage, itemsPerPage, viewMode]);
+
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedStatus]);
 
   const handleViewCustomer = (customer) => {
     setSelectedCustomer(customer);
@@ -124,7 +145,7 @@ const ViewCustomers = () => {
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
           <div className="relative flex-1 w-full">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
@@ -132,24 +153,25 @@ const ViewCustomers = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name, email, or phone..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
             />
           </div>
 
-          <select
+          <AnimatedSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="blocked">Blocked</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'blocked', label: 'Blocked' },
+            ]}
+            className="w-full sm:w-auto min-w-[140px]"
+          />
 
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded text-sm font-medium transition-colors ${
                 viewMode === 'grid'
                   ? 'bg-white text-primary-600 shadow-sm'
                   : 'text-gray-600'
@@ -159,7 +181,7 @@ const ViewCustomers = () => {
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded text-sm font-medium transition-colors ${
                 viewMode === 'table'
                   ? 'bg-white text-primary-600 shadow-sm'
                   : 'text-gray-600'
@@ -177,15 +199,25 @@ const ViewCustomers = () => {
             <p className="text-gray-500">No customers found</p>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCustomers.map((customer) => (
-              <CustomerCard
-                key={customer.id}
-                customer={customer}
-                onView={handleViewCustomer}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {paginatedCustomers.map((customer) => (
+                <CustomerCard
+                  key={customer.id}
+                  customer={customer}
+                  onView={handleViewCustomer}
+                />
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredCustomers.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              className="mt-6"
+            />
+          </>
         ) : (
           <DataTable
             data={filteredCustomers}

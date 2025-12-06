@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiUpload, FiDownload, FiFile, FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import { FiUpload, FiDownload, FiFile, FiCheckCircle, FiXCircle, FiInfo } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -77,13 +77,47 @@ const BulkUpload = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Bulk Upload</h1>
           <p className="text-sm sm:text-base text-gray-600">Upload multiple products via CSV file</p>
         </div>
+      </div>
+
+      {/* Bulk Upload Instructions */}
+      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-3 shadow-sm -mt-5">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex items-start gap-2 flex-1">
+            <FiInfo className="text-blue-600 text-base flex-shrink-0 mt-0.5" />
+            <h3 className="text-sm font-semibold text-blue-900">
+              Bulk Upload Instruction:
+            </h3>
+        </div>
         <button
           onClick={downloadTemplate}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-xs flex-shrink-0"
         >
-          <FiDownload />
+            <FiDownload className="text-sm" />
           <span>Download Template</span>
         </button>
+        </div>
+        <ul className="space-y-1 text-xs text-blue-800 ml-6">
+          <li className="flex items-start gap-1.5">
+            <span className="text-blue-600 font-semibold">•</span>
+            <span>Read and follow instructions carefully while preparing data</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="text-blue-600 font-semibold">•</span>
+            <span>Download and save the sample file to reduce errors</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="text-blue-600 font-semibold">•</span>
+            <span>For adding bulk Product file should be .csv format</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="text-blue-600 font-semibold">•</span>
+            <span>You can copy image path from media section</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="text-blue-600 font-semibold">•</span>
+            <span>Make sure you entered valid data as per instructions before proceed</span>
+          </li>
+        </ul>
       </div>
 
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">

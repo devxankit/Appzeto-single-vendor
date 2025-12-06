@@ -14,6 +14,11 @@
     ]
   },
   {
+    "title": "Return Requests",
+    "route": "/admin/return-requests",
+    "children": []
+  },
+  {
     "title": "Products",
     "route": "/admin/products",
     "children": [

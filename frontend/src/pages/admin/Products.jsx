@@ -17,6 +17,7 @@ import DataTable from "../../components/Admin/DataTable";
 import ExportButton from "../../components/Admin/ExportButton";
 import Badge from "../../components/Badge";
 import ConfirmModal from "../../components/Admin/ConfirmModal";
+import AnimatedSelect from "../../components/Admin/AnimatedSelect";
 import { formatCurrency, generateCSV } from "../../utils/adminHelpers";
 import { formatPrice } from "../../utils/helpers";
 import { products as initialProducts } from "../../data/products";
@@ -363,45 +364,43 @@ const Products = () => {
           {/* Filters Row - Desktop */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
             {/* Status Filter */}
-            <select
+            <AnimatedSelect
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0">
-              <option value="all">All Status</option>
-              <option value="in_stock">In Stock</option>
-              <option value="low_stock">Low Stock</option>
-              <option value="out_of_stock">Out of Stock</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'in_stock', label: 'In Stock' },
+                { value: 'low_stock', label: 'Low Stock' },
+                { value: 'out_of_stock', label: 'Out of Stock' },
+              ]}
+              className="flex-shrink-0 min-w-[140px]"
+            />
 
             {/* Category Filter */}
-            <select
+            <AnimatedSelect
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0">
-              <option value="all">All Categories</option>
-              {categories
-                .filter((cat) => cat.isActive !== false)
-                .map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-            </select>
+              options={[
+                { value: 'all', label: 'All Categories' },
+                ...categories
+                  .filter((cat) => cat.isActive !== false)
+                  .map((cat) => ({ value: String(cat.id), label: cat.name })),
+              ]}
+              className="flex-shrink-0 min-w-[160px]"
+            />
 
             {/* Brand Filter */}
-            <select
+            <AnimatedSelect
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 flex-shrink-0">
-              <option value="all">All Brands</option>
-              {brands
-                .filter((brand) => brand.isActive !== false)
-                .map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
-            </select>
+              options={[
+                { value: 'all', label: 'All Brands' },
+                ...brands
+                  .filter((brand) => brand.isActive !== false)
+                  .map((brand) => ({ value: String(brand.id), label: brand.name })),
+              ]}
+              className="flex-shrink-0 min-w-[140px]"
+            />
 
             {/* Export Button */}
             <ExportButton
@@ -423,45 +422,40 @@ const Products = () => {
           {/* Filters Stack - Mobile */}
           <div className="sm:hidden space-y-2 mt-3">
             {/* Status Filter */}
-            <select
+            <AnimatedSelect
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-              <option value="all">All Status</option>
-              <option value="in_stock">In Stock</option>
-              <option value="low_stock">Low Stock</option>
-              <option value="out_of_stock">Out of Stock</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'in_stock', label: 'In Stock' },
+                { value: 'low_stock', label: 'Low Stock' },
+                { value: 'out_of_stock', label: 'Out of Stock' },
+              ]}
+            />
 
             {/* Category Filter */}
-            <select
+            <AnimatedSelect
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-              <option value="all">All Categories</option>
-              {categories
-                .filter((cat) => cat.isActive !== false)
-                .map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-            </select>
+              options={[
+                { value: 'all', label: 'All Categories' },
+                ...categories
+                  .filter((cat) => cat.isActive !== false)
+                  .map((cat) => ({ value: String(cat.id), label: cat.name })),
+              ]}
+            />
 
             {/* Brand Filter */}
-            <select
+            <AnimatedSelect
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-              <option value="all">All Brands</option>
-              {brands
-                .filter((brand) => brand.isActive !== false)
-                .map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
-            </select>
+              options={[
+                { value: 'all', label: 'All Brands' },
+                ...brands
+                  .filter((brand) => brand.isActive !== false)
+                  .map((brand) => ({ value: String(brand.id), label: brand.name })),
+              ]}
+            />
 
             {/* Export Button */}
             <div className="pt-1">

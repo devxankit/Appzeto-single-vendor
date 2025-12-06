@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FiPlus, FiSearch, FiTrash2, FiEdit } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useCategoryStore } from '../../../store/categoryStore';
 import CategoryForm from '../../../components/Admin/Categories/CategoryForm';
 import CategoryTree from '../../../components/Admin/Categories/CategoryTree';
 import ExportButton from '../../../components/Admin/ExportButton';
+import Pagination from '../../../components/Admin/Pagination';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const ManageCategories = () => {
@@ -18,34 +20,62 @@ const ManageCategories = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [parentCategoryId, setParentCategoryId] = useState(null);
   const [viewMode, setViewMode] = useState('tree');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     initialize();
   }, []);
 
-  const filteredCategories = categories.filter((category) => {
-    const matchesSearch =
-      !searchQuery ||
-      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (category.description &&
-        category.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredCategories = useMemo(() => {
+    return categories.filter((category) => {
+      const matchesSearch =
+        !searchQuery ||
+        category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (category.description &&
+          category.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'active' && category.isActive) ||
-      (selectedStatus === 'inactive' && !category.isActive);
+      const matchesStatus =
+        selectedStatus === 'all' ||
+        (selectedStatus === 'active' && category.isActive) ||
+        (selectedStatus === 'inactive' && !category.isActive);
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    });
+  }, [categories, searchQuery, selectedStatus]);
+
+  // Pagination for list view
+  const paginatedCategories = useMemo(() => {
+    if (viewMode !== 'list') return filteredCategories;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCategories.slice(startIndex, endIndex);
+  }, [filteredCategories, currentPage, itemsPerPage, viewMode]);
+
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedStatus]);
 
   const handleCreate = () => {
     setEditingCategory(null);
+    setParentCategoryId(null);
+    setShowForm(true);
+  };
+
+  const handleAddSubcategory = (parentId) => {
+    setEditingCategory(null);
+    setParentCategoryId(parentId);
     setShowForm(true);
   };
 
   const handleEdit = (category) => {
     setEditingCategory(category);
+    setParentCategoryId(null);
     setShowForm(true);
   };
 
@@ -59,6 +89,7 @@ const ManageCategories = () => {
   const handleFormClose = () => {
     setShowForm(false);
     setEditingCategory(null);
+    setParentCategoryId(null);
   };
 
   return (
@@ -82,34 +113,35 @@ const ManageCategories = () => {
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="relative sm:col-span-2">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
+          <div className="relative flex-1 w-full">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search categories..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
             />
           </div>
 
-          <select
+          <AnimatedSelect
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+            options={[
+              { value: 'all', label: 'All Status' },
+              { value: 'active', label: 'Active' },
+              { value: 'inactive', label: 'Inactive' },
+            ]}
+            className="w-full sm:w-auto min-w-[140px]"
+          />
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+        <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
             <button
               onClick={() => setViewMode('tree')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded text-sm font-medium transition-colors ${
                 viewMode === 'tree'
                   ? 'bg-white text-primary-600 shadow-sm'
                   : 'text-gray-600'
@@ -119,7 +151,7 @@ const ManageCategories = () => {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              className={`flex-1 sm:flex-initial px-3 py-2 rounded text-sm font-medium transition-colors ${
                 viewMode === 'list'
                   ? 'bg-white text-primary-600 shadow-sm'
                   : 'text-gray-600'
@@ -129,16 +161,18 @@ const ManageCategories = () => {
             </button>
           </div>
 
-          <ExportButton
-            data={filteredCategories}
-            headers={[
-              { label: 'ID', accessor: (row) => row.id },
-              { label: 'Name', accessor: (row) => row.name },
-              { label: 'Description', accessor: (row) => row.description || '' },
-              { label: 'Status', accessor: (row) => (row.isActive ? 'Active' : 'Inactive') },
-            ]}
-            filename="categories"
-          />
+          <div className="w-full sm:w-auto">
+            <ExportButton
+              data={filteredCategories}
+              headers={[
+                { label: 'ID', accessor: (row) => row.id },
+                { label: 'Name', accessor: (row) => row.name },
+                { label: 'Description', accessor: (row) => row.description || '' },
+                { label: 'Status', accessor: (row) => (row.isActive ? 'Active' : 'Inactive') },
+              ]}
+              filename="categories"
+            />
+          </div>
         </div>
       </div>
 
@@ -152,48 +186,62 @@ const ManageCategories = () => {
             categories={filteredCategories}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onAddSubcategory={handleAddSubcategory}
           />
         ) : (
-          <div className="space-y-2">
-            {filteredCategories.map((category) => (
-              <div
-                key={category.id}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                {category.image && (
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-10 h-10 object-cover rounded-lg"
-                  />
-                )}
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">{category.name}</p>
-                  {category.description && (
-                    <p className="text-xs text-gray-500">{category.description}</p>
+          <>
+            <div className="space-y-2">
+              {paginatedCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  {category.image && (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-10 h-10 object-cover rounded-lg"
+                    />
                   )}
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-800">{category.name}</p>
+                    {category.description && (
+                      <p className="text-xs text-gray-500">{category.description}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleEdit(category)}
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    <FiEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(category.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <FiTrash2 />
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleEdit(category)}
-                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  <FiEdit />
-                </button>
-                <button
-                  onClick={() => handleDelete(category.id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <FiTrash2 />
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            {viewMode === 'list' && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={filteredCategories.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                className="mt-4"
+              />
+            )}
+          </>
         )}
       </div>
 
       {showForm && (
         <CategoryForm
           category={editingCategory}
+          parentId={parentCategoryId}
           onClose={handleFormClose}
           onSave={() => {
             initialize();

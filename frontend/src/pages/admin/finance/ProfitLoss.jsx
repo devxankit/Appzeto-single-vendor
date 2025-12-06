@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { FiDollarSign, FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { mockOrders } from '../../../data/adminMockData';
 import { formatCurrency } from '../../../utils/adminHelpers';
 
@@ -38,15 +39,16 @@ const ProfitLoss = () => {
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <select
+        <AnimatedSelect
           value={period}
           onChange={(e) => setPeriod(e.target.value)}
-          className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-        >
-          <option value="month">This Month</option>
-          <option value="quarter">This Quarter</option>
-          <option value="year">This Year</option>
-        </select>
+          options={[
+            { value: 'month', label: 'This Month' },
+            { value: 'quarter', label: 'This Quarter' },
+            { value: 'year', label: 'This Year' },
+          ]}
+          className="min-w-[140px]"
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

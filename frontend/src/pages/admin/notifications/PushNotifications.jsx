@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FiSend, FiBell, FiUsers, FiTarget } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const PushNotifications = () => {
@@ -68,30 +69,31 @@ const PushNotifications = () => {
               <FiTarget className="inline mr-2" />
               Target Audience
             </label>
-            <select
+            <AnimatedSelect
               value={formData.target}
               onChange={(e) => setFormData({ ...formData, target: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="all">All Users</option>
-              <option value="customers">Customers Only</option>
-              <option value="vip">VIP Customers</option>
-              <option value="segment">Custom Segment</option>
-            </select>
+              options={[
+                { value: 'all', label: 'All Users' },
+                { value: 'customers', label: 'Customers Only' },
+                { value: 'vip', label: 'VIP Customers' },
+                { value: 'segment', label: 'Custom Segment' },
+                { value: 'delivery-boy', label: 'Delivery boy' },
+              ]}
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Schedule
             </label>
-            <select
+            <AnimatedSelect
               value={formData.schedule}
               onChange={(e) => setFormData({ ...formData, schedule: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="now">Send Now</option>
-              <option value="scheduled">Schedule Later</option>
-            </select>
+              options={[
+                { value: 'now', label: 'Send Now' },
+                { value: 'scheduled', label: 'Schedule Later' },
+              ]}
+            />
           </div>
 
           {formData.schedule === 'scheduled' && (

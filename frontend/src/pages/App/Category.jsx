@@ -6,7 +6,8 @@ import MobileLayout from "../../components/Layout/Mobile/MobileLayout";
 import ProductCard from "../../components/ProductCard";
 import ProductListItem from "../../components/Mobile/ProductListItem";
 import { products } from "../../data/products";
-import { categories } from "../../data/categories";
+import { categories as fallbackCategories } from "../../data/categories";
+import { useCategoryStore } from "../../store/categoryStore";
 import PageTransition from "../../components/PageTransition";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import LazyImage from "../../components/LazyImage";
@@ -15,7 +16,24 @@ const MobileCategory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const categoryId = parseInt(id);
-  const category = categories.find((cat) => cat.id === categoryId);
+  const { categories, initialize, getCategoryById, getCategoriesByParent } = useCategoryStore();
+  
+  // Initialize store on mount
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get category from store or fallback
+  const category = useMemo(() => {
+    const cat = getCategoryById(categoryId);
+    return cat || fallbackCategories.find((cat) => cat.id === categoryId);
+  }, [categoryId, categories, getCategoryById]);
+
+  // Get subcategories for this category
+  const subcategories = useMemo(() => {
+    if (!categoryId) return [];
+    return getCategoriesByParent(categoryId).filter(cat => cat.isActive !== false);
+  }, [categoryId, categories, getCategoriesByParent]);
 
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'

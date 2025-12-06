@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { FiX, FiMail, FiPhone, FiMapPin, FiShoppingBag, FiDollarSign, FiClock, FiEdit } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiX, FiMail, FiPhone, FiMapPin, FiShoppingBag, FiDollarSign, FiClock, FiEdit, FiCreditCard } from 'react-icons/fi';
 import { useCustomerStore } from '../../../store/customerStore';
 import Badge from '../../Badge';
 import { formatCurrency, formatDateTime } from '../../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
 const CustomerDetail = ({ customer, onClose, onUpdate }) => {
+  const navigate = useNavigate();
   const { updateCustomer, toggleCustomerStatus, addActivity } = useCustomerStore();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -42,7 +44,7 @@ const CustomerDetail = ({ customer, onClose, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">Customer Details</h2>
           <button
@@ -184,6 +186,40 @@ const CustomerDetail = ({ customer, onClose, onUpdate }) => {
                   : 'No orders yet'}
               </p>
             </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button
+              onClick={() => {
+                navigate(`/admin/customers/${customer.id}?tab=orders`);
+                onClose();
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold text-sm"
+            >
+              <FiShoppingBag />
+              <span>View Orders</span>
+            </button>
+            <button
+              onClick={() => {
+                navigate(`/admin/customers/${customer.id}?tab=transactions`);
+                onClose();
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm"
+            >
+              <FiCreditCard />
+              <span>View Transactions</span>
+            </button>
+            <button
+              onClick={() => {
+                navigate(`/admin/customers/${customer.id}?tab=addresses`);
+                onClose();
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
+            >
+              <FiMapPin />
+              <span>View Addresses</span>
+            </button>
           </div>
 
           {/* Activity History */}
