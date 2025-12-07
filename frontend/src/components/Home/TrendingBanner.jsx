@@ -13,8 +13,29 @@ const TrendingBanner = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-4 sm:py-8 md:py-12 bg-transparent">
-      <div className="container mx-auto px-2 sm:px-4">
+    <section ref={sectionRef} className="py-4 sm:py-8 md:py-0 bg-transparent">
+      {/* Desktop Layout - White card container */}
+      <div className="hidden md:block bg-white rounded-lg mb-4 p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative w-full overflow-hidden rounded-lg"
+          style={{ aspectRatio: "41/22" }}>
+          <LazyImage
+            src="/images/hero/banner2.png"
+            alt="Trending Items Banner"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/1200x300?text=Banner";
+            }}
+          />
+        </motion.div>
+      </div>
+
+      {/* Mobile Layout - Unchanged */}
+      <div className="md:hidden container mx-auto px-2 sm:px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

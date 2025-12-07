@@ -141,7 +141,7 @@ const NewArrivalsSection = () => {
         </div>
 
         {/* Products Grid - Image Only */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="flex flex-wrap md:flex-nowrap md:overflow-x-visible gap-2 md:gap-3">
           {newArrivals.map((product, index) => {
             const productLink = isMobileApp ? `/app/product/${product.id}` : `/product/${product.id}`;
             return (
@@ -155,6 +155,7 @@ const NewArrivalsSection = () => {
                   stiffness: 100,
                   damping: 10,
                 }}
+                className="w-[calc(33.333%-0.5rem)] md:w-0 md:flex-1 md:min-w-0"
               >
                 <motion.div
                   animate={{

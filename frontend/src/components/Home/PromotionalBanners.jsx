@@ -44,8 +44,67 @@ const PromotionalBanners = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 bg-transparent">
-      <div className="container mx-auto px-2 sm:px-4">
+    <section ref={sectionRef} className="py-16 md:py-0 bg-transparent">
+      {/* Desktop Layout - White card container with 3-column grid */}
+      <div className="hidden md:block bg-white rounded-lg mb-4 p-4">
+        <div className="grid grid-cols-3 gap-1">
+          {banners.map((banner, index) => (
+            <motion.div
+              key={banner.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.2 }}
+              whileHover={{ y: -4, scale: 1.01 }}
+              className={`bg-gradient-to-br ${banner.gradient} rounded-lg p-4 relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group`}
+              style={{ aspectRatio: "41/22" }}
+            >
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-16 h-16 bg-white rounded-full blur-xl"></div>
+              </div>
+
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div>
+                  {banner.description && (
+                    <p className="text-xs text-white/90 mb-1 font-medium">{banner.description}</p>
+                  )}
+                  <h3 className="text-lg font-bold text-white mb-0.5 drop-shadow-lg">
+                    {banner.title}
+                  </h3>
+                  {banner.subtitle && (
+                    <h3 className="text-lg font-bold text-white mb-0.5 drop-shadow-lg">
+                      {banner.subtitle}
+                    </h3>
+                  )}
+                  {banner.subtext && (
+                    <h3 className="text-lg font-bold text-white mb-2 drop-shadow-lg">
+                      {banner.subtext}
+                    </h3>
+                  )}
+                </div>
+                <p className="text-white text-sm font-bold bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full inline-block">
+                  {banner.discount}
+                </p>
+              </div>
+              <div className="absolute right-0 bottom-0 w-24 h-24 opacity-30 group-hover:opacity-40 transition-opacity">
+                <img
+                  src={banner.image}
+                  alt={banner.title}
+                  className="w-full h-full object-cover rounded-tl-full"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/200x200?text=Promo';
+                  }}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile Layout - Unchanged */}
+      <div className="md:hidden container mx-auto px-2 sm:px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-8">
           {banners.map((banner, index) => (
             <motion.div

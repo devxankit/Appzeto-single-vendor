@@ -10,11 +10,11 @@ import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import PageTransition from '../components/PageTransition';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
-import useHeaderHeight from '../hooks/useHeaderHeight';
+import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const Profile = () => {
   const { user, updateProfile, changePassword, isLoading } = useAuthStore();
-  const headerHeight = useHeaderHeight();
+  const { responsivePadding } = useResponsiveHeaderPadding();
   const [activeTab, setActiveTab] = useState('personal');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -67,8 +67,8 @@ const Profile = () => {
         <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 w-full overflow-x-hidden">
           <Header />
           <Navbar />
-          <main className="w-full overflow-x-hidden" style={{ paddingTop: `${headerHeight}px` }}>
-            <div className="container mx-auto px-2 sm:px-4 py-8">
+          <main className="w-full overflow-x-hidden" style={{ paddingTop: `${responsivePadding}px` }}>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-2">
               <div className="max-w-4xl mx-auto">
                 <h1 className="text-3xl font-bold text-gray-800 mb-8">My Profile</h1>
 

@@ -14,7 +14,7 @@ import Footer from '../components/Layout/Footer';
 import PageTransition from '../components/PageTransition';
 import Breadcrumbs from '../components/Layout/Breadcrumbs';
 import successSound from '../../data/sounds/success.mp3';
-import useHeaderHeight from '../hooks/useHeaderHeight';
+import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const Checkout = () => {
   const { user, isAuthenticated } = useAuthStore();
   const { addresses, getDefaultAddress, addAddress } = useAddressStore();
   const { createOrder } = useOrderStore();
-  const headerHeight = useHeaderHeight();
+  const { responsivePadding } = useResponsiveHeaderPadding();
   
   const [step, setStep] = useState(1);
   const [isGuest, setIsGuest] = useState(false);
@@ -231,15 +231,16 @@ const Checkout = () => {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 w-full overflow-x-hidden">
         <Header />
         <Navbar />
-        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${headerHeight}px` }}>
-          <div className="container mx-auto px-2 sm:px-4 py-8">
-          <Breadcrumbs />
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">Checkout</h1>
+        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${responsivePadding}px` }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-2">
+            <div className="max-w-5xl mx-auto">
+              <Breadcrumbs />
+              <h1 className="text-3xl font-bold text-gray-800 mb-8">Checkout</h1>
 
-          {/* Guest Checkout Option */}
-          {!isAuthenticated && !isGuest && (
-            <div className="glass-card rounded-2xl p-6 mb-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              {/* Guest Checkout Option */}
+              {!isAuthenticated && !isGuest && (
+                <div className="glass-card rounded-2xl p-6 mb-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-bold text-gray-800 mb-2">Have an account?</h3>
                   <p className="text-sm text-gray-600">Sign in for faster checkout and order tracking</p>
@@ -257,40 +258,40 @@ const Checkout = () => {
                   >
                     Continue as Guest
                   </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+              )}
 
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-4">
-              {[1, 2, 3].map((s) => (
-                <div key={s} className="flex items-center">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                      step >= s
-                        ? 'gradient-green text-white'
-                        : 'bg-gray-200 text-gray-500'
-                    }`}
-                  >
-                    {s}
-                  </div>
-                  {s < 3 && (
-                    <div
-                      className={`w-16 h-1 mx-2 ${
-                        step > s ? 'gradient-green' : 'bg-gray-200'
-                      }`}
-                    />
-                  )}
+              {/* Progress Steps */}
+              <div className="flex items-center justify-center mb-8">
+                <div className="flex items-center gap-4">
+                  {[1, 2, 3].map((s) => (
+                    <div key={s} className="flex items-center">
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                          step >= s
+                            ? 'gradient-green text-white'
+                            : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
+                        {s}
+                      </div>
+                      {s < 3 && (
+                        <div
+                          className={`w-16 h-1 mx-2 ${
+                            step > s ? 'gradient-green' : 'bg-gray-200'
+                          }`}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Content */}
+                <div className="lg:col-span-2">
               <form onSubmit={handleSubmit}>
                 {/* Step 1: Shipping Information */}
                 {step === 1 && (
@@ -663,10 +664,10 @@ const Checkout = () => {
                   </button>
                 </div>
               </form>
-            </div>
+                </div>
 
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
+                {/* Order Summary */}
+                <div className="lg:col-span-1">
               <div className="glass-card rounded-2xl p-6 sticky top-4">
                 <h2 className="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
                 <div className="space-y-4 mb-6">
@@ -764,7 +765,8 @@ const Checkout = () => {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+            </div>
           </div>
         </main>
         <Footer />

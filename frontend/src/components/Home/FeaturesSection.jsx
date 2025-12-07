@@ -40,8 +40,37 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 bg-transparent">
-      <div className="container mx-auto px-2 sm:px-4">
+    <section ref={sectionRef} className="py-16 md:py-0 bg-transparent">
+      {/* Desktop Layout - White card container */}
+      <div className="hidden md:block bg-white rounded-lg mb-4 p-4">
+        <div className="grid grid-cols-4 gap-4">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <motion.div
+                key={feature.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="bg-gray-50 rounded-lg p-6 text-center hover-lift group cursor-pointer"
+              >
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 gradient-green rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-glow-green transition-all duration-300 group-hover:scale-110">
+                    <Icon className="text-white text-2xl" />
+                  </div>
+                </div>
+                <h3 className="text-base font-semibold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">{feature.title}</h3>
+                <p className="text-xs text-gray-600">{feature.description}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mobile Layout - Unchanged */}
+      <div className="md:hidden container mx-auto px-2 sm:px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;

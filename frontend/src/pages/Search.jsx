@@ -12,11 +12,11 @@ import PageTransition from '../components/PageTransition';
 import Breadcrumbs from '../components/Layout/Breadcrumbs';
 import useInfiniteScroll from '../hooks/useInfiniteScroll';
 import ProductGridSkeleton from '../components/Skeletons/ProductGridSkeleton';
-import useHeaderHeight from '../hooks/useHeaderHeight';
+import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const headerHeight = useHeaderHeight();
+  const { responsivePadding } = useResponsiveHeaderPadding();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
@@ -116,26 +116,27 @@ const Search = () => {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 w-full overflow-x-hidden">
         <Header />
         <Navbar />
-        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${headerHeight}px` }}>
-          <div className="container mx-auto px-2 sm:px-4 py-8">
-          <Breadcrumbs />
-          {/* Search Header */}
-          <div className="mb-6">
-            <form onSubmit={handleSearch} className="mb-4">
-              <div className="relative">
+        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${responsivePadding}px` }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-2">
+            <div className="max-w-7xl mx-auto">
+              <Breadcrumbs />
+              {/* Search Header */}
+              <div className="mb-6">
+                <form onSubmit={handleSearch} className="mb-4">
+                  <div className="relative">
                 <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full pl-12 pr-4 py-4 glass-card rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700 placeholder:text-gray-400 text-lg"
-                />
-              </div>
-            </form>
+                    placeholder="Search products..."
+                    className="w-full pl-12 pr-4 py-4 glass-card rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700 placeholder:text-gray-400 text-lg"
+                  />
+                </div>
+              </form>
 
-            {/* Filter Toggle */}
-            <div className="flex items-center justify-between">
+              {/* Filter Toggle */}
+              <div className="flex items-center justify-between">
               <p className="text-gray-600">
                 Found {filteredProducts.length} product(s)
               </p>
@@ -144,12 +145,12 @@ const Search = () => {
                 className="flex items-center gap-2 px-4 py-2 glass-card rounded-xl hover:bg-white/80 transition-colors"
               >
                 <FiFilter className="text-gray-600" />
-                <span className="font-semibold text-gray-700">Filters</span>
-              </button>
+                  <span className="font-semibold text-gray-700">Filters</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Filters Sidebar */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -292,7 +293,8 @@ const Search = () => {
                 </>
               )}
             </div>
-          </div>
+            </div>
+            </div>
           </div>
         </main>
         <Footer />

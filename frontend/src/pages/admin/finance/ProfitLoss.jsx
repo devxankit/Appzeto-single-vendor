@@ -1,13 +1,15 @@
-import { useState, useMemo } from 'react';
-import { FiDollarSign, FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
-import { motion } from 'framer-motion';
-import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
-import { mockOrders } from '../../../data/adminMockData';
-import { formatCurrency } from '../../../utils/adminHelpers';
+import { useState, useMemo } from "react";
+import { FiDollarSign, FiTrendingUp, FiTrendingDown } from "react-icons/fi";
+import { motion } from "framer-motion";
+import ProfitLossChart from "../../../components/Admin/Analytics/ProfitLossChart";
+import AnimatedSelect from "../../../components/Admin/AnimatedSelect";
+import { mockOrders, generateRevenueData } from "../../../data/adminMockData";
+import { formatCurrency } from "../../../utils/adminHelpers";
 
 const ProfitLoss = () => {
-  const [period, setPeriod] = useState('month');
+  const [period, setPeriod] = useState("month");
   const [orders] = useState(mockOrders);
+  const revenueData = useMemo(() => generateRevenueData(30), []);
 
   const financials = useMemo(() => {
     const revenue = orders.reduce((sum, order) => sum + order.total, 0);
@@ -31,11 +33,14 @@ const ProfitLoss = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+      className="space-y-6">
       <div className="lg:hidden">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Profit & Loss</h1>
-        <p className="text-sm sm:text-base text-gray-600">View financial performance and profitability</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+          Profit & Loss
+        </h1>
+        <p className="text-sm sm:text-base text-gray-600">
+          View financial performance and profitability
+        </p>
       </div>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
@@ -43,9 +48,9 @@ const ProfitLoss = () => {
           value={period}
           onChange={(e) => setPeriod(e.target.value)}
           options={[
-            { value: 'month', label: 'This Month' },
-            { value: 'quarter', label: 'This Quarter' },
-            { value: 'year', label: 'This Year' },
+            { value: "month", label: "This Month" },
+            { value: "quarter", label: "This Quarter" },
+            { value: "year", label: "This Year" },
           ]}
           className="min-w-[140px]"
         />
@@ -57,7 +62,9 @@ const ProfitLoss = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Total Revenue</span>
-              <span className="font-bold text-green-600">{formatCurrency(financials.revenue)}</span>
+              <span className="font-bold text-green-600">
+                {formatCurrency(financials.revenue)}
+              </span>
             </div>
           </div>
         </div>
@@ -67,16 +74,24 @@ const ProfitLoss = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Cost of Goods Sold</span>
-              <span className="font-bold text-red-600">{formatCurrency(financials.costOfGoods)}</span>
+              <span className="font-bold text-red-600">
+                {formatCurrency(financials.costOfGoods)}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Operating Expenses</span>
-              <span className="font-bold text-red-600">{formatCurrency(financials.operatingExpenses)}</span>
+              <span className="font-bold text-red-600">
+                {formatCurrency(financials.operatingExpenses)}
+              </span>
             </div>
             <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
-              <span className="font-semibold text-gray-800">Total Expenses</span>
+              <span className="font-semibold text-gray-800">
+                Total Expenses
+              </span>
               <span className="font-bold text-red-600">
-                {formatCurrency(financials.costOfGoods + financials.operatingExpenses)}
+                {formatCurrency(
+                  financials.costOfGoods + financials.operatingExpenses
+                )}
               </span>
             </div>
           </div>
@@ -89,26 +104,48 @@ const ProfitLoss = () => {
             <p className="text-sm text-gray-600">Gross Profit</p>
             <FiTrendingUp className="text-green-600" />
           </div>
-          <p className="text-2xl font-bold text-green-600">{formatCurrency(financials.grossProfit)}</p>
+          <p className="text-2xl font-bold text-green-600">
+            {formatCurrency(financials.grossProfit)}
+          </p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-gray-600">Net Profit</p>
             <FiDollarSign className="text-blue-600" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">{formatCurrency(financials.netProfit)}</p>
+          <p className="text-2xl font-bold text-gray-800">
+            {formatCurrency(financials.netProfit)}
+          </p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-gray-600">Profit Margin</p>
             <FiTrendingDown className="text-purple-600" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">{financials.profitMargin.toFixed(2)}%</p>
+          <p className="text-2xl font-bold text-gray-800">
+            {financials.profitMargin.toFixed(2)}%
+          </p>
         </div>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-800">Financial Trends</h3>
+          <AnimatedSelect
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            options={[
+              { value: "week", label: "Last 7 Days" },
+              { value: "month", label: "Last 30 Days" },
+              { value: "year", label: "Last Year" },
+            ]}
+            className="min-w-[140px]"
+          />
+        </div>
+        <ProfitLossChart data={revenueData} period={period} />
       </div>
     </motion.div>
   );
 };
 
 export default ProfitLoss;
-

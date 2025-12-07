@@ -11,11 +11,11 @@ import PageTransition from '../components/PageTransition';
 import ProductCard from '../components/ProductCard';
 import Breadcrumbs from '../components/Layout/Breadcrumbs';
 import Badge from '../components/Badge';
-import useHeaderHeight from '../hooks/useHeaderHeight';
+import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const DailyDeals = () => {
   const allDeals = getDailyDeals();
-  const headerHeight = useHeaderHeight();
+  const { responsivePadding } = useResponsiveHeaderPadding();
   const [viewMode, setViewMode] = useState('grid');
   const [timeLeft, setTimeLeft] = useState({
     hours: 23,
@@ -68,8 +68,8 @@ const DailyDeals = () => {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 w-full overflow-x-hidden">
         <Header />
         <Navbar />
-        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${headerHeight}px` }}>
-          <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
+        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${responsivePadding}px` }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-2">
             <div className="max-w-7xl mx-auto">
               <Breadcrumbs />
 

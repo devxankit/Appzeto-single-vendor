@@ -111,13 +111,14 @@ const DailyDealsSection = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-wrap md:flex-nowrap md:overflow-x-visible gap-3">
           {dailyDeals.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
+              className="w-[calc(50%-0.75rem)] md:w-0 md:flex-1 md:min-w-0"
             >
               <ProductCard product={product} />
             </motion.div>

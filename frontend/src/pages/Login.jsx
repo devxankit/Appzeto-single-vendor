@@ -10,13 +10,13 @@ import Header from '../components/Layout/Header';
 import Navbar from '../components/Layout/Navbar';
 import Footer from '../components/Layout/Footer';
 import PageTransition from '../components/PageTransition';
-import useHeaderHeight from '../hooks/useHeaderHeight';
+import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading } = useAuthStore();
-  const headerHeight = useHeaderHeight();
+  const { responsivePadding } = useResponsiveHeaderPadding();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -43,8 +43,8 @@ const Login = () => {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 w-full overflow-x-hidden">
         <Header />
         <Navbar />
-        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${headerHeight}px` }}>
-          <div className="container mx-auto px-2 sm:px-4 pt-4 sm:pt-6">
+        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${responsivePadding}px` }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
             <div className="max-w-md mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

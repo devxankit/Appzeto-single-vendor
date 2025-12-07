@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'react';
-import { FiPlus, FiSearch, FiEdit, FiTrash2 } from 'react-icons/fi';
-import { motion } from 'framer-motion';
-import { useBrandStore } from '../../../store/brandStore';
-import BrandForm from '../../../components/Admin/Brands/BrandForm';
-import DataTable from '../../../components/Admin/DataTable';
-import ExportButton from '../../../components/Admin/ExportButton';
-import ConfirmModal from '../../../components/Admin/ConfirmModal';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { FiPlus, FiSearch, FiEdit, FiTrash2 } from "react-icons/fi";
+import { motion } from "framer-motion";
+import { useBrandStore } from "../../../store/brandStore";
+import BrandForm from "../../../components/Admin/Brands/BrandForm";
+import DataTable from "../../../components/Admin/DataTable";
+import ExportButton from "../../../components/Admin/ExportButton";
+import ConfirmModal from "../../../components/Admin/ConfirmModal";
+import AnimatedSelect from "../../../components/Admin/AnimatedSelect";
+import toast from "react-hot-toast";
 
 const ManageBrands = () => {
   const { brands, initialize, deleteBrand } = useBrandStore();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
@@ -26,9 +27,9 @@ const ManageBrands = () => {
       brand.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'active' && brand.isActive) ||
-      (selectedStatus === 'inactive' && !brand.isActive);
+      selectedStatus === "all" ||
+      (selectedStatus === "active" && brand.isActive) ||
+      (selectedStatus === "inactive" && !brand.isActive);
 
     return matchesSearch && matchesStatus;
   });
@@ -50,13 +51,13 @@ const ManageBrands = () => {
   const confirmDelete = () => {
     deleteBrand(deleteModal.id);
     setDeleteModal({ isOpen: false, id: null });
-    toast.success('Brand deleted');
+    toast.success("Brand deleted");
   };
 
   const columns = [
     {
-      key: 'name',
-      label: 'Brand Name',
+      key: "name",
+      label: "Brand Name",
       sortable: true,
       render: (value, row) => (
         <div className="flex items-center gap-3">
@@ -72,33 +73,32 @@ const ManageBrands = () => {
       ),
     },
     {
-      key: 'isActive',
-      label: 'Status',
+      key: "isActive",
+      label: "Status",
       sortable: true,
       render: (value) => (
-        <span className={`px-2 py-1 rounded text-xs font-medium ${
-          value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-        }`}>
-          {value ? 'Active' : 'Inactive'}
+        <span
+          className={`px-2 py-1 rounded text-xs font-medium ${
+            value ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+          }`}>
+          {value ? "Active" : "Inactive"}
         </span>
       ),
     },
     {
-      key: 'actions',
-      label: 'Actions',
+      key: "actions",
+      label: "Actions",
       sortable: false,
       render: (_, row) => (
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleEdit(row)}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-          >
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
             <FiEdit />
           </button>
           <button
             onClick={() => handleDelete(row.id)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
             <FiTrash2 />
           </button>
         </div>
@@ -110,17 +110,19 @@ const ManageBrands = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+      className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="lg:hidden">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Manage Brands</h1>
-          <p className="text-sm sm:text-base text-gray-600">View and manage product brands</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+            Manage Brands
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">
+            View and manage product brands
+          </p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm"
-        >
+          className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm">
           <FiPlus />
           <span>Add Brand</span>
         </button>
@@ -143,9 +145,9 @@ const ManageBrands = () => {
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             options={[
-              { value: 'all', label: 'All Status' },
-              { value: 'active', label: 'Active' },
-              { value: 'inactive', label: 'Inactive' },
+              { value: "all", label: "All Status" },
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
             ]}
             className="w-full sm:w-auto min-w-[140px]"
           />
@@ -155,9 +157,12 @@ const ManageBrands = () => {
           <ExportButton
             data={filteredBrands}
             headers={[
-              { label: 'ID', accessor: (row) => row.id },
-              { label: 'Name', accessor: (row) => row.name },
-              { label: 'Status', accessor: (row) => (row.isActive ? 'Active' : 'Inactive') },
+              { label: "ID", accessor: (row) => row.id },
+              { label: "Name", accessor: (row) => row.name },
+              {
+                label: "Status",
+                accessor: (row) => (row.isActive ? "Active" : "Inactive"),
+              },
             ]}
             filename="brands"
           />
@@ -203,4 +208,3 @@ const ManageBrands = () => {
 };
 
 export default ManageBrands;
-

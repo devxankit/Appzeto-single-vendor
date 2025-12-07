@@ -20,13 +20,13 @@ import VariantSelector from '../components/Product/VariantSelector';
 import ReviewForm from '../components/Product/ReviewForm';
 import ReviewItem from '../components/Product/ReviewItem';
 import SocialShare from '../components/Product/SocialShare';
-import useHeaderHeight from '../hooks/useHeaderHeight';
+import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const product = getProductById(id);
-  const headerHeight = useHeaderHeight();
+  const { responsivePadding } = useResponsiveHeaderPadding();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [reviewSortBy, setReviewSortBy] = useState('newest');
@@ -158,10 +158,11 @@ const ProductDetail = () => {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 w-full overflow-x-hidden">
         <Header />
         <Navbar />
-        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${headerHeight}px` }}>
-          <div className="container mx-auto px-2 sm:px-4 py-6">
-          {/* Breadcrumbs */}
-          <Breadcrumbs />
+        <main className="w-full overflow-x-hidden" style={{ paddingTop: `${responsivePadding}px` }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-1">
+            <div className="max-w-6xl mx-auto">
+              {/* Breadcrumbs */}
+              <Breadcrumbs />
 
           {/* Back Button */}
           <button
@@ -392,7 +393,7 @@ const ProductDetail = () => {
           {similarProducts.length > 0 && (
             <div className="mt-12 border-t border-gray-200 pt-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">You May Also Like</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
                 {similarProducts.map((similarProduct, index) => (
                   <motion.div
                     key={similarProduct.id}
@@ -406,6 +407,7 @@ const ProductDetail = () => {
               </div>
             </div>
           )}
+            </div>
           </div>
         </main>
         <Footer />

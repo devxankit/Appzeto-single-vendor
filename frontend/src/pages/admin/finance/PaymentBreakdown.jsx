@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
-import { FiCreditCard, FiDollarSign, FiSmartphone } from 'react-icons/fi';
-import { motion } from 'framer-motion';
-import { mockOrders } from '../../../data/adminMockData';
-import { formatCurrency } from '../../../utils/adminHelpers';
+import { useState, useMemo } from "react";
+import { FiCreditCard, FiDollarSign, FiSmartphone } from "react-icons/fi";
+import { motion } from "framer-motion";
+import PaymentBreakdownPieChart from "../../../components/Admin/Analytics/PaymentBreakdownPieChart";
+import { mockOrders } from "../../../data/adminMockData";
+import { formatCurrency } from "../../../utils/adminHelpers";
 
 const PaymentBreakdown = () => {
   const [orders] = useState(mockOrders);
@@ -17,7 +18,7 @@ const PaymentBreakdown = () => {
     };
 
     orders.forEach((order) => {
-      const method = order.paymentMethod || 'creditCard';
+      const method = order.paymentMethod || "creditCard";
       if (breakdown[method]) {
         breakdown[method].count++;
         breakdown[method].total += order.total;
@@ -27,7 +28,10 @@ const PaymentBreakdown = () => {
     return breakdown;
   }, [orders]);
 
-  const totalAmount = Object.values(paymentBreakdown).reduce((sum, method) => sum + method.total, 0);
+  const totalAmount = Object.values(paymentBreakdown).reduce(
+    (sum, method) => sum + method.total,
+    0
+  );
 
   const getMethodIcon = (method) => {
     const icons = {
@@ -42,11 +46,11 @@ const PaymentBreakdown = () => {
 
   const getMethodLabel = (method) => {
     const labels = {
-      creditCard: 'Credit Card',
-      debitCard: 'Debit Card',
-      cash: 'Cash',
-      wallet: 'Digital Wallet',
-      upi: 'UPI',
+      creditCard: "Credit Card",
+      debitCard: "Debit Card",
+      cash: "Cash",
+      wallet: "Digital Wallet",
+      upi: "UPI",
     };
     return labels[method] || method;
   };
@@ -55,46 +59,24 @@ const PaymentBreakdown = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+      className="space-y-6">
       <div className="lg:hidden">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Payment Breakdown</h1>
-        <p className="text-sm sm:text-base text-gray-600">Analyze payment methods and distribution</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+          Payment Breakdown
+        </h1>
+        <p className="text-sm sm:text-base text-gray-600">
+          Analyze payment methods and distribution
+        </p>
       </div>
 
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Total Payments: {formatCurrency(totalAmount)}</h3>
-        <div className="space-y-4">
-          {Object.entries(paymentBreakdown).map(([method, data]) => {
-            const Icon = getMethodIcon(method);
-            const percentage = totalAmount > 0 ? (data.total / totalAmount) * 100 : 0;
-            return (
-              <div key={method} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <Icon className="text-primary-600" />
-                    <span className="font-semibold text-gray-800">{getMethodLabel(method)}</span>
-                  </div>
-                  <span className="font-bold text-gray-800">{formatCurrency(data.total)}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-primary-600 h-2 rounded-full"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                  <span className="text-sm text-gray-600">{percentage.toFixed(1)}%</span>
-                  <span className="text-sm text-gray-600">({data.count} orders)</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">
+          Total Payments: {formatCurrency(totalAmount)}
+        </h3>
+        <PaymentBreakdownPieChart paymentData={paymentBreakdown} />
       </div>
     </motion.div>
   );
 };
 
 export default PaymentBreakdown;
-
