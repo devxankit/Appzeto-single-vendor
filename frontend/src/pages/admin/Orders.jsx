@@ -1,21 +1,22 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiEye } from 'react-icons/fi';
+import {
+  FiShoppingBag,
+  FiClock,
+  FiCheckCircle,
+  FiPackage,
+  FiTruck,
+  FiXCircle,
+  FiList,
+  FiMapPin,
+  FiBell,
+} from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import DataTable from '../../components/Admin/DataTable';
-import ExportButton from '../../components/Admin/ExportButton';
-import Badge from '../../components/Badge';
-import AnimatedSelect from '../../components/Admin/AnimatedSelect';
-import { formatCurrency, formatDateTime } from '../../utils/adminHelpers';
 import { mockOrders } from '../../data/adminMockData';
-import Button from '../../components/Admin/Button';
 
 const Orders = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [dateFilter, setDateFilter] = useState('all');
 
   // Load orders from localStorage or use mock data
   useEffect(() => {
@@ -28,116 +29,119 @@ const Orders = () => {
     }
   }, []);
 
-  // Save orders to localStorage
-  const saveOrders = (newOrders) => {
-    setOrders(newOrders);
-    localStorage.setItem('admin-orders', JSON.stringify(newOrders));
-  };
+  // Calculate order statistics
+  const orderStats = useMemo(() => {
+    const stats = {
+      pending: 0,
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+      cancelled: 0,
+      total: orders.length,
+      totalRevenue: 0,
+    };
 
-  // Filtered orders
-  const filteredOrders = useMemo(() => {
-    let filtered = orders;
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (order) =>
-          order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.customer.email.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Status filter
-    if (selectedStatus !== 'all') {
-      filtered = filtered.filter((order) => order.status === selectedStatus);
-    }
-
-    // Date filter
-    if (dateFilter !== 'all') {
-      const now = new Date();
-      const filterDate = new Date();
+    orders.forEach((order) => {
+      const status = order.status?.toLowerCase() || '';
       
-      switch (dateFilter) {
-        case 'today':
-          filterDate.setHours(0, 0, 0, 0);
-          filtered = filtered.filter((order) => new Date(order.date) >= filterDate);
-          break;
-        case 'week':
-          filterDate.setDate(now.getDate() - 7);
-          filtered = filtered.filter((order) => new Date(order.date) >= filterDate);
-          break;
-        case 'month':
-          filterDate.setMonth(now.getMonth() - 1);
-          filtered = filtered.filter((order) => new Date(order.date) >= filterDate);
-          break;
-        default:
-          break;
+      if (status === 'pending') {
+        stats.pending++;
+      } else if (status === 'processing') {
+        stats.processing++;
+      } else if (status === 'shipped') {
+        stats.shipped++;
+      } else if (status === 'delivered') {
+        stats.delivered++;
+      } else if (status === 'cancelled' || status === 'canceled') {
+        stats.cancelled++;
       }
-    }
 
-    return filtered;
-  }, [orders, searchQuery, selectedStatus, dateFilter]);
+      // Calculate total revenue from delivered orders
+      if (status === 'delivered') {
+        stats.totalRevenue += order.total || 0;
+      }
+    });
 
-  // Table columns
-  const columns = [
+    return stats;
+  }, [orders]);
+
+  // Analytics cards configuration
+  const analyticsCards = [
     {
-      key: 'id',
-      label: 'Order ID',
-      sortable: true,
-      render: (value) => <span className="font-semibold">{value}</span>,
+      title: 'Total Orders',
+      value: orderStats.total,
+      icon: FiShoppingBag,
+      bgColor: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+      cardBg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
     },
     {
-      key: 'customer',
-      label: 'Customer',
-      sortable: true,
-      render: (value) => (
-        <div>
-          <p className="font-medium text-gray-800">{value.name}</p>
-          <p className="text-xs text-gray-500">{value.email}</p>
-        </div>
-      ),
+      title: 'Pending',
+      value: orderStats.pending,
+      icon: FiClock,
+      bgColor: 'bg-gradient-to-br from-yellow-500 to-amber-600',
+      cardBg: 'bg-gradient-to-br from-yellow-50 to-amber-50',
     },
     {
-      key: 'date',
-      label: 'Date',
-      sortable: true,
-      render: (value) => formatDateTime(value),
+      title: 'Processing',
+      value: orderStats.processing,
+      icon: FiPackage,
+      bgColor: 'bg-gradient-to-br from-indigo-500 to-purple-600',
+      cardBg: 'bg-gradient-to-br from-indigo-50 to-purple-50',
     },
     {
-      key: 'total',
-      label: 'Total',
-      sortable: true,
-      render: (value) => (
-        <span className="font-bold text-gray-800">{formatCurrency(value)}</span>
-      ),
+      title: 'Shipped',
+      value: orderStats.shipped,
+      icon: FiTruck,
+      bgColor: 'bg-gradient-to-br from-cyan-500 to-blue-600',
+      cardBg: 'bg-gradient-to-br from-cyan-50 to-blue-50',
     },
     {
-      key: 'items',
-      label: 'Items',
-      sortable: true,
-      render: (value) => {
-        const count = Array.isArray(value) ? value.length : (typeof value === 'number' ? value : 0);
-        return <span>{count} items</span>;
-      },
+      title: 'Delivered',
+      value: orderStats.delivered,
+      icon: FiCheckCircle,
+      bgColor: 'bg-gradient-to-br from-green-500 to-emerald-600',
+      cardBg: 'bg-gradient-to-br from-green-50 to-emerald-50',
     },
     {
-      key: 'status',
-      label: 'Status',
-      sortable: true,
-      render: (value) => <Badge variant={value}>{value}</Badge>,
+      title: 'Cancelled',
+      value: orderStats.cancelled,
+      icon: FiXCircle,
+      bgColor: 'bg-gradient-to-br from-red-500 to-rose-600',
+      cardBg: 'bg-gradient-to-br from-red-50 to-rose-50',
+    },
+  ];
+
+  // Option cards configuration
+  const optionCards = [
+    {
+      path: '/admin/orders/all-orders',
+      label: 'All Orders',
+      icon: FiList,
+      gradient: 'from-blue-500 via-blue-600 to-blue-700',
+      lightGradient: 'from-blue-50 via-blue-100/80 to-blue-50',
+      shadowColor: 'shadow-blue-500/20',
+      hoverShadow: 'hover:shadow-blue-500/30',
+      description: 'View and manage all orders',
     },
     {
-      key: 'actions',
-      label: 'Actions',
-      sortable: false,
-      render: (_, row) => (
-        <Button
-          onClick={() => navigate(`/admin/orders/${row.id}`)}
-          variant="iconBlue"
-          icon={FiEye}
-        />
-      ),
+      path: '/admin/orders/order-tracking',
+      label: 'Order Tracking',
+      icon: FiMapPin,
+      gradient: 'from-purple-500 via-purple-600 to-purple-700',
+      lightGradient: 'from-purple-50 via-purple-100/80 to-purple-50',
+      shadowColor: 'shadow-purple-500/20',
+      hoverShadow: 'hover:shadow-purple-500/30',
+      description: 'Track order status',
+    },
+    {
+      path: '/admin/orders/order-notifications',
+      label: 'Order Notifications',
+      icon: FiBell,
+      gradient: 'from-orange-500 via-orange-600 to-orange-700',
+      lightGradient: 'from-orange-50 via-orange-100/80 to-orange-50',
+      shadowColor: 'shadow-orange-500/20',
+      hoverShadow: 'hover:shadow-orange-500/30',
+      description: 'Manage order notifications',
     },
   ];
 
@@ -145,86 +149,153 @@ const Orders = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-5 sm:space-y-6"
     >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="lg:hidden">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Orders</h1>
-          <p className="text-sm sm:text-base text-gray-600">Manage and track customer orders</p>
-        </div>
+      <div className="px-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1.5">
+          Orders
+        </h1>
+        <p className="text-sm sm:text-base text-gray-500">
+          Manage and track customer orders
+        </p>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
-          {/* Search */}
-          <div className="relative flex-1 w-full sm:min-w-[200px]">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by ID, name, or email..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
-            />
-          </div>
-
-          {/* Status Filter */}
-          <AnimatedSelect
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            options={[
-              { value: 'all', label: 'All Status' },
-              { value: 'pending', label: 'Pending' },
-              { value: 'processing', label: 'Processing' },
-              { value: 'shipped', label: 'Shipped' },
-              { value: 'delivered', label: 'Delivered' },
-              { value: 'cancelled', label: 'Cancelled' },
-            ]}
-            className="w-full sm:w-auto min-w-[140px]"
-          />
-
-          {/* Date Filter */}
-          <AnimatedSelect
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            options={[
-              { value: 'all', label: 'All Time' },
-              { value: 'today', label: 'Today' },
-              { value: 'week', label: 'Last 7 Days' },
-              { value: 'month', label: 'Last 30 Days' },
-            ]}
-            className="w-full sm:w-auto min-w-[140px]"
-          />
-
-        {/* Export Button */}
-          <div className="w-full sm:w-auto">
-            <ExportButton
-              data={filteredOrders}
-              headers={[
-                { label: 'Order ID', accessor: (row) => row.id },
-                { label: 'Customer', accessor: (row) => row.customer.name },
-                { label: 'Email', accessor: (row) => row.customer.email },
-                { label: 'Date', accessor: (row) => formatDateTime(row.date) },
-                { label: 'Total', accessor: (row) => formatCurrency(row.total) },
-                { label: 'Items', accessor: (row) => row.items },
-                { label: 'Status', accessor: (row) => row.status },
-              ]}
-              filename="orders"
-            />
-          </div>
-        </div>
+      {/* Analytics Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {analyticsCards.map((card, index) => {
+          const Icon = card.icon;
+          return (
+            <motion.div
+              key={card.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className={`${card.cardBg} rounded-xl p-3 sm:p-4 shadow-md border-2 border-transparent hover:shadow-lg transition-all duration-300 relative overflow-hidden`}
+            >
+              {/* Decorative gradient overlay */}
+              <div className={`absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 ${card.bgColor} opacity-10 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16`}></div>
+              
+              <div className="flex items-center justify-between mb-2 sm:mb-3 relative z-10">
+                <div className={`${card.bgColor} bg-white/20 p-2 sm:p-2.5 rounded-lg shadow-md`}>
+                  <Icon className="text-white text-base sm:text-lg" />
+                </div>
+              </div>
+              <div className="relative z-10">
+                <h3 className="text-gray-600 text-xs sm:text-sm font-medium mb-1">
+                  {card.title}
+                </h3>
+                <p className="text-gray-800 text-lg sm:text-xl font-bold">
+                  {card.value.toLocaleString()}
+                </p>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Orders Table */}
-      <DataTable
-        data={filteredOrders}
-        columns={columns}
-        pagination={true}
-        itemsPerPage={10}
-        onRowClick={(row) => navigate(`/admin/orders/${row.id}`)}
-      />
+      {/* Option Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+        {optionCards.map((item, index) => {
+          const Icon = item.icon;
+          return (
+            <motion.button
+              key={item.path}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{
+                delay: index * 0.05,
+                type: 'spring',
+                stiffness: 200,
+                damping: 20,
+              }}
+              onClick={() => navigate(item.path)}
+              className="group relative overflow-hidden"
+            >
+              <div
+                className={`
+                relative h-full
+                flex flex-col items-center justify-center
+                p-3 sm:p-6
+                bg-white
+                rounded-2xl sm:rounded-3xl
+                border border-gray-100/80
+                ${`bg-gradient-to-br ${item.lightGradient}`}
+                ${item.shadowColor} ${item.hoverShadow}
+                shadow-md sm:shadow-lg hover:shadow-2xl
+                transition-all duration-500 ease-out
+                active:scale-[0.96]
+                hover:border-transparent
+                overflow-hidden
+              `}
+              >
+                {/* Animated Background Gradient */}
+                <div
+                  className={`
+                  absolute inset-0
+                  bg-gradient-to-br ${item.gradient}
+                  opacity-0 group-hover:opacity-10
+                  transition-opacity duration-500
+                `}
+                />
+
+                {/* Decorative Circles */}
+                <div className="absolute -top-6 -right-6 sm:-top-8 sm:-right-8 w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-white/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                {/* Icon Container with Enhanced Design */}
+                <div
+                  className={`
+                  relative z-10
+                  w-12 h-12 sm:w-20 sm:h-20
+                  rounded-xl sm:rounded-3xl
+                  bg-gradient-to-br ${item.gradient}
+                  flex items-center justify-center
+                  mb-2 sm:mb-4
+                  ${item.shadowColor}
+                  shadow-lg sm:shadow-xl group-hover:shadow-2xl
+                  group-hover:scale-110 group-hover:rotate-3
+                  transition-all duration-500 ease-out
+                  before:absolute before:inset-0
+                  before:bg-gradient-to-br before:from-white/20 before:to-transparent
+                  before:rounded-xl sm:before:rounded-3xl
+                `}
+                >
+                  <Icon
+                    className="text-white text-lg sm:text-3xl relative z-10"
+                    strokeWidth={2.5}
+                  />
+
+                  {/* Shine Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-xl sm:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 text-center space-y-0.5 sm:space-y-1">
+                  <h3 className="text-xs sm:text-base font-bold text-gray-900 group-hover:text-gray-950 transition-colors duration-300 leading-tight">
+                    {item.label}
+                  </h3>
+                  <p className="text-[10px] sm:text-xs text-gray-500 group-hover:text-gray-600 transition-colors duration-300 leading-tight">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Bottom Accent Line */}
+                <div
+                  className={`
+                  absolute bottom-0 left-0 right-0
+                  h-0.5 sm:h-1
+                  bg-gradient-to-r ${item.gradient}
+                  transform scale-x-0 group-hover:scale-x-100
+                  transition-transform duration-500 ease-out
+                  origin-left
+                `}
+                />
+              </div>
+            </motion.button>
+          );
+        })}
+      </div>
     </motion.div>
   );
 };

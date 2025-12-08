@@ -1,692 +1,198 @@
-import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FiPlus,
-  FiSearch,
-  FiEdit,
-  FiTrash2,
-  FiFilter,
-  FiX,
-  FiUpload,
-  FiDownload,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi";
 import { motion } from "framer-motion";
-import DataTable from "../../components/Admin/DataTable";
-import ExportButton from "../../components/Admin/ExportButton";
-import Badge from "../../components/Badge";
-import ConfirmModal from "../../components/Admin/ConfirmModal";
-import AnimatedSelect from "../../components/Admin/AnimatedSelect";
-import Button from "../../components/Admin/Button";
-import { formatCurrency, generateCSV } from "../../utils/adminHelpers";
-import { formatPrice } from "../../utils/helpers";
-import { products as initialProducts } from "../../data/products";
-import { useCategoryStore } from "../../store/categoryStore";
-import { useBrandStore } from "../../store/brandStore";
-import toast from "react-hot-toast";
+import {
+  FiPackage,
+  FiPlus,
+  FiUpload,
+  FiDollarSign,
+  FiStar,
+  FiHelpCircle,
+} from "react-icons/fi";
 
 const Products = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
-  const { categories, initialize: initCategories } = useCategoryStore();
-  const { brands, initialize: initBrands } = useBrandStore();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedBrand, setSelectedBrand] = useState("all");
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    productId: null,
-    isBulk: false,
-  });
-  const itemsPerPage = 10;
 
-  // Load products from localStorage or use initial products
-  useEffect(() => {
-    initCategories();
-    initBrands();
-    const savedProducts = localStorage.getItem("admin-products");
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    } else {
-      setProducts(initialProducts);
-      localStorage.setItem("admin-products", JSON.stringify(initialProducts));
-    }
-  }, []);
-
-  // Save products to localStorage when they change
-  const saveProducts = (newProducts) => {
-    setProducts(newProducts);
-    localStorage.setItem("admin-products", JSON.stringify(newProducts));
-  };
-
-  // Filtered products
-  const filteredProducts = useMemo(() => {
-    let filtered = products;
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Status filter
-    if (selectedStatus !== "all") {
-      filtered = filtered.filter((product) => product.stock === selectedStatus);
-    }
-
-    // Category filter
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(
-        (product) => product.categoryId === parseInt(selectedCategory)
-      );
-    }
-
-    // Brand filter
-    if (selectedBrand !== "all") {
-      filtered = filtered.filter(
-        (product) => product.brandId === parseInt(selectedBrand)
-      );
-    }
-
-    return filtered;
-  }, [products, searchQuery, selectedStatus, selectedCategory, selectedBrand]);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedStatus, selectedCategory, selectedBrand]);
-
-  // Pagination for mobile cards
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredProducts.slice(startIndex, endIndex);
-  }, [filteredProducts, currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-
-  // Table columns
-  const columns = [
+  const menuItems = [
     {
-      key: "id",
-      label: "ID",
-      sortable: true,
+      path: "/admin/products/manage-products",
+      label: "Manage Products",
+      icon: FiPackage,
+      gradient: "from-blue-500 via-blue-600 to-blue-700",
+      lightGradient: "from-blue-50 via-blue-100/80 to-blue-50",
+      shadowColor: "shadow-blue-500/20",
+      hoverShadow: "hover:shadow-blue-500/30",
+      description: "View and manage all products",
     },
     {
-      key: "name",
-      label: "Product Name",
-      sortable: true,
-      render: (value, row) => (
-        <div className="flex items-center gap-3">
-          <img
-            src={row.image}
-            alt={value}
-            className="w-10 h-10 object-cover rounded-lg"
-            onError={(e) => {
-              e.target.src = "https://via.placeholder.com/50x50?text=Product";
-            }}
-          />
-          <span className="font-medium">{value}</span>
-        </div>
-      ),
+      path: "/admin/products/add-product",
+      label: "Add Product",
+      icon: FiPlus,
+      gradient: "from-green-500 via-green-600 to-green-700",
+      lightGradient: "from-green-50 via-green-100/80 to-green-50",
+      shadowColor: "shadow-green-500/20",
+      hoverShadow: "hover:shadow-green-500/30",
+      description: "Create a new product",
     },
     {
-      key: "price",
-      label: "Price",
-      sortable: true,
-      render: (value) => formatPrice(value),
+      path: "/admin/products/bulk-upload",
+      label: "Bulk Upload",
+      icon: FiUpload,
+      gradient: "from-purple-500 via-purple-600 to-purple-700",
+      lightGradient: "from-purple-50 via-purple-100/80 to-purple-50",
+      shadowColor: "shadow-purple-500/20",
+      hoverShadow: "hover:shadow-purple-500/30",
+      description: "Upload products in bulk",
     },
     {
-      key: "stockQuantity",
-      label: "Stock",
-      sortable: true,
-      render: (value) => value.toLocaleString(),
+      path: "/admin/products/tax-pricing",
+      label: "Tax & Pricing",
+      icon: FiDollarSign,
+      gradient: "from-orange-500 via-orange-600 to-orange-700",
+      lightGradient: "from-orange-50 via-orange-100/80 to-orange-50",
+      shadowColor: "shadow-orange-500/20",
+      hoverShadow: "hover:shadow-orange-500/30",
+      description: "Manage tax and pricing rules",
     },
     {
-      key: "stock",
-      label: "Status",
-      sortable: true,
-      render: (value) => (
-        <Badge
-          variant={
-            value === "in_stock"
-              ? "success"
-              : value === "low_stock"
-              ? "warning"
-              : "error"
-          }>
-          {value.replace("_", " ").toUpperCase()}
-        </Badge>
-      ),
+      path: "/admin/products/product-ratings",
+      label: "Product Ratings",
+      icon: FiStar,
+      gradient: "from-amber-500 via-amber-600 to-amber-700",
+      lightGradient: "from-amber-50 via-amber-100/80 to-amber-50",
+      shadowColor: "shadow-amber-500/20",
+      hoverShadow: "hover:shadow-amber-500/30",
+      description: "View and manage ratings",
     },
     {
-      key: "actions",
-      label: "Actions",
-      sortable: false,
-      render: (_, row) => (
-        <div className="flex items-center gap-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/admin/products/${row.id}`);
-            }}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-            <FiEdit />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(row.id);
-            }}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-            <FiTrash2 />
-          </button>
-        </div>
-      ),
+      path: "/admin/products/product-faqs",
+      label: "Product FAQs",
+      icon: FiHelpCircle,
+      gradient: "from-indigo-500 via-indigo-600 to-indigo-700",
+      lightGradient: "from-indigo-50 via-indigo-100/80 to-indigo-50",
+      shadowColor: "shadow-indigo-500/20",
+      hoverShadow: "hover:shadow-indigo-500/30",
+      description: "Manage product FAQs",
     },
   ];
-
-  const handleDelete = (id) => {
-    setDeleteModal({ isOpen: true, productId: id, isBulk: false });
-  };
-
-  const confirmDelete = () => {
-    if (deleteModal.isBulk) {
-      if (selectedProducts.length === 0) {
-        toast.error("Please select products to delete");
-        return;
-      }
-      const newProducts = products.filter(
-        (p) => !selectedProducts.includes(p.id)
-      );
-      saveProducts(newProducts);
-      setSelectedProducts([]);
-      toast.success("Products deleted successfully");
-    } else {
-      const newProducts = products.filter(
-        (p) => p.id !== deleteModal.productId
-      );
-      saveProducts(newProducts);
-      toast.success("Product deleted successfully");
-    }
-  };
-
-  const handleBulkDelete = () => {
-    if (selectedProducts.length === 0) {
-      toast.error("Please select products to delete");
-      return;
-    }
-    setDeleteModal({ isOpen: true, productId: null, isBulk: true });
-  };
-
-  const handleBulkImport = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".csv";
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const csv = event.target.result;
-          const lines = csv.split("\n");
-          const headers = lines[0]
-            .split(",")
-            .map((h) => h.trim().replace(/"/g, ""));
-
-          // Simple CSV parser - in production, use a proper CSV library
-          const importedProducts = [];
-          for (let i = 1; i < lines.length; i++) {
-            if (!lines[i].trim()) continue;
-            const values = lines[i]
-              .split(",")
-              .map((v) => v.trim().replace(/"/g, ""));
-            if (values.length < headers.length) continue;
-
-            const product = {};
-            headers.forEach((header, index) => {
-              product[header] = values[index];
-            });
-
-            if (product.name && product.price) {
-              importedProducts.push({
-                ...product,
-                id:
-                  Math.max(...products.map((p) => p.id), 0) +
-                  importedProducts.length +
-                  1,
-                price: parseFloat(product.price) || 0,
-                stockQuantity: parseInt(product.stockQuantity) || 0,
-                rating: 0,
-                reviewCount: 0,
-              });
-            }
-          }
-
-          if (importedProducts.length > 0) {
-            const newProducts = [...products, ...importedProducts];
-            saveProducts(newProducts);
-            toast.success(
-              `${importedProducts.length} products imported successfully`
-            );
-          } else {
-            toast.error("No valid products found in CSV");
-          }
-        } catch (error) {
-          toast.error("Failed to import products: " + error.message);
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  };
-
-  const handleExport = () => {
-    const headers = [
-      { label: "ID", accessor: (row) => row.id },
-      { label: "Name", accessor: (row) => row.name },
-      { label: "Price", accessor: (row) => formatCurrency(row.price) },
-      { label: "Stock", accessor: (row) => row.stockQuantity },
-      { label: "Status", accessor: (row) => row.stock },
-    ];
-    // Export handled by ExportButton component
-  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6">
+      className="space-y-5 sm:space-y-6"
+    >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="lg:hidden">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-            Products
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600">
-            Manage your product catalog
-          </p>
-        </div>
-        <div className="flex items-center gap-2 sm:mt-0">
-          <Button
-            onClick={handleBulkImport}
-            variant="primary"
-            size="sm"
-            icon={FiUpload}
-            className="flex-1 sm:flex-initial"
-            title="Import Products (CSV)"
-          >
-            Import
-          </Button>
-          <Button
-            onClick={() => navigate("/admin/products/new")}
-            variant="primary"
-            size="sm"
-            icon={FiPlus}
-            className="flex-1 sm:flex-initial"
-          >
-            Add Product
-          </Button>
-        </div>
+      <div className="px-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1.5">
+          Products
+        </h1>
+        <p className="text-sm sm:text-base text-gray-500">
+          Manage your product catalog and settings
+        </p>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200">
-        {/* Mobile Filter Toggle */}
-        <div className="flex items-center justify-between mb-3 sm:hidden">
-          <span className="text-sm font-semibold text-gray-700">Filters</span>
-          <Button
-            onClick={() => setShowFilters(!showFilters)}
-            variant="ghost"
-            size="sm"
-            icon={FiFilter}
-          >
-            {showFilters ? "Hide" : "Show"}
-          </Button>
-        </div>
-
-        {/* Filter Content */}
-        <div
-          className={`${
-            showFilters ? "block" : "hidden"
-          } sm:block space-y-3 sm:space-y-0`}>
-          {/* Search */}
-          <div className="relative w-full sm:flex-1">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm sm:text-base" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm sm:text-base text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </div>
-
-          {/* Filters Row - Desktop */}
-          <div className="hidden sm:flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
-            {/* Status Filter */}
-            <AnimatedSelect
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              options={[
-                { value: 'all', label: 'All Status' },
-                { value: 'in_stock', label: 'In Stock' },
-                { value: 'low_stock', label: 'Low Stock' },
-                { value: 'out_of_stock', label: 'Out of Stock' },
-              ]}
-              className="flex-shrink-0 min-w-[140px]"
-            />
-
-            {/* Category Filter */}
-            <AnimatedSelect
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              options={[
-                { value: 'all', label: 'All Categories' },
-                ...categories
-                  .filter((cat) => cat.isActive !== false)
-                  .map((cat) => ({ value: String(cat.id), label: cat.name })),
-              ]}
-              className="flex-shrink-0 min-w-[160px]"
-            />
-
-            {/* Brand Filter */}
-            <AnimatedSelect
-              value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              options={[
-                { value: 'all', label: 'All Brands' },
-                ...brands
-                  .filter((brand) => brand.isActive !== false)
-                  .map((brand) => ({ value: String(brand.id), label: brand.name })),
-              ]}
-              className="flex-shrink-0 min-w-[140px]"
-            />
-
-            {/* Export Button */}
-            <ExportButton
-              data={filteredProducts}
-              headers={[
-                { label: "ID", accessor: (row) => row.id },
-                { label: "Name", accessor: (row) => row.name },
-                {
-                  label: "Price",
-                  accessor: (row) => formatCurrency(row.price),
-                },
-                { label: "Stock", accessor: (row) => row.stockQuantity },
-                { label: "Status", accessor: (row) => row.stock },
-              ]}
-              filename="products"
-            />
-          </div>
-
-          {/* Filters Stack - Mobile */}
-          <div className="sm:hidden space-y-2 mt-3">
-            {/* Status Filter */}
-            <AnimatedSelect
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              options={[
-                { value: 'all', label: 'All Status' },
-                { value: 'in_stock', label: 'In Stock' },
-                { value: 'low_stock', label: 'Low Stock' },
-                { value: 'out_of_stock', label: 'Out of Stock' },
-              ]}
-            />
-
-            {/* Category Filter */}
-            <AnimatedSelect
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              options={[
-                { value: 'all', label: 'All Categories' },
-                ...categories
-                  .filter((cat) => cat.isActive !== false)
-                  .map((cat) => ({ value: String(cat.id), label: cat.name })),
-              ]}
-            />
-
-            {/* Brand Filter */}
-            <AnimatedSelect
-              value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              options={[
-                { value: 'all', label: 'All Brands' },
-                ...brands
-                  .filter((brand) => brand.isActive !== false)
-                  .map((brand) => ({ value: String(brand.id), label: brand.name })),
-              ]}
-            />
-
-            {/* Export Button */}
-            <div className="pt-1">
-              <ExportButton
-                data={filteredProducts}
-                headers={[
-                  { label: "ID", accessor: (row) => row.id },
-                  { label: "Name", accessor: (row) => row.name },
-                  {
-                    label: "Price",
-                    accessor: (row) => formatCurrency(row.price),
-                  },
-                  { label: "Stock", accessor: (row) => row.stockQuantity },
-                  { label: "Status", accessor: (row) => row.stock },
-                ]}
-                filename="products"
-                className="w-full justify-center"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Bulk Actions */}
-        {selectedProducts.length > 0 && (
-          <div className="mt-3 sm:mt-4 p-3 bg-primary-50 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <span className="text-xs sm:text-sm font-semibold text-primary-700">
-              {selectedProducts.length} product(s) selected
-            </span>
-            <Button
-              onClick={handleBulkDelete}
-              variant="danger"
-              size="sm"
-              className="w-full sm:w-auto"
+      {/* Grid Layout */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
+        {menuItems.map((item, index) => {
+          const Icon = item.icon;
+          return (
+            <motion.button
+              key={item.path}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{
+                delay: index * 0.05,
+                type: "spring",
+                stiffness: 200,
+                damping: 20,
+              }}
+              onClick={() => navigate(item.path)}
+              className="group relative overflow-hidden"
             >
-              Delete Selected
-            </Button>
-          </div>
-        )}
-      </div>
+              <div
+                className={`
+                relative h-full
+                flex flex-col items-center justify-center
+                p-3 sm:p-6
+                bg-white
+                rounded-2xl sm:rounded-3xl
+                border border-gray-100/80
+                ${`bg-gradient-to-br ${item.lightGradient}`}
+                ${item.shadowColor} ${item.hoverShadow}
+                shadow-md sm:shadow-lg hover:shadow-2xl
+                transition-all duration-500 ease-out
+                active:scale-[0.96]
+                hover:border-transparent
+                overflow-hidden
+              `}
+              >
+                {/* Animated Background Gradient */}
+                <div
+                  className={`
+                  absolute inset-0
+                  bg-gradient-to-br ${item.gradient}
+                  opacity-0 group-hover:opacity-10
+                  transition-opacity duration-500
+                `}
+                />
 
-      {/* Products Table - Desktop */}
-      <div className="hidden lg:block">
-        <DataTable
-          data={filteredProducts}
-          columns={columns}
-          pagination={true}
-          itemsPerPage={10}
-          onRowClick={(row) => navigate(`/admin/products/${row.id}`)}
-        />
-      </div>
+                {/* Decorative Circles */}
+                <div className="absolute -top-6 -right-6 sm:-top-8 sm:-right-8 w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-white/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-      {/* Products Cards - Mobile */}
-      <div className="lg:hidden">
-        {paginatedProducts.length === 0 ? (
-          <div className="bg-white rounded-xl p-8 text-center shadow-sm border border-gray-200">
-            <p className="text-gray-500">No products found</p>
-          </div>
-        ) : (
-          <>
-            <div className="space-y-3">
-              {paginatedProducts.map((product) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-                  <div className="flex gap-4">
-                    {/* Product Image */}
-                    <div className="flex-shrink-0">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.target.src =
-                            "https://via.placeholder.com/100x100?text=Product";
-                        }}
-                      />
-                    </div>
+                {/* Icon Container with Enhanced Design */}
+                <div
+                  className={`
+                  relative z-10
+                  w-12 h-12 sm:w-20 sm:h-20
+                  rounded-xl sm:rounded-3xl
+                  bg-gradient-to-br ${item.gradient}
+                  flex items-center justify-center
+                  mb-2 sm:mb-4
+                  ${item.shadowColor}
+                  shadow-lg sm:shadow-xl group-hover:shadow-2xl
+                  group-hover:scale-110 group-hover:rotate-3
+                  transition-all duration-500 ease-out
+                  before:absolute before:inset-0
+                  before:bg-gradient-to-br before:from-white/20 before:to-transparent
+                  before:rounded-xl sm:before:rounded-3xl
+                `}
+                >
+                  <Icon
+                    className="text-white text-lg sm:text-3xl relative z-10"
+                    strokeWidth={2.5}
+                  />
 
-                    {/* Product Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-800 text-sm sm:text-base line-clamp-2">
-                            {product.name}
-                          </h3>
-                          <p className="text-xs text-gray-500 mt-1">
-                            ID: {product.id}
-                          </p>
-                        </div>
-                        <Badge
-                          variant={
-                            product.stock === "in_stock"
-                              ? "success"
-                              : product.stock === "low_stock"
-                              ? "warning"
-                              : "error"
-                          }>
-                          {product.stock.replace("_", " ").toUpperCase()}
-                        </Badge>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-3">
-                        <div>
-                          <p className="text-lg font-bold text-gray-800">
-                            {formatPrice(product.price)}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            Stock: {product.stockQuantity.toLocaleString()}
-                          </p>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-2">
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/admin/products/${product.id}`);
-                            }}
-                            variant="iconBlue"
-                            icon={FiEdit}
-                            aria-label="Edit product"
-                          />
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(product.id);
-                            }}
-                            variant="iconRed"
-                            icon={FiTrash2}
-                            aria-label="Delete product"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Pagination - Mobile */}
-            {totalPages > 1 && (
-              <div className="mt-6 bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-gray-600">
-                    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                    {Math.min(
-                      currentPage * itemsPerPage,
-                      filteredProducts.length
-                    )}{" "}
-                    of {filteredProducts.length}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                      }
-                      disabled={currentPage === 1}
-                      variant="secondary"
-                      icon={FiChevronLeft}
-                    />
-                    <div className="flex items-center gap-1">
-                      {[...Array(Math.min(totalPages, 5))].map((_, index) => {
-                        let page;
-                        if (totalPages <= 5) {
-                          page = index + 1;
-                        } else if (currentPage <= 3) {
-                          page = index + 1;
-                        } else if (currentPage >= totalPages - 2) {
-                          page = totalPages - 4 + index;
-                        } else {
-                          page = currentPage - 2 + index;
-                        }
-                        return (
-                          <Button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            variant={currentPage === page ? "primary" : "ghost"}
-                            size="sm"
-                            className={currentPage === page ? "" : "text-gray-700"}
-                          >
-                            {page}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                    <Button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      variant="secondary"
-                      icon={FiChevronRight}
-                    />
-                  </div>
+                  {/* Shine Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-xl sm:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
 
-      {/* Confirmation Modal */}
-      <ConfirmModal
-        isOpen={deleteModal.isOpen}
-        onClose={() =>
-          setDeleteModal({ isOpen: false, productId: null, isBulk: false })
-        }
-        onConfirm={confirmDelete}
-        title={
-          deleteModal.isBulk ? "Delete Multiple Products?" : "Delete Product?"
-        }
-        message={
-          deleteModal.isBulk
-            ? `Are you sure you want to delete ${selectedProducts.length} product(s)? This action cannot be undone.`
-            : "Are you sure you want to delete this product? This action cannot be undone."
-        }
-        confirmText="Delete"
-        cancelText="Cancel"
-        type="danger"
-      />
+                {/* Content */}
+                <div className="relative z-10 text-center space-y-0.5 sm:space-y-1">
+                  <h3 className="text-xs sm:text-base font-bold text-gray-900 group-hover:text-gray-950 transition-colors duration-300 leading-tight">
+                    {item.label}
+                  </h3>
+                  <p className="text-[10px] sm:text-xs text-gray-500 group-hover:text-gray-600 transition-colors duration-300 leading-tight">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Bottom Accent Line */}
+                <div
+                  className={`
+                  absolute bottom-0 left-0 right-0
+                  h-0.5 sm:h-1
+                  bg-gradient-to-r ${item.gradient}
+                  transform scale-x-0 group-hover:scale-x-100
+                  transition-transform duration-500 ease-out
+                  origin-left
+                `}
+                />
+              </div>
+            </motion.button>
+          );
+        })}
+      </div>
     </motion.div>
   );
 };
