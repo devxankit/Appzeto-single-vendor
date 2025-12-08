@@ -8,6 +8,7 @@ import Badge from '../../components/Badge';
 import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency, formatDateTime } from '../../utils/adminHelpers';
 import { mockOrders } from '../../data/adminMockData';
+import Button from '../../components/Admin/Button';
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -131,12 +132,11 @@ const Orders = () => {
       label: 'Actions',
       sortable: false,
       render: (_, row) => (
-        <button
+        <Button
           onClick={() => navigate(`/admin/orders/${row.id}`)}
-          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          <FiEye />
-        </button>
+          variant="iconBlue"
+          icon={FiEye}
+        />
       ),
     },
   ];

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FiSave } from "react-icons/fi";
 import { useSettingsStore } from "../../../store/settingsStore";
+import AnimatedSelect from "../AnimatedSelect";
 
 const PaymentSettings = () => {
   const { settings, updateSettings, initialize } = useSettingsStore();

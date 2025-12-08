@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiX } from 'react-icons/fi';
+import Button from './Button';
 
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Confirm', cancelText = 'Cancel', type = 'danger' }) => {
   if (!isOpen) return null;
@@ -7,15 +8,15 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
   const typeStyles = {
     danger: {
       icon: 'text-red-600',
-      button: 'bg-red-600 hover:bg-red-700 text-white',
+      variant: 'danger',
     },
     warning: {
       icon: 'text-orange-600',
-      button: 'bg-orange-600 hover:bg-orange-700 text-white',
+      variant: 'danger', // Using danger variant for warning as well
     },
     info: {
       icon: 'text-blue-600',
-      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      variant: 'primary',
     },
   };
 
@@ -30,25 +31,63 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-[10000] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-[10000]"
+          />
+          
+          {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-4 pointer-events-none"
           >
-            {/* Modal */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              variants={{
+                hidden: { 
+                  y: '100%',
+                  scale: 0.95,
+                  opacity: 0
+                },
+                visible: { 
+                  y: 0,
+                  scale: 1,
+                  opacity: 1,
+                  transition: { 
+                    type: 'spring',
+                    damping: 22,
+                    stiffness: 350,
+                    mass: 0.7
+                  }
+                },
+                exit: { 
+                  y: '100%',
+                  scale: 0.95,
+                  opacity: 0,
+                  transition: { 
+                    type: 'spring',
+                    damping: 30,
+                    stiffness: 400
+                  }
+                }
+              }}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6 relative mx-4"
+              className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6 relative mx-4 pointer-events-auto"
+              style={{ willChange: 'transform' }}
             >
               {/* Close Button */}
-              <button
+              <Button
                 onClick={onClose}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                variant="icon"
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
                 aria-label="Close"
               >
                 <FiX className="text-xl" />
-              </button>
+              </Button>
 
               {/* Icon */}
               <div className="flex justify-center mb-4">
@@ -73,21 +112,23 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3">
-                <button
+                <Button
                   onClick={onClose}
-                  className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+                  variant="secondary"
+                  className="flex-1"
                 >
                   {cancelText}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     onConfirm();
                     onClose();
                   }}
-                  className={`flex-1 px-4 py-2.5 ${styles.button} rounded-lg transition-colors font-semibold`}
+                  variant={styles.variant}
+                  className="flex-1"
                 >
                   {confirmText}
-                </button>
+                </Button>
               </div>
             </motion.div>
           </motion.div>

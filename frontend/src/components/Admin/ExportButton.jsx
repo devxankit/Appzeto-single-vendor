@@ -1,5 +1,6 @@
 import { FiDownload } from 'react-icons/fi';
 import { generateCSV } from '../../utils/adminHelpers';
+import Button from './Button';
 
 const ExportButton = ({ data, headers, filename, className = '' }) => {
   const handleExport = () => {
@@ -11,13 +12,15 @@ const ExportButton = ({ data, headers, filename, className = '' }) => {
   };
 
   return (
-    <button
+    <Button
       onClick={handleExport}
-      className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-xs sm:text-sm flex-shrink-0 whitespace-nowrap ${className}`}
+      variant="success"
+      size="sm"
+      icon={FiDownload}
+      className={`flex-shrink-0 whitespace-nowrap ${className}`}
     >
-      <FiDownload className="text-sm sm:text-base" />
-      <span>Export CSV</span>
-    </button>
+      Export CSV
+    </Button>
   );
 };
 

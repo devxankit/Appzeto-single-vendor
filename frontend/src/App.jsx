@@ -91,14 +91,13 @@ import OrderTrends from "./pages/admin/finance/OrderTrends";
 import PaymentBreakdown from "./pages/admin/finance/PaymentBreakdown";
 import TaxReports from "./pages/admin/finance/TaxReports";
 import RefundReports from "./pages/admin/finance/RefundReports";
-// Store Settings child pages
-import StoreProfile from "./pages/admin/settings/store/StoreProfile";
-import PaymentMethods from "./pages/admin/settings/store/PaymentMethods";
-import ShippingMethods from "./pages/admin/settings/store/ShippingMethods";
-// Web Settings child pages
-import Themes from "./pages/admin/settings/web/Themes";
-import Languages from "./pages/admin/settings/web/Languages";
-import SEOSettings from "./pages/admin/settings/web/SEOSettings";
+// Consolidated Settings pages
+import GeneralSettings from "./pages/admin/settings/GeneralSettings";
+import PaymentShippingSettings from "./pages/admin/settings/PaymentShippingSettings";
+import OrdersCustomersSettings from "./pages/admin/settings/OrdersCustomersSettings";
+import ProductsInventorySettings from "./pages/admin/settings/ProductsInventorySettings";
+import ContentFeaturesSettings from "./pages/admin/settings/ContentFeaturesSettings";
+import NotificationsSEOSettings from "./pages/admin/settings/NotificationsSEOSettings";
 // Policies child pages
 import PrivacyPolicy from "./pages/admin/policies/PrivacyPolicy";
 import RefundPolicy from "./pages/admin/policies/RefundPolicy";
@@ -260,15 +259,13 @@ const AppRoutes = () => {
           <Route path="finance/tax-reports" element={<TaxReports />} />
           <Route path="finance/refund-reports" element={<RefundReports />} />
           <Route path="analytics" element={<Analytics />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="settings/store" element={<StoreProfile />} />
-          <Route path="settings/store/store-profile" element={<StoreProfile />} />
-          <Route path="settings/store/payment-methods" element={<PaymentMethods />} />
-          <Route path="settings/store/shipping-methods" element={<ShippingMethods />} />
-          <Route path="settings/web" element={<Themes />} />
-          <Route path="settings/web/themes" element={<Themes />} />
-          <Route path="settings/web/languages" element={<Languages />} />
-          <Route path="settings/web/seo-settings" element={<SEOSettings />} />
+          <Route path="settings" element={<Navigate to="/admin/settings/general" replace />} />
+          <Route path="settings/general" element={<Settings />} />
+          <Route path="settings/payment-shipping" element={<Settings />} />
+          <Route path="settings/orders-customers" element={<Settings />} />
+          <Route path="settings/products-inventory" element={<Settings />} />
+          <Route path="settings/content-features" element={<Settings />} />
+          <Route path="settings/notifications-seo" element={<Settings />} />
           <Route path="policies" element={<PrivacyPolicy />} />
           <Route path="policies/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="policies/refund-policy" element={<RefundPolicy />} />

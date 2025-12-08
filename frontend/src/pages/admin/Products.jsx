@@ -18,6 +18,7 @@ import ExportButton from "../../components/Admin/ExportButton";
 import Badge from "../../components/Badge";
 import ConfirmModal from "../../components/Admin/ConfirmModal";
 import AnimatedSelect from "../../components/Admin/AnimatedSelect";
+import Button from "../../components/Admin/Button";
 import { formatCurrency, generateCSV } from "../../utils/adminHelpers";
 import { formatPrice } from "../../utils/helpers";
 import { products as initialProducts } from "../../data/products";
@@ -315,19 +316,25 @@ const Products = () => {
           </p>
         </div>
         <div className="flex items-center gap-2 sm:mt-0">
-          <button
+          <Button
             onClick={handleBulkImport}
-            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-xs sm:text-sm flex-1 sm:flex-initial"
-            title="Import Products (CSV)">
-            <FiUpload className="text-sm sm:text-base" />
-            <span>Import</span>
-          </button>
-          <button
+            variant="primary"
+            size="sm"
+            icon={FiUpload}
+            className="flex-1 sm:flex-initial"
+            title="Import Products (CSV)"
+          >
+            Import
+          </Button>
+          <Button
             onClick={() => navigate("/admin/products/new")}
-            className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-xs sm:text-sm flex-1 sm:flex-initial">
-            <FiPlus className="text-sm sm:text-base" />
-            <span>Add Product</span>
-          </button>
+            variant="primary"
+            size="sm"
+            icon={FiPlus}
+            className="flex-1 sm:flex-initial"
+          >
+            Add Product
+          </Button>
         </div>
       </div>
 
@@ -336,12 +343,14 @@ const Products = () => {
         {/* Mobile Filter Toggle */}
         <div className="flex items-center justify-between mb-3 sm:hidden">
           <span className="text-sm font-semibold text-gray-700">Filters</span>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800">
-            <FiFilter className="text-base" />
-            <span>{showFilters ? "Hide" : "Show"}</span>
-          </button>
+            variant="ghost"
+            size="sm"
+            icon={FiFilter}
+          >
+            {showFilters ? "Hide" : "Show"}
+          </Button>
         </div>
 
         {/* Filter Content */}
@@ -484,11 +493,14 @@ const Products = () => {
             <span className="text-xs sm:text-sm font-semibold text-primary-700">
               {selectedProducts.length} product(s) selected
             </span>
-            <button
+            <Button
               onClick={handleBulkDelete}
-              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm">
+              variant="danger"
+              size="sm"
+              className="w-full sm:w-auto"
+            >
               Delete Selected
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -568,24 +580,24 @@ const Products = () => {
 
                         {/* Actions */}
                         <div className="flex items-center gap-2">
-                          <button
+                          <Button
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/admin/products/${product.id}`);
                             }}
-                            className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            aria-label="Edit product">
-                            <FiEdit className="text-lg" />
-                          </button>
-                          <button
+                            variant="iconBlue"
+                            icon={FiEdit}
+                            aria-label="Edit product"
+                          />
+                          <Button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(product.id);
                             }}
-                            className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            aria-label="Delete product">
-                            <FiTrash2 className="text-lg" />
-                          </button>
+                            variant="iconRed"
+                            icon={FiTrash2}
+                            aria-label="Delete product"
+                          />
                         </div>
                       </div>
                     </div>
@@ -607,14 +619,14 @@ const Products = () => {
                     of {filteredProducts.length}
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
+                    <Button
                       onClick={() =>
                         setCurrentPage((prev) => Math.max(1, prev - 1))
                       }
                       disabled={currentPage === 1}
-                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                      <FiChevronLeft />
-                    </button>
+                      variant="secondary"
+                      icon={FiChevronLeft}
+                    />
                     <div className="flex items-center gap-1">
                       {[...Array(Math.min(totalPages, 5))].map((_, index) => {
                         let page;
@@ -628,27 +640,26 @@ const Products = () => {
                           page = currentPage - 2 + index;
                         }
                         return (
-                          <button
+                          <Button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                              currentPage === page
-                                ? "bg-primary-600 text-white"
-                                : "text-gray-700 hover:bg-gray-100"
-                            }`}>
+                            variant={currentPage === page ? "primary" : "ghost"}
+                            size="sm"
+                            className={currentPage === page ? "" : "text-gray-700"}
+                          >
                             {page}
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
-                    <button
+                    <Button
                       onClick={() =>
                         setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                      <FiChevronRight />
-                    </button>
+                      variant="secondary"
+                      icon={FiChevronRight}
+                    />
                   </div>
                 </div>
               </div>

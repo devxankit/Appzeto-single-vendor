@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FiSearch, FiEye, FiMessageSquare } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
 import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
@@ -182,18 +182,71 @@ const Tickets = () => {
         />
       </div>
 
-      {selectedTicket && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-800">Ticket Details</h3>
-              <button
-                onClick={() => setSelectedTicket(null)}
-                className="text-gray-400 hover:text-gray-600"
+      <AnimatePresence>
+        {selectedTicket && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={() => setSelectedTicket(null)}
+              className="fixed inset-0 bg-black/50 z-50"
+            />
+            
+            {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+            >
+              <motion.div
+                variants={{
+                  hidden: { 
+                    y: '100%',
+                    scale: 0.95,
+                    opacity: 0
+                  },
+                  visible: { 
+                    y: 0,
+                    scale: 1,
+                    opacity: 1,
+                    transition: { 
+                      type: 'spring',
+                      damping: 22,
+                      stiffness: 350,
+                      mass: 0.7
+                    }
+                  },
+                  exit: { 
+                    y: '100%',
+                    scale: 0.95,
+                    opacity: 0,
+                    transition: { 
+                      type: 'spring',
+                      damping: 30,
+                      stiffness: 400
+                    }
+                  }
+                }}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
+                style={{ willChange: 'transform' }}
               >
-                ✕
-              </button>
-            </div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-800">Ticket Details</h3>
+                  <button
+                    onClick={() => setSelectedTicket(null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+                </div>
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600">Ticket ID</p>
@@ -226,9 +279,11 @@ const Tickets = () => {
                 </Badge>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

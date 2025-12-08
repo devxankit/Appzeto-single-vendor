@@ -9,6 +9,7 @@ import Pagination from '../../components/Admin/Pagination';
 import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
+import Button from '../../components/Admin/Button';
 
 const Categories = () => {
   const {
@@ -127,14 +128,15 @@ const Categories = () => {
         {/* Title and Button Row */}
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 lg:hidden">Categories</h1>
-          <button
+          <Button
             onClick={handleCreate}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base flex-shrink-0"
+            variant="primary"
+            icon={FiPlus}
+            className="flex-shrink-0"
           >
-            <FiPlus className="text-base sm:text-lg" />
             <span className="hidden xs:inline sm:inline">Add Category</span>
             <span className="xs:hidden">Add</span>
-          </button>
+          </Button>
         </div>
         {/* Description */}
         <p className="text-sm sm:text-base text-gray-600 lg:hidden">Manage your product categories</p>
@@ -145,13 +147,14 @@ const Categories = () => {
         {/* Mobile Filter Toggle */}
         <div className="flex items-center justify-between mb-3 sm:hidden">
           <span className="text-sm font-semibold text-gray-700">Filters</span>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
+            variant="ghost"
+            size="sm"
+            icon={FiFilter}
           >
-            <FiFilter className="text-base" />
-            <span>{showFilters ? 'Hide' : 'Show'}</span>
-          </button>
+            {showFilters ? 'Hide' : 'Show'}
+          </Button>
         </div>
 
         {/* Filter Content */}
@@ -184,26 +187,22 @@ const Categories = () => {
 
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-              <button
+              <Button
                 onClick={() => setViewMode('tree')}
-                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'tree'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600'
-                }`}
+                variant={viewMode === 'tree' ? 'primary' : 'ghost'}
+                size="sm"
+                className={viewMode === 'tree' ? '' : 'text-gray-600'}
               >
                 Tree View
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600'
-                }`}
+                variant={viewMode === 'list' ? 'primary' : 'ghost'}
+                size="sm"
+                className={viewMode === 'list' ? '' : 'text-gray-600'}
               >
                 List View
-              </button>
+              </Button>
             </div>
 
             {/* Export Button */}
@@ -235,26 +234,22 @@ const Categories = () => {
 
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-              <button
+              <Button
                 onClick={() => setViewMode('tree')}
-                className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'tree'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600'
-                }`}
+                variant={viewMode === 'tree' ? 'primary' : 'ghost'}
+                size="sm"
+                className={`flex-1 ${viewMode === 'tree' ? '' : 'text-gray-600'}`}
               >
                 Tree View
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setViewMode('list')}
-                className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600'
-                }`}
+                variant={viewMode === 'list' ? 'primary' : 'ghost'}
+                size="sm"
+                className={`flex-1 ${viewMode === 'list' ? '' : 'text-gray-600'}`}
               >
                 List View
-              </button>
+              </Button>
             </div>
 
             {/* Export Button */}
@@ -281,12 +276,14 @@ const Categories = () => {
             <span className="text-xs sm:text-sm font-semibold text-primary-700">
               {selectedCategories.length} category(ies) selected
             </span>
-            <button
+            <Button
               onClick={handleBulkDelete}
-              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm"
+              variant="danger"
+              size="sm"
+              className="w-full sm:w-auto"
             >
               Delete Selected
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -342,18 +339,16 @@ const Categories = () => {
                       <p className="text-xs text-gray-500">{category.description}</p>
                     )}
                   </div>
-                  <button
+                  <Button
                     onClick={() => handleEdit(category)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    <FiSearch className="text-lg" />
-                  </button>
-                  <button
+                    variant="iconBlue"
+                    icon={FiSearch}
+                  />
+                  <Button
                     onClick={() => handleDelete(category.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <FiTrash2 className="text-lg" />
-                  </button>
+                    variant="iconRed"
+                    icon={FiTrash2}
+                  />
                 </div>
               ))}
             </div>

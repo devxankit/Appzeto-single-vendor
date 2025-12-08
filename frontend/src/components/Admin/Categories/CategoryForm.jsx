@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { FiX, FiSave, FiUpload } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCategoryStore } from '../../../store/categoryStore';
 import AnimatedSelect from '../AnimatedSelect';
 import toast from 'react-hot-toast';
+import Button from '../Button';
 
 const CategoryForm = ({ category, parentId, onClose, onSave }) => {
   const { categories, createCategory, updateCategory, getCategoryById } = useCategoryStore();
@@ -79,31 +81,84 @@ const CategoryForm = ({ category, parentId, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-800">
-              {isEdit ? 'Edit Category' : isSubcategory ? 'Create Subcategory' : 'Create Category'}
-            </h2>
-            {isSubcategory && parentCategory && (
-              <p className="text-sm text-gray-600 mt-1">
-                Parent: <span className="font-semibold text-gray-800">{parentCategory.name}</span>
-              </p>
-            )}
-            {isEdit && parentCategory && (
-              <p className="text-sm text-gray-600 mt-1">
-                Parent: <span className="font-semibold text-gray-800">{parentCategory.name}</span>
-              </p>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+    <AnimatePresence>
+      <>
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={onClose}
+          className="fixed inset-0 bg-black/50 z-50"
+        />
+        
+        {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+        >
+          <motion.div
+            variants={{
+              hidden: { 
+                y: '100%',
+                scale: 0.95,
+                opacity: 0
+              },
+              visible: { 
+                y: 0,
+                scale: 1,
+                opacity: 1,
+                transition: { 
+                  type: 'spring',
+                  damping: 22,
+                  stiffness: 350,
+                  mass: 0.7
+                }
+              },
+              exit: { 
+                y: '100%',
+                scale: 0.95,
+                opacity: 0,
+                transition: { 
+                  type: 'spring',
+                  damping: 30,
+                  stiffness: 400
+                }
+              }
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin pointer-events-auto"
+            style={{ willChange: 'transform' }}
           >
-            <FiX className="text-xl text-gray-600" />
-          </button>
-        </div>
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  {isEdit ? 'Edit Category' : isSubcategory ? 'Create Subcategory' : 'Create Category'}
+                </h2>
+                {isSubcategory && parentCategory && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Parent: <span className="font-semibold text-gray-800">{parentCategory.name}</span>
+                  </p>
+                )}
+                {isEdit && parentCategory && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Parent: <span className="font-semibold text-gray-800">{parentCategory.name}</span>
+                  </p>
+                )}
+              </div>
+              <Button
+                onClick={onClose}
+                variant="icon"
+                icon={FiX}
+                className="text-gray-600"
+              />
+            </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Basic Information */}
@@ -236,24 +291,26 @@ const CategoryForm = ({ category, parentId, onClose, onSave }) => {
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
-            <button
+            <Button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+              variant="secondary"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+              variant="primary"
+              icon={FiSave}
             >
-              <FiSave />
               {isEdit ? 'Update Category' : 'Create Category'}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      </>
+    </AnimatePresence>
   );
 };
 

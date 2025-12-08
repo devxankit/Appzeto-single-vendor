@@ -13,7 +13,9 @@ const CategoryOrder = () => {
   }, []);
 
   useEffect(() => {
-    setOrderedCategories([...categories].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)));
+    // Filter out subcategories (only show root categories)
+    const rootCategories = categories.filter((cat) => !cat.parentId);
+    setOrderedCategories([...rootCategories].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)));
   }, [categories]);
 
   const moveUp = (index) => {

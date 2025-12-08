@@ -2,6 +2,7 @@ import { FiMenu, FiBell, FiLogOut } from 'react-icons/fi';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuthStore } from '../../../store/adminAuthStore';
 import toast from 'react-hot-toast';
+import Button from '../Button';
 
 const AdminHeader = ({ onMenuClick }) => {
   const location = useLocation();
@@ -48,12 +49,12 @@ const AdminHeader = ({ onMenuClick }) => {
       <div className="flex items-center justify-between px-4 lg:px-6 py-4">
         {/* Left: Menu Button */}
         <div className="flex items-center gap-4">
-          <button
+          <Button
             onClick={onMenuClick}
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <FiMenu className="text-2xl text-gray-700" />
-          </button>
+            variant="icon"
+            className="lg:hidden text-gray-700"
+            icon={FiMenu}
+          />
           
           {/* Page Heading - Desktop Only */}
           <div className="hidden lg:block">
@@ -65,19 +66,25 @@ const AdminHeader = ({ onMenuClick }) => {
         {/* Right: Notifications & Logout */}
         <div className="flex items-center gap-4">
           {/* Notifications */}
-          <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <FiBell className="text-xl text-gray-700" />
+          <div className="relative">
+            <Button
+              variant="icon"
+              className="text-gray-700"
+              icon={FiBell}
+            />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          </div>
 
           {/* Logout Button */}
-          <button
+          <Button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-700 hover:bg-red-600 hover:text-white transition-all duration-300 border border-gray-300 hover:border-red-600"
+            variant="ghost"
+            icon={FiLogOut}
+            size="sm"
+            className="text-gray-700 hover:bg-red-600 hover:text-white hover:border-red-600 border border-gray-300"
           >
-            <FiLogOut className="text-lg" />
-            <span className="font-medium text-sm">Logout</span>
-          </button>
+            Logout
+          </Button>
         </div>
       </div>
     </header>

@@ -7,6 +7,7 @@ import ExportButton from '../../components/Admin/ExportButton';
 import Pagination from '../../components/Admin/Pagination';
 import Badge from '../../components/Badge';
 import toast from 'react-hot-toast';
+import Button from '../../components/Admin/Button';
 
 const Brands = () => {
   const {
@@ -113,14 +114,15 @@ const Brands = () => {
         {/* Title and Button Row */}
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 lg:hidden">Brands</h1>
-          <button
+          <Button
             onClick={handleCreate}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base flex-shrink-0"
+            variant="primary"
+            icon={FiPlus}
+            className="flex-shrink-0"
           >
-            <FiPlus className="text-base sm:text-lg" />
             <span className="hidden xs:inline sm:inline">Add Brand</span>
             <span className="xs:hidden">Add</span>
-          </button>
+          </Button>
         </div>
         {/* Description */}
         <p className="text-sm sm:text-base text-gray-600 lg:hidden">Manage your product brands</p>
@@ -131,13 +133,14 @@ const Brands = () => {
         {/* Mobile Filter Toggle */}
         <div className="flex items-center justify-between mb-3 sm:hidden">
           <span className="text-sm font-semibold text-gray-700">Filters</span>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
+            variant="ghost"
+            size="sm"
+            icon={FiFilter}
           >
-            <FiFilter className="text-base" />
-            <span>{showFilters ? 'Hide' : 'Show'}</span>
-          </button>
+            {showFilters ? 'Hide' : 'Show'}
+          </Button>
         </div>
 
         {/* Filter Content */}
@@ -219,12 +222,14 @@ const Brands = () => {
             <span className="text-xs sm:text-sm font-semibold text-primary-700">
               {selectedBrands.length} brand(s) selected
             </span>
-            <button
+            <Button
               onClick={handleBulkDelete}
-              className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm"
+              variant="danger"
+              size="sm"
+              className="w-full sm:w-auto"
             >
               Delete Selected
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -294,25 +299,25 @@ const Brands = () => {
                 )}
 
                 <div className="flex items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
-                  <button
+                  <Button
                     onClick={() => toggleBrandStatus(brand.id)}
-                    className="flex-1 p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-xs sm:text-sm"
+                    variant="icon"
+                    className="flex-1 text-gray-600"
+                    icon={brand.isActive ? FiEyeOff : FiEye}
                     title={brand.isActive ? 'Deactivate' : 'Activate'}
-                  >
-                    {brand.isActive ? <FiEyeOff className="text-sm sm:text-base" /> : <FiEye className="text-sm sm:text-base" />}
-                  </button>
-                  <button
+                  />
+                  <Button
                     onClick={() => handleEdit(brand)}
-                    className="flex-1 p-1.5 sm:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-xs sm:text-sm"
-                  >
-                    <FiEdit className="text-sm sm:text-base" />
-                  </button>
-                  <button
+                    variant="iconBlue"
+                    className="flex-1"
+                    icon={FiEdit}
+                  />
+                  <Button
                     onClick={() => handleDelete(brand.id)}
-                    className="flex-1 p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-xs sm:text-sm"
-                  >
-                    <FiTrash2 className="text-sm sm:text-base" />
-                  </button>
+                    variant="iconRed"
+                    className="flex-1"
+                    icon={FiTrash2}
+                  />
                 </div>
               </div>
               ))}

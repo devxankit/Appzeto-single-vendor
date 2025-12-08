@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiX, FiMail, FiPhone, FiMapPin, FiShoppingBag, FiDollarSign, FiClock, FiEdit, FiCreditCard } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCustomerStore } from '../../../store/customerStore';
 import Badge from '../../Badge';
 import { formatCurrency, formatDateTime } from '../../../utils/adminHelpers';
@@ -43,17 +44,70 @@ const CustomerDetail = ({ customer, onClose, onUpdate }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">Customer Details</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+    <AnimatePresence>
+      <>
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={onClose}
+          className="fixed inset-0 bg-black/50 z-50"
+        />
+        
+        {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+        >
+          <motion.div
+            variants={{
+              hidden: { 
+                y: '100%',
+                scale: 0.95,
+                opacity: 0
+              },
+              visible: { 
+                y: 0,
+                scale: 1,
+                opacity: 1,
+                transition: { 
+                  type: 'spring',
+                  damping: 22,
+                  stiffness: 350,
+                  mass: 0.7
+                }
+              },
+              exit: { 
+                y: '100%',
+                scale: 0.95,
+                opacity: 0,
+                transition: { 
+                  type: 'spring',
+                  damping: 30,
+                  stiffness: 400
+                }
+              }
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin pointer-events-auto"
+            style={{ willChange: 'transform' }}
           >
-            <FiX className="text-xl text-gray-600" />
-          </button>
-        </div>
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
+              <h2 className="text-2xl font-bold text-gray-800">Customer Details</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <FiX className="text-xl text-gray-600" />
+              </button>
+            </div>
 
         <div className="p-6 space-y-6">
           {/* Customer Info */}
@@ -247,8 +301,10 @@ const CustomerDetail = ({ customer, onClose, onUpdate }) => {
             </div>
           )}
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      </>
+    </AnimatePresence>
   );
 };
 

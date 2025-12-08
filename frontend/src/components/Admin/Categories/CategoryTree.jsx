@@ -3,6 +3,7 @@ import { FiChevronDown, FiChevronRight, FiEdit, FiTrash2, FiEye, FiEyeOff, FiPlu
 import { useCategoryStore } from '../../../store/categoryStore';
 import Badge from '../../Badge';
 import toast from 'react-hot-toast';
+import Button from '../Button';
 
 const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 0 }) => {
   const { toggleCategoryStatus } = useCategoryStore();
@@ -34,16 +35,12 @@ const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 
             <div className="flex items-start gap-3 mb-3">
               {/* Expand Button */}
               {hasChildren && (
-                <button
+                <Button
                   onClick={() => toggleExpand(category.id)}
-                  className="flex-shrink-0 p-1.5 -ml-1 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  {isExpanded ? (
-                    <FiChevronDown className="text-gray-500 text-base" />
-                  ) : (
-                    <FiChevronRight className="text-gray-500 text-base" />
-                  )}
-                </button>
+                  variant="icon"
+                  className="flex-shrink-0 -ml-1 text-gray-500"
+                  icon={isExpanded ? FiChevronDown : FiChevronRight}
+                />
               )}
               {!hasChildren && <div className="w-6" />}
 
@@ -96,39 +93,47 @@ const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 
             {/* Action Buttons - Horizontal Layout */}
             <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
               {onAddSubcategory && (
-                <button
+                <Button
                   onClick={() => onAddSubcategory(category.id)}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors active:scale-95"
+                  variant="ghostBlue"
+                  size="sm"
+                  icon={FiPlus}
+                  className="flex-1"
                   title="Add Subcategory"
                 >
-                  <FiPlus className="text-sm" />
-                  <span>Add Sub</span>
-                </button>
+                  Add Sub
+                </Button>
               )}
-              <button
+              <Button
                 onClick={() => toggleCategoryStatus(category.id)}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors active:scale-95"
+                variant="ghost"
+                size="sm"
+                icon={category.isActive ? FiEye : FiEyeOff}
+                className="flex-1"
                 title={category.isActive ? 'Deactivate' : 'Activate'}
               >
-                {category.isActive ? <FiEye className="text-sm" /> : <FiEyeOff className="text-sm" />}
-                <span>{category.isActive ? 'Hide' : 'Show'}</span>
-              </button>
-              <button
+                {category.isActive ? 'Hide' : 'Show'}
+              </Button>
+              <Button
                 onClick={() => onEdit(category)}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors active:scale-95"
+                variant="ghostBlue"
+                size="sm"
+                icon={FiEdit}
+                className="flex-1"
                 title="Edit"
               >
-                <FiEdit className="text-sm" />
-                <span>Edit</span>
-              </button>
-              <button
+                Edit
+              </Button>
+              <Button
                 onClick={() => onDelete(category.id)}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors active:scale-95"
+                variant="ghostRed"
+                size="sm"
+                icon={FiTrash2}
+                className="flex-1"
                 title="Delete"
               >
-                <FiTrash2 className="text-sm" />
-                <span>Delete</span>
-              </button>
+                Delete
+              </Button>
             </div>
           </div>
         </div>
@@ -140,16 +145,12 @@ const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 
           }`}
         >
           {hasChildren && (
-            <button
+            <Button
               onClick={() => toggleExpand(category.id)}
-              className="p-1 hover:bg-gray-200 rounded transition-colors"
-            >
-              {isExpanded ? (
-                <FiChevronDown className="text-gray-600" />
-              ) : (
-                <FiChevronRight className="text-gray-600" />
-              )}
-            </button>
+              variant="icon"
+              icon={isExpanded ? FiChevronDown : FiChevronRight}
+              className="text-gray-600"
+            />
           )}
           {!hasChildren && <div className="w-6" />}
 
@@ -182,35 +183,31 @@ const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 
             </Badge>
             <div className="flex items-center gap-2">
               {onAddSubcategory && (
-                <button
+                <Button
                   onClick={() => onAddSubcategory(category.id)}
-                  className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                  variant="iconBlue"
+                  icon={FiPlus}
                   title="Add Subcategory"
-                >
-                  <FiPlus />
-                </button>
+                />
               )}
-              <button
+              <Button
                 onClick={() => toggleCategoryStatus(category.id)}
-                className="p-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
+                variant="icon"
+                icon={category.isActive ? FiEye : FiEyeOff}
                 title={category.isActive ? 'Deactivate' : 'Activate'}
-              >
-                {category.isActive ? <FiEye /> : <FiEyeOff />}
-              </button>
-              <button
+              />
+              <Button
                 onClick={() => onEdit(category)}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                variant="iconBlue"
+                icon={FiEdit}
                 title="Edit"
-              >
-                <FiEdit />
-              </button>
-              <button
+              />
+              <Button
                 onClick={() => onDelete(category.id)}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                variant="iconRed"
+                icon={FiTrash2}
                 title="Delete"
-              >
-                <FiTrash2 />
-              </button>
+              />
             </div>
           </div>
         </div>

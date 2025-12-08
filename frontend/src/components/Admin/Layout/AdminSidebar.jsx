@@ -50,8 +50,7 @@ const iconMap = {
   "Support Desk": FiMessageCircle,
   Reports: FiFileText,
   "Analytics & Finance": FiBarChart2,
-  "Store Settings": FiSettings,
-  "Web Settings": FiGlobe,
+  Settings: FiSettings,
   Policies: FiShield,
   Firebase: FiDatabase,
 };
@@ -122,15 +121,13 @@ const getChildRoute = (parentRoute, childName) => {
       "Tax Reports": "/admin/finance/tax-reports",
       "Refund Reports": "/admin/finance/refund-reports",
     },
-    "/admin/settings/store": {
-      "Store Profile": "/admin/settings/store/store-profile",
-      "Payment Methods": "/admin/settings/store/payment-methods",
-      "Shipping Methods": "/admin/settings/store/shipping-methods",
-    },
-    "/admin/settings/web": {
-      Themes: "/admin/settings/web/themes",
-      Languages: "/admin/settings/web/languages",
-      "SEO Settings": "/admin/settings/web/seo-settings",
+    "/admin/settings": {
+      General: "/admin/settings/general",
+      "Payment & Shipping": "/admin/settings/payment-shipping",
+      "Orders & Customers": "/admin/settings/orders-customers",
+      "Products & Inventory": "/admin/settings/products-inventory",
+      "Content & Features": "/admin/settings/content-features",
+      "Notifications & SEO": "/admin/settings/notifications-seo",
     },
     "/admin/policies": {
       "Privacy Policy": "/admin/policies/privacy-policy",

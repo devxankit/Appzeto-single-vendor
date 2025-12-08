@@ -135,21 +135,15 @@
     ]
   },
   {
-    "title": "Store Settings",
-    "route": "/admin/settings/store",
+    "title": "Settings",
+    "route": "/admin/settings",
     "children": [
-      "Store Profile",
-      "Payment Methods",
-      "Shipping Methods"
-    ]
-  },
-  {
-    "title": "Web Settings",
-    "route": "/admin/settings/web",
-    "children": [
-      "Themes",
-      "Languages",
-      "SEO Settings"
+      "General",
+      "Payment & Shipping",
+      "Orders & Customers",
+      "Products & Inventory",
+      "Content & Features",
+      "Notifications & SEO"
     ]
   },
   {

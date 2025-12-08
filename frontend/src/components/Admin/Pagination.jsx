@@ -1,4 +1,5 @@
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import Button from './Button';
 
 const Pagination = ({
   currentPage,
@@ -26,14 +27,13 @@ const Pagination = ({
         Showing {startItem} to {endItem} of {totalItems} results
       </div>
       <div className="flex items-center gap-2">
-        <button
+        <Button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          variant="secondary"
+          icon={FiChevronLeft}
           aria-label="Previous page"
-        >
-          <FiChevronLeft />
-        </button>
+        />
         <div className="flex items-center gap-1">
           {[...Array(totalPages)].map((_, index) => {
             const page = index + 1;
@@ -44,18 +44,16 @@ const Pagination = ({
               (page >= currentPage - 1 && page <= currentPage + 1)
             ) {
               return (
-                <button
+                <Button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                    currentPage === page
-                      ? 'bg-primary-600 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
+                  variant={currentPage === page ? 'primary' : 'ghost'}
+                  size="sm"
+                  className={currentPage === page ? '' : 'text-gray-700'}
                   aria-label={`Go to page ${page}`}
                 >
                   {page}
-                </button>
+                </Button>
               );
             } else if (
               page === currentPage - 2 ||
@@ -66,14 +64,13 @@ const Pagination = ({
             return null;
           })}
         </div>
-        <button
+        <Button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          variant="secondary"
+          icon={FiChevronRight}
           aria-label="Next page"
-        >
-          <FiChevronRight />
-        </button>
+        />
       </div>
     </div>
   );
