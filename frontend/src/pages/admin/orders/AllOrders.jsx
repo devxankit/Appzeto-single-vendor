@@ -143,7 +143,7 @@ const OrderItemsDropdown = ({ items, orderTotal }) => {
               stiffness: 300,
               damping: 30
             }}
-            className={`absolute left-0 z-50 bg-white rounded-xl shadow-2xl border border-gray-200 w-[90vw] sm:w-[500px] max-w-[600px] max-h-[400px] overflow-hidden ${
+            className={`absolute left-0 z-50 bg-white rounded-xl shadow-2xl border border-gray-200 w-[85vw] sm:w-[500px] max-w-[600px] max-h-[400px] overflow-hidden ${
               openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
             }`}
             style={{ transformOrigin: openUpward ? 'bottom left' : 'top left' }}
@@ -151,23 +151,23 @@ const OrderItemsDropdown = ({ items, orderTotal }) => {
             <div className="p-4 border-b border-gray-200 bg-gray-50">
               <h3 className="font-semibold text-gray-800 text-sm">Order Items</h3>
             </div>
-            <div className="overflow-y-auto max-h-[320px]">
-              <table className="w-full">
+            <div className="overflow-y-auto overflow-x-auto max-h-[320px] scrollbar-admin">
+              <table className="w-full min-w-[600px] sm:min-w-0">
                 <thead className="bg-gray-50 sticky top-0">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase whitespace-nowrap">
                       Item ID
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-2 sm:px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase whitespace-nowrap">
                       Item Name
                     </th>
-                    <th className="px-4 py-2 text-center text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-2 sm:px-4 py-2 text-center text-xs font-semibold text-gray-700 uppercase whitespace-nowrap">
                       Quantity
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-2 sm:px-4 py-2 text-right text-xs font-semibold text-gray-700 uppercase whitespace-nowrap">
                       Unit Price
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-2 sm:px-4 py-2 text-right text-xs font-semibold text-gray-700 uppercase whitespace-nowrap">
                       Total
                     </th>
                   </tr>
@@ -178,19 +178,19 @@ const OrderItemsDropdown = ({ items, orderTotal }) => {
                     const itemId = item.id || item.itemId || `ITEM-${index + 1}`;
                     return (
                       <tr key={item.id || index} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 text-sm text-gray-800 font-medium">
+                        <td className="px-2 sm:px-4 py-2 text-sm text-gray-800 font-medium whitespace-nowrap">
                           {itemId}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-800">
+                        <td className="px-2 sm:px-4 py-2 text-sm text-gray-800 whitespace-nowrap">
                           {item.name || `Item ${index + 1}`}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-700 text-center">
+                        <td className="px-2 sm:px-4 py-2 text-sm text-gray-700 text-center whitespace-nowrap">
                           {item.quantity || 1}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-700 text-right">
+                        <td className="px-2 sm:px-4 py-2 text-sm text-gray-700 text-right whitespace-nowrap">
                           {formatCurrency(item.price || 0)}
                         </td>
-                        <td className="px-4 py-2 text-sm font-semibold text-gray-800 text-right">
+                        <td className="px-2 sm:px-4 py-2 text-sm font-semibold text-gray-800 text-right whitespace-nowrap">
                           {formatCurrency(itemTotal)}
                         </td>
                       </tr>
