@@ -4,10 +4,8 @@ import { motion } from "framer-motion";
 import {
   FiHome,
   FiPackage,
-  FiMoreVertical,
   FiShoppingBag,
   FiSettings,
-  FiHexagon,
 } from "react-icons/fi";
 
 const AdminBottomNav = () => {
@@ -16,7 +14,6 @@ const AdminBottomNav = () => {
   const navItems = [
     { path: "/admin/dashboard", icon: FiHome, label: "Home" },
     { path: "/admin/products", icon: FiPackage, label: "Products" },
-    { path: "/admin/more", icon: FiHexagon, label: "More" },
     { path: "/admin/orders", icon: FiShoppingBag, label: "Orders" },
     { path: "/admin/settings", icon: FiSettings, label: "Setting" },
   ];
@@ -24,23 +21,6 @@ const AdminBottomNav = () => {
   const isActive = (path) => {
     if (path === "/admin/dashboard") {
       return location.pathname === "/admin/dashboard";
-    }
-    if (path === "/admin/more") {
-      // Check if current path is one of the "more" related pages
-      const morePaths = [
-        "/admin/categories",
-        "/admin/brands",
-        "/admin/customers",
-        "/admin/inventory",
-        "/admin/campaigns",
-        "/admin/banners",
-        "/admin/reviews",
-        "/admin/analytics",
-        "/admin/content",
-      ];
-      return morePaths.some((morePath) =>
-        location.pathname.startsWith(morePath)
-      );
     }
     return location.pathname.startsWith(path);
   };
