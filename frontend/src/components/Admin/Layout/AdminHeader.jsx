@@ -1,18 +1,25 @@
+import { useState } from 'react';
 import { FiMenu, FiBell, FiLogOut } from 'react-icons/fi';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuthStore } from '../../../store/adminAuthStore';
 import toast from 'react-hot-toast';
 import Button from '../Button';
+import NotificationWindow from './NotificationWindow';
 
 const AdminHeader = ({ onMenuClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAdminAuthStore();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleLogout = () => {
     logout();
     toast.success('Logged out successfully');
     navigate('/admin/login');
+  };
+
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
   };
 
   // Get page name from pathname
@@ -68,11 +75,20 @@ const AdminHeader = ({ onMenuClick }) => {
           {/* Notifications */}
           <div className="relative">
             <Button
+              data-notification-button
+              onClick={toggleNotifications}
               variant="icon"
               className="text-gray-700"
               icon={FiBell}
             />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            
+            {/* Notification Window - positioned relative to this container */}
+            <NotificationWindow
+              isOpen={showNotifications}
+              onClose={() => setShowNotifications(false)}
+              position="right"
+            />
           </div>
 
           {/* Logout Button */}
