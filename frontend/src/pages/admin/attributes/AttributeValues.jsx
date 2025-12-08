@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FiPlus, FiEdit, FiTrash2, FiSearch } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import DataTable from '../../../components/Admin/DataTable';
@@ -7,6 +8,8 @@ import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
 
 const AttributeValues = () => {
+  const location = useLocation();
+  const isAppRoute = location.pathname.startsWith('/app');
   const [attributeValues, setAttributeValues] = useState([
     { id: 1, attributeId: 1, attributeName: 'Color', value: 'Red', displayOrder: 1, status: 'active' },
     { id: 2, attributeId: 1, attributeName: 'Color', value: 'Blue', displayOrder: 2, status: 'active' },
@@ -164,7 +167,7 @@ const AttributeValues = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => setEditingValue(null)}
-              className="fixed inset-0 bg-black/50 z-50"
+              className="fixed inset-0 bg-black/50 z-[10000]"
             />
             
             {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
@@ -172,12 +175,12 @@ const AttributeValues = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+              className={`fixed inset-0 z-[10000] flex ${isAppRoute ? 'items-start pt-[10px]' : 'items-end'} sm:items-center justify-center p-4 pointer-events-none`}
             >
               <motion.div
                 variants={{
                   hidden: { 
-                    y: '100%',
+                    y: isAppRoute ? '-100%' : '100%',
                     scale: 0.95,
                     opacity: 0
                   },
@@ -193,7 +196,7 @@ const AttributeValues = () => {
                     }
                   },
                   exit: { 
-                    y: '100%',
+                    y: isAppRoute ? '-100%' : '100%',
                     scale: 0.95,
                     opacity: 0,
                     transition: { 
@@ -207,7 +210,7 @@ const AttributeValues = () => {
                 animate="visible"
                 exit="exit"
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl p-6 max-w-md w-full pointer-events-auto"
+                className={`bg-white ${isAppRoute ? 'rounded-b-3xl' : 'rounded-t-3xl'} sm:rounded-xl shadow-xl p-6 max-w-md w-full pointer-events-auto`}
                 style={{ willChange: 'transform' }}
               >
                 <h3 className="text-lg font-bold text-gray-800 mb-4">

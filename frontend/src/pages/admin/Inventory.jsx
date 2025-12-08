@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FiSearch, FiAlertTriangle, FiEdit, FiRefreshCw, FiX, FiPackage, FiPlus, FiMinus } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { products as initialProducts } from '../../data/products';
@@ -10,6 +11,8 @@ import { formatCurrency } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
 const Inventory = () => {
+  const location = useLocation();
+  const isAppRoute = location.pathname.startsWith('/app');
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [stockFilter, setStockFilter] = useState('all');
@@ -464,7 +467,7 @@ const StockManagementModal = ({ isOpen, product, lowStockThreshold, onClose, onU
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-black/50 z-[10000]"
             onClick={onClose}
           />
           
@@ -473,12 +476,12 @@ const StockManagementModal = ({ isOpen, product, lowStockThreshold, onClose, onU
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+            className={`fixed inset-0 z-[10000] flex ${isAppRoute ? 'items-start pt-[10px]' : 'items-end'} sm:items-center justify-center p-4 pointer-events-none`}
           >
             <motion.div
               variants={{
                 hidden: { 
-                  y: '100%',
+                  y: isAppRoute ? '-100%' : '100%',
                   scale: 0.95,
                   opacity: 0
                 },
@@ -494,7 +497,7 @@ const StockManagementModal = ({ isOpen, product, lowStockThreshold, onClose, onU
                   }
                 },
                 exit: { 
-                  y: '100%',
+                  y: isAppRoute ? '-100%' : '100%',
                   scale: 0.95,
                   opacity: 0,
                   transition: { 
@@ -508,7 +511,7 @@ const StockManagementModal = ({ isOpen, product, lowStockThreshold, onClose, onU
               animate="visible"
               exit="exit"
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-t-3xl sm:rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl pointer-events-auto relative"
+              className={`bg-white ${isAppRoute ? 'rounded-b-3xl' : 'rounded-t-3xl'} sm:rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl pointer-events-auto relative`}
               style={{ willChange: 'transform' }}
             >
               {/* Drag Handle - Mobile Only */}

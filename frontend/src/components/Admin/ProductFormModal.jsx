@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FiSave, FiX, FiUpload } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { products as initialProducts } from "../../data/products";
@@ -10,6 +11,8 @@ import toast from "react-hot-toast";
 import Button from "./Button";
 
 const ProductFormModal = ({ isOpen, onClose, productId, onSuccess }) => {
+  const location = useLocation();
+  const isAppRoute = location.pathname.startsWith('/app');
   const isEdit = productId && productId !== "new";
 
   const { categories, initialize: initCategories } = useCategoryStore();
@@ -352,12 +355,12 @@ const ProductFormModal = ({ isOpen, onClose, productId, onSuccess }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-4 pointer-events-none"
+            className={`fixed inset-0 z-[10000] flex ${isAppRoute ? 'items-start pt-[10px]' : 'items-end'} sm:items-center justify-center p-4 pointer-events-none`}
           >
             <motion.div
               variants={{
                 hidden: { 
-                  y: '100%',
+                  y: isAppRoute ? '-100%' : '100%',
                   scale: 0.95,
                   opacity: 0
                 },
@@ -373,7 +376,7 @@ const ProductFormModal = ({ isOpen, onClose, productId, onSuccess }) => {
                   }
                 },
                 exit: { 
-                  y: '100%',
+                  y: isAppRoute ? '-100%' : '100%',
                   scale: 0.95,
                   opacity: 0,
                   transition: { 
@@ -387,7 +390,7 @@ const ProductFormModal = ({ isOpen, onClose, productId, onSuccess }) => {
               animate="visible"
               exit="exit"
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col pointer-events-auto"
+              className={`bg-white ${isAppRoute ? 'rounded-b-3xl' : 'rounded-t-3xl'} sm:rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col pointer-events-auto`}
               style={{ willChange: 'transform' }}
             >
               {/* Header */}

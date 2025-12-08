@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FiPlus, FiEdit, FiTrash2, FiSave } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
@@ -7,6 +8,8 @@ import { formatCurrency } from '../../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
 const TaxPricing = () => {
+  const location = useLocation();
+  const isAppRoute = location.pathname.startsWith('/app');
   const [taxRules, setTaxRules] = useState([
     { id: 1, name: 'Standard Tax', rate: 18, type: 'percentage', applicableTo: 'all', status: 'active' },
     { id: 2, name: 'GST', rate: 5, type: 'percentage', applicableTo: 'electronics', status: 'active' },
@@ -177,7 +180,7 @@ const TaxPricing = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => setEditingTax(null)}
-              className="fixed inset-0 bg-black/50 z-50"
+              className="fixed inset-0 bg-black/50 z-[10000]"
             />
             
             {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
@@ -185,12 +188,12 @@ const TaxPricing = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+              className={`fixed inset-0 z-[10000] flex ${isAppRoute ? 'items-start pt-[10px]' : 'items-end'} sm:items-center justify-center p-4 pointer-events-none`}
             >
               <motion.div
                 variants={{
                   hidden: { 
-                    y: '100%',
+                    y: isAppRoute ? '-100%' : '100%',
                     scale: 0.95,
                     opacity: 0
                   },
@@ -206,7 +209,7 @@ const TaxPricing = () => {
                     }
                   },
                   exit: { 
-                    y: '100%',
+                    y: isAppRoute ? '-100%' : '100%',
                     scale: 0.95,
                     opacity: 0,
                     transition: { 
@@ -220,7 +223,7 @@ const TaxPricing = () => {
                 animate="visible"
                 exit="exit"
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl p-6 max-w-md w-full pointer-events-auto"
+                className={`bg-white ${isAppRoute ? 'rounded-b-3xl' : 'rounded-t-3xl'} sm:rounded-xl shadow-xl p-6 max-w-md w-full pointer-events-auto`}
                 style={{ willChange: 'transform' }}
               >
                 <h3 className="text-lg font-bold text-gray-800 mb-4">
@@ -334,7 +337,7 @@ const TaxPricing = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => setEditingPricing(null)}
-              className="fixed inset-0 bg-black/50 z-50"
+              className="fixed inset-0 bg-black/50 z-[10000]"
             />
             
             {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
@@ -342,12 +345,12 @@ const TaxPricing = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+              className={`fixed inset-0 z-[10000] flex ${isAppRoute ? 'items-start pt-[10px]' : 'items-end'} sm:items-center justify-center p-4 pointer-events-none`}
             >
               <motion.div
                 variants={{
                   hidden: { 
-                    y: '100%',
+                    y: isAppRoute ? '-100%' : '100%',
                     scale: 0.95,
                     opacity: 0
                   },
@@ -363,7 +366,7 @@ const TaxPricing = () => {
                     }
                   },
                   exit: { 
-                    y: '100%',
+                    y: isAppRoute ? '-100%' : '100%',
                     scale: 0.95,
                     opacity: 0,
                     transition: { 
@@ -377,7 +380,7 @@ const TaxPricing = () => {
                 animate="visible"
                 exit="exit"
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl p-6 max-w-md w-full pointer-events-auto"
+                className={`bg-white ${isAppRoute ? 'rounded-b-3xl' : 'rounded-t-3xl'} sm:rounded-xl shadow-xl p-6 max-w-md w-full pointer-events-auto`}
                 style={{ willChange: 'transform' }}
               >
                 <h3 className="text-lg font-bold text-gray-800 mb-4">

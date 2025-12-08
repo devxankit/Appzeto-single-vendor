@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FiX, FiSave } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBrandStore } from '../../../store/brandStore';
@@ -6,6 +7,8 @@ import toast from 'react-hot-toast';
 import Button from '../Button';
 
 const BrandForm = ({ brand, onClose, onSave }) => {
+  const location = useLocation();
+  const isAppRoute = location.pathname.startsWith('/app');
   const { createBrand, updateBrand } = useBrandStore();
   const isEdit = !!brand;
 
@@ -68,7 +71,7 @@ const BrandForm = ({ brand, onClose, onSave }) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           onClick={onClose}
-          className="fixed inset-0 bg-black/50 z-50"
+          className="fixed inset-0 bg-black/50 z-[10000]"
         />
         
         {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
@@ -76,12 +79,12 @@ const BrandForm = ({ brand, onClose, onSave }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
+          className={`fixed inset-0 z-[10000] flex ${isAppRoute ? 'items-start pt-[10px]' : 'items-end'} sm:items-center justify-center p-4 pointer-events-none`}
         >
           <motion.div
             variants={{
               hidden: { 
-                y: '100%',
+                y: isAppRoute ? '-100%' : '100%',
                 scale: 0.95,
                 opacity: 0
               },
@@ -97,7 +100,7 @@ const BrandForm = ({ brand, onClose, onSave }) => {
                 }
               },
               exit: { 
-                y: '100%',
+                y: isAppRoute ? '-100%' : '100%',
                 scale: 0.95,
                 opacity: 0,
                 transition: { 
@@ -111,7 +114,7 @@ const BrandForm = ({ brand, onClose, onSave }) => {
             animate="visible"
             exit="exit"
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin pointer-events-auto"
+            className={`bg-white ${isAppRoute ? 'rounded-b-3xl' : 'rounded-t-3xl'} sm:rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto scrollbar-admin pointer-events-auto`}
             style={{ willChange: 'transform' }}
           >
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">

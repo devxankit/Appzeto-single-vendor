@@ -1,8 +1,12 @@
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiX } from 'react-icons/fi';
 import Button from './Button';
 
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Confirm', cancelText = 'Cancel', type = 'danger' }) => {
+  const location = useLocation();
+  const isAppRoute = location.pathname.startsWith('/app');
+  
   if (!isOpen) return null;
 
   const typeStyles = {
@@ -41,12 +45,12 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-4 pointer-events-none"
+            className={`fixed inset-0 z-[10000] flex ${isAppRoute ? 'items-start pt-[10px]' : 'items-end'} sm:items-center justify-center p-4 pointer-events-none`}
           >
             <motion.div
               variants={{
                 hidden: { 
-                  y: '100%',
+                  y: isAppRoute ? '-100%' : '100%',
                   scale: 0.95,
                   opacity: 0
                 },
@@ -62,7 +66,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
                   }
                 },
                 exit: { 
-                  y: '100%',
+                  y: isAppRoute ? '-100%' : '100%',
                   scale: 0.95,
                   opacity: 0,
                   transition: { 
@@ -76,7 +80,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
               animate="visible"
               exit="exit"
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6 relative mx-4 pointer-events-auto"
+              className={`bg-white ${isAppRoute ? 'rounded-b-3xl' : 'rounded-t-3xl'} sm:rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6 relative mx-4 pointer-events-auto`}
               style={{ willChange: 'transform' }}
             >
               {/* Close Button */}
