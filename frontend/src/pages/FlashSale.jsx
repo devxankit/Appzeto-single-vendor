@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiClock, FiGrid, FiList, FiZap, FiTrendingUp } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { getFlashSale } from '../data/products';
+import { useCampaignStore } from '../store/campaignStore';
 import { formatPrice } from '../utils/helpers';
 import Header from '../components/Layout/Header';
 import Navbar from '../components/Layout/Navbar';
@@ -14,7 +16,42 @@ import Badge from '../components/Badge';
 import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const FlashSale = () => {
-  const allFlashSale = getFlashSale();
+  const navigate = useNavigate();
+  const { getActiveCampaigns, getCampaignsByType, initialize } = useCampaignStore();
+  
+  // Initialize campaigns
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get active flash sale campaigns
+  const flashSaleCampaigns = useMemo(() => {
+    const allCampaigns = getCampaignsByType('flash_sale');
+    const now = new Date();
+    return allCampaigns.filter(
+      campaign =>
+        campaign.isActive &&
+        new Date(campaign.startDate) <= now &&
+        new Date(campaign.endDate) >= now
+    );
+  }, [getCampaignsByType]);
+
+  // If there's exactly one active flash sale campaign, redirect to it
+  useEffect(() => {
+    if (flashSaleCampaigns.length === 1 && flashSaleCampaigns[0].route) {
+      navigate(flashSaleCampaigns[0].route, { replace: true });
+    }
+  }, [flashSaleCampaigns, navigate]);
+
+  // Fallback to static data if no campaigns
+  const allFlashSale = useMemo(() => {
+    if (flashSaleCampaigns.length > 0) {
+      // If multiple campaigns, use products from the first one
+      // For now, fallback to static data
+      return getFlashSale();
+    }
+    return getFlashSale();
+  }, [flashSaleCampaigns]);
   const { responsivePadding } = useResponsiveHeaderPadding();
   const [viewMode, setViewMode] = useState('grid');
   const [timeLeft, setTimeLeft] = useState({

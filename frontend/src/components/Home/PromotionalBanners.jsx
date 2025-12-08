@@ -1,17 +1,49 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useBannerStore } from '../../store/bannerStore';
+import { useCampaignStore } from '../../store/campaignStore';
 import { gsapAnimations } from '../../utils/animations';
 
 const PromotionalBanners = () => {
   const sectionRef = useRef(null);
+  const { getBannersByType, initialize: initBanners } = useBannerStore();
+  const { initialize: initCampaigns } = useCampaignStore();
 
   useEffect(() => {
+    initBanners();
+    initCampaigns();
     if (sectionRef.current) {
       gsapAnimations.scrollReveal(sectionRef.current);
     }
-  }, []);
+  }, [initBanners, initCampaigns]);
 
-  const banners = [
+  // Get active promotional banners from store
+  const campaignBanners = useMemo(() => {
+    const allBanners = getBannersByType('promotional');
+    const now = new Date();
+    return allBanners
+      .filter(banner => {
+        if (!banner.isActive) return false;
+        if (banner.startDate && new Date(banner.startDate) > now) return false;
+        if (banner.endDate && new Date(banner.endDate) < now) return false;
+        return true;
+      })
+      .slice(0, 3) // Limit to 3 campaign banners
+      .map((banner, index) => ({
+        id: `campaign-${banner.id}`,
+        title: banner.title,
+        subtitle: banner.subtitle || '',
+        description: banner.description || '',
+        discount: banner.subtitle || 'Special Offer',
+        gradient: 'from-blue-400 via-purple-400 to-pink-400',
+        image: banner.image || '/images/promotional/beauty.jpg',
+        link: banner.link || '/offers',
+        isCampaign: true,
+      }));
+  }, [getBannersByType]);
+
+  const staticBanners = [
     {
       id: 1,
       title: 'Beauty is',
@@ -43,22 +75,44 @@ const PromotionalBanners = () => {
     },
   ];
 
+  // Merge campaign banners with static banners (campaign banners first)
+  const banners = useMemo(() => {
+    const merged = [...campaignBanners];
+    // Fill remaining slots with static banners
+    const remainingSlots = 3 - merged.length;
+    if (remainingSlots > 0) {
+      merged.push(...staticBanners.slice(0, remainingSlots));
+    }
+    return merged.slice(0, 3); // Ensure max 3 banners
+  }, [campaignBanners]);
+
+  const BannerWrapper = ({ banner, children }) => {
+    if (banner.link) {
+      return (
+        <Link to={banner.link} className="block">
+          {children}
+        </Link>
+      );
+    }
+    return children;
+  };
+
   return (
     <section ref={sectionRef} className="py-16 md:py-0 bg-transparent">
       {/* Desktop Layout - White card container with 3-column grid */}
       <div className="hidden md:block bg-white rounded-lg mb-4 p-4">
         <div className="grid grid-cols-3 gap-1">
           {banners.map((banner, index) => (
-            <motion.div
-              key={banner.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              whileHover={{ y: -4, scale: 1.01 }}
-              className={`bg-gradient-to-br ${banner.gradient} rounded-lg p-4 relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group`}
-              style={{ aspectRatio: "41/22" }}
-            >
+            <BannerWrapper key={banner.id} banner={banner}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+                whileHover={{ y: -4, scale: 1.01 }}
+                className={`bg-gradient-to-br ${banner.gradient} rounded-lg p-4 relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group`}
+                style={{ aspectRatio: "41/22" }}
+              >
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full blur-2xl"></div>
@@ -98,7 +152,8 @@ const PromotionalBanners = () => {
                   }}
                 />
               </div>
-            </motion.div>
+              </motion.div>
+            </BannerWrapper>
           ))}
         </div>
       </div>
@@ -107,15 +162,15 @@ const PromotionalBanners = () => {
       <div className="md:hidden container mx-auto px-2 sm:px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-8">
           {banners.map((banner, index) => (
-            <motion.div
-              key={banner.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              whileHover={{ y: -8, scale: 1.02 }}
-              className={`bg-gradient-to-br ${banner.gradient} rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group`}
-            >
+            <BannerWrapper key={banner.id} banner={banner}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+                whileHover={{ y: -8, scale: 1.02 }}
+                className={`bg-gradient-to-br ${banner.gradient} rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group`}
+              >
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 bg-white rounded-full blur-3xl"></div>
@@ -153,7 +208,8 @@ const PromotionalBanners = () => {
                   }}
                 />
               </div>
-            </motion.div>
+              </motion.div>
+            </BannerWrapper>
           ))}
         </div>
       </div>

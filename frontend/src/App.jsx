@@ -13,6 +13,7 @@ import Wishlist from "./pages/Wishlist";
 import Offers from "./pages/Offers";
 import DailyDeals from "./pages/DailyDeals";
 import FlashSale from "./pages/FlashSale";
+import CampaignPage from "./pages/CampaignPage";
 import Category from "./pages/Category";
 import CartDrawer from "./components/Cart/CartDrawer";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
@@ -153,6 +154,8 @@ const AppRoutes = () => {
       <Route path="/offers" element={<RouteWrapper><Offers /></RouteWrapper>} />
       <Route path="/daily-deals" element={<RouteWrapper><DailyDeals /></RouteWrapper>} />
       <Route path="/flash-sale" element={<RouteWrapper><FlashSale /></RouteWrapper>} />
+      <Route path="/sale/:slug" element={<RouteWrapper><CampaignPage /></RouteWrapper>} />
+      <Route path="/campaign/:id" element={<RouteWrapper><CampaignPage /></RouteWrapper>} />
       <Route path="/order-confirmation/:orderId" element={<RouteWrapper><OrderConfirmation /></RouteWrapper>} />
       <Route path="/orders/:orderId" element={<RouteWrapper><OrderDetailPage /></RouteWrapper>} />
       <Route path="/track-order/:orderId" element={<RouteWrapper><TrackOrder /></RouteWrapper>} />

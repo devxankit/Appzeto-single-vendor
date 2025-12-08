@@ -1,50 +1,70 @@
-import { useState } from 'react';
-import { FiPlus, FiEdit, FiTrash2, FiTag } from 'react-icons/fi';
+import { useState, useEffect, useMemo } from 'react';
+import { FiPlus, FiEdit, FiTrash2, FiTag, FiExternalLink } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { useCampaignStore } from '../../../store/campaignStore';
+import CampaignForm from '../../../components/Admin/Campaigns/CampaignForm';
 import DataTable from '../../../components/Admin/DataTable';
 import Badge from '../../../components/Badge';
 import ConfirmModal from '../../../components/Admin/ConfirmModal';
-import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import { formatDateTime } from '../../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 
 const FestivalOffers = () => {
-  const [offers, setOffers] = useState([
-    {
-      id: 1,
-      title: 'Diwali Sale',
-      discount: 30,
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      status: 'active',
-    },
-    {
-      id: 2,
-      title: 'Christmas Special',
-      discount: 25,
-      startDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 37 * 24 * 60 * 60 * 1000).toISOString(),
-      status: 'upcoming',
-    },
-  ]);
+  const {
+    campaigns,
+    initialize,
+    getCampaignsByType,
+    deleteCampaign,
+  } = useCampaignStore();
+
   const [editingOffer, setEditingOffer] = useState(null);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
 
-  const handleSave = (offerData) => {
-    if (editingOffer && editingOffer.id) {
-      setOffers(offers.map((o) => (o.id === editingOffer.id ? { ...offerData, id: editingOffer.id } : o)));
-      toast.success('Offer updated');
-    } else {
-      setOffers([...offers, { ...offerData, id: offers.length + 1 }]);
-      toast.success('Offer added');
-    }
-    setEditingOffer(null);
-  };
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get festival campaigns
+  const festivalCampaigns = useMemo(() => {
+    return getCampaignsByType('festival');
+  }, [campaigns, getCampaignsByType]);
+
+  // Convert campaigns to table format
+  const offers = useMemo(() => {
+    return festivalCampaigns.map(campaign => {
+      const now = new Date();
+      const startDate = new Date(campaign.startDate);
+      const endDate = new Date(campaign.endDate);
+      
+      let status = 'expired';
+      if (!campaign.isActive) {
+        status = 'inactive';
+      } else if (startDate > now) {
+        status = 'upcoming';
+      } else if (endDate >= now) {
+        status = 'active';
+      }
+
+      return {
+        id: campaign.id,
+        title: campaign.name,
+        discount: campaign.discountValue,
+        startDate: campaign.startDate,
+        endDate: campaign.endDate,
+        status,
+        campaign, // Store full campaign object for reference
+      };
+    });
+  }, [festivalCampaigns]);
 
   const handleDelete = () => {
-    setOffers(offers.filter((o) => o.id !== deleteModal.id));
+    deleteCampaign(deleteModal.id);
     setDeleteModal({ isOpen: false, id: null });
-    toast.success('Offer deleted');
+  };
+
+  const handleFormClose = () => {
+    setEditingOffer(null);
   };
 
   const columns = [
@@ -95,8 +115,19 @@ const FestivalOffers = () => {
       sortable: false,
       render: (_, row) => (
         <div className="flex items-center gap-2">
+          {row.campaign?.route && (
+            <Link
+              to={row.campaign.route}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              title="View Campaign Page"
+            >
+              <FiExternalLink />
+            </Link>
+          )}
           <button
-            onClick={() => setEditingOffer(row)}
+            onClick={() => setEditingOffer(row.campaign)}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
           >
             <FiEdit />
@@ -124,171 +155,50 @@ const FestivalOffers = () => {
           <p className="text-sm sm:text-base text-gray-600">Manage seasonal and festival offers</p>
         </div>
         <button
-          onClick={() => setEditingOffer({})}
+          onClick={() => setEditingOffer({ type: 'festival' })}
           className="flex items-center gap-2 px-4 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm"
         >
           <FiPlus />
-          <span>Add Offer</span>
+          <span>Add Festival Offer</span>
         </button>
       </div>
 
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-        <DataTable
-          data={offers}
-          columns={columns}
-          pagination={true}
-          itemsPerPage={10}
-        />
-      </div>
+      {offers.length === 0 ? (
+        <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-200">
+          <FiTag className="text-6xl text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-gray-800 mb-2">No Festival Offers</h3>
+          <p className="text-gray-600 mb-6">
+            Create your first festival offer to get started!
+          </p>
+          <button
+            onClick={() => setEditingOffer({ type: 'festival' })}
+            className="px-6 py-3 gradient-green text-white rounded-xl font-semibold hover:shadow-glow-green transition-all"
+          >
+            Create Festival Offer
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <DataTable
+            data={offers}
+            columns={columns}
+            pagination={true}
+            itemsPerPage={10}
+          />
+        </div>
+      )}
 
-      <AnimatePresence>
-        {editingOffer !== null && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setEditingOffer(null)}
-              className="fixed inset-0 bg-black/50 z-50"
-            />
-            
-            {/* Modal Content - Mobile: Slide up from bottom, Desktop: Center with scale */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none"
-            >
-              <motion.div
-                variants={{
-                  hidden: { 
-                    y: '100%',
-                    scale: 0.95,
-                    opacity: 0
-                  },
-                  visible: { 
-                    y: 0,
-                    scale: 1,
-                    opacity: 1,
-                    transition: { 
-                      type: 'spring',
-                      damping: 22,
-                      stiffness: 350,
-                      mass: 0.7
-                    }
-                  },
-                  exit: { 
-                    y: '100%',
-                    scale: 0.95,
-                    opacity: 0,
-                    transition: { 
-                      type: 'spring',
-                      damping: 30,
-                      stiffness: 400
-                    }
-                  }
-                }}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-t-3xl sm:rounded-xl shadow-xl p-6 max-w-md w-full pointer-events-auto"
-                style={{ willChange: 'transform' }}
-              >
-                <h3 className="text-lg font-bold text-gray-800 mb-4">
-                  {editingOffer.id ? 'Edit Offer' : 'Add Offer'}
-                </h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                handleSave({
-                  title: formData.get('title'),
-                  discount: parseInt(formData.get('discount')),
-                  startDate: formData.get('startDate'),
-                  endDate: formData.get('endDate'),
-                  status: formData.get('status'),
-                });
-              }}
-              className="space-y-4"
-            >
-              <input
-                type="text"
-                name="title"
-                defaultValue={editingOffer.title || ''}
-                placeholder="Offer Title"
-                required
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <input
-                type="number"
-                name="discount"
-                defaultValue={editingOffer.discount || ''}
-                placeholder="Discount (%)"
-                required
-                min="0"
-                max="100"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                <input
-                  type="datetime-local"
-                  name="startDate"
-                  defaultValue={editingOffer.startDate ? new Date(editingOffer.startDate).toISOString().slice(0, 16) : ''}
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                <input
-                  type="datetime-local"
-                  name="endDate"
-                  defaultValue={editingOffer.endDate ? new Date(editingOffer.endDate).toISOString().slice(0, 16) : ''}
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <AnimatedSelect
-                name="status"
-                value={editingOffer.status || 'active'}
-                onChange={(e) => {
-                  const form = e.target.closest('form');
-                  if (form) {
-                    const statusInput = form.querySelector('[name="status"]');
-                    if (statusInput) statusInput.value = e.target.value;
-                  }
-                }}
-                options={[
-                  { value: 'active', label: 'Active' },
-                  { value: 'upcoming', label: 'Upcoming' },
-                  { value: 'expired', label: 'Expired' },
-                ]}
-              />
-              <div className="flex items-center gap-2">
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditingOffer(null)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-              </motion.div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Campaign Form Modal */}
+      {editingOffer !== null && (
+        <CampaignForm
+          campaign={editingOffer}
+          onClose={handleFormClose}
+          onSave={() => {
+            initialize();
+            handleFormClose();
+          }}
+        />
+      )}
 
       <ConfirmModal
         isOpen={deleteModal.isOpen}

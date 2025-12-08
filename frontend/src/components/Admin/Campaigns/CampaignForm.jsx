@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
-import { FiX, FiSave, FiCalendar } from 'react-icons/fi';
+import { useState, useEffect, useMemo } from 'react';
+import { FiX, FiSave, FiCalendar, FiLink, FiEye, FiSearch, FiFilter, FiCheckSquare, FiSquare, FiXCircle, FiUpload, FiImage } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCampaignStore } from '../../../store/campaignStore';
+import { useCategoryStore } from '../../../store/categoryStore';
+import { useBrandStore } from '../../../store/brandStore';
 import { products as initialProducts } from '../../../data/products';
+import { generateSlug } from '../../../store/campaignStore';
+import { createCampaignBanner } from '../../../utils/campaignHelpers';
 import AnimatedSelect from '../AnimatedSelect';
 import { formatPrice } from '../../../utils/helpers';
 import toast from 'react-hot-toast';
@@ -22,12 +26,70 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
     endDate: '',
     productIds: [],
     isActive: true,
+    slug: '',
+    autoCreateBanner: true,
+    pageConfig: {
+      showCountdown: true,
+      countdownType: 'campaign_end',
+      viewModes: ['grid', 'list'],
+      defaultViewMode: 'grid',
+      enableFilters: true,
+      enableSorting: true,
+      productsPerPage: 12,
+      showStats: true,
+    },
+    bannerConfig: {
+      title: '',
+      subtitle: '',
+      image: '',
+      customImage: false,
+    },
   });
 
   const [products] = useState(() => {
     const savedProducts = localStorage.getItem('admin-products');
     return savedProducts ? JSON.parse(savedProducts) : initialProducts;
   });
+
+  // Product selection filters
+  const [productSearchQuery, setProductSearchQuery] = useState('');
+  const [selectedProductCategory, setSelectedProductCategory] = useState('all');
+  const [selectedProductBrand, setSelectedProductBrand] = useState('all');
+  const [selectedProductStock, setSelectedProductStock] = useState('all');
+  const [productPage, setProductPage] = useState(1);
+  const productsPerPage = 20;
+
+  // Get stores
+  const { categories, getRootCategories, getCategoriesByParent, initialize: initCategories } = useCategoryStore();
+  const { brands, initialize: initBrands } = useBrandStore();
+
+  // Initialize stores
+  useEffect(() => {
+    initCategories();
+    initBrands();
+  }, [initCategories, initBrands]);
+
+  // Generate slug from name
+  const generatedSlug = useMemo(() => {
+    if (formData.name) {
+      const campaigns = useCampaignStore.getState().campaigns;
+      const existingCampaigns = isEdit 
+        ? campaigns.filter(c => c.id !== campaign.id)
+        : campaigns;
+      return generateSlug(formData.name, existingCampaigns);
+    }
+    return '';
+  }, [formData.name, isEdit, campaign]);
+
+  // Update slug when name changes (if slug is empty or matches old generated slug)
+  useEffect(() => {
+    if (formData.name && (!formData.slug || formData.slug === generateSlug(campaign?.name || '', []))) {
+      setFormData(prev => ({
+        ...prev,
+        slug: generatedSlug,
+      }));
+    }
+  }, [formData.name, generatedSlug, campaign]);
 
   useEffect(() => {
     if (campaign) {
@@ -41,6 +103,30 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
         endDate: campaign.endDate ? campaign.endDate.split('T')[0] : '',
         productIds: campaign.productIds || [],
         isActive: campaign.isActive !== undefined ? campaign.isActive : true,
+        slug: campaign.slug || '',
+        autoCreateBanner: campaign.autoCreateBanner !== undefined ? campaign.autoCreateBanner : true,
+        pageConfig: campaign.pageConfig || {
+          showCountdown: true,
+          countdownType: 'campaign_end',
+          viewModes: ['grid', 'list'],
+          defaultViewMode: 'grid',
+          enableFilters: true,
+          enableSorting: true,
+          productsPerPage: 12,
+          showStats: true,
+        },
+        bannerConfig: campaign.bannerConfig ? {
+          ...campaign.bannerConfig,
+          // Detect if image is base64 (custom uploaded image)
+          customImage: campaign.bannerConfig.image && campaign.bannerConfig.image.startsWith('data:image/') 
+            ? true 
+            : (campaign.bannerConfig.customImage || false),
+        } : {
+          title: '',
+          subtitle: '',
+          image: '',
+          customImage: false,
+        },
       });
     } else {
       // Set default dates
@@ -57,11 +143,104 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
+    
+    // Handle nested pageConfig updates
+    if (name.startsWith('pageConfig.')) {
+      const configKey = name.split('.')[1];
+      setFormData({
+        ...formData,
+        pageConfig: {
+          ...formData.pageConfig,
+          [configKey]: type === 'checkbox' ? checked : (type === 'number' ? parseInt(value) : value),
+        },
+      });
+    }
+    // Handle nested bannerConfig updates
+    else if (name.startsWith('bannerConfig.')) {
+      const configKey = name.split('.')[1];
+      setFormData({
+        ...formData,
+        bannerConfig: {
+          ...formData.bannerConfig,
+          [configKey]: value,
+        },
+      });
+    }
+    // Handle viewModes array
+    else if (name === 'viewMode') {
+      const viewModes = formData.pageConfig.viewModes || [];
+      const newViewModes = checked
+        ? [...viewModes, value]
+        : viewModes.filter(m => m !== value);
+      setFormData({
+        ...formData,
+        pageConfig: {
+          ...formData.pageConfig,
+          viewModes: newViewModes,
+        },
+      });
+    }
+    else {
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : (type === 'number' ? parseFloat(value) : value),
+      });
+    }
   };
+
+  // Filter products based on search, category, brand, and stock
+  const filteredProducts = useMemo(() => {
+    let filtered = products;
+
+    // Search filter
+    if (productSearchQuery) {
+      filtered = filtered.filter((product) =>
+        product.name.toLowerCase().includes(productSearchQuery.toLowerCase())
+      );
+    }
+
+    // Category filter - include products from parent category and all its subcategories
+    if (selectedProductCategory !== 'all') {
+      const parentCategoryId = parseInt(selectedProductCategory);
+      // Get all subcategories for this parent category
+      const subcategories = getCategoriesByParent(parentCategoryId);
+      const allCategoryIds = [parentCategoryId, ...subcategories.map(cat => cat.id)];
+      
+      filtered = filtered.filter(
+        (product) => allCategoryIds.includes(product.categoryId)
+      );
+    }
+
+    // Brand filter
+    if (selectedProductBrand !== 'all') {
+      filtered = filtered.filter(
+        (product) => product.brandId === parseInt(selectedProductBrand)
+      );
+    }
+
+    // Stock filter
+    if (selectedProductStock !== 'all') {
+      filtered = filtered.filter(
+        (product) => product.stock === selectedProductStock
+      );
+    }
+
+    return filtered;
+  }, [products, productSearchQuery, selectedProductCategory, selectedProductBrand, selectedProductStock]);
+
+  // Paginated products
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (productPage - 1) * productsPerPage;
+    const endIndex = startIndex + productsPerPage;
+    return filteredProducts.slice(startIndex, endIndex);
+  }, [filteredProducts, productPage, productsPerPage]);
+
+  const totalProductPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setProductPage(1);
+  }, [productSearchQuery, selectedProductCategory, selectedProductBrand, selectedProductStock]);
 
   const handleProductToggle = (productId) => {
     setFormData({
@@ -70,6 +249,77 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
         ? formData.productIds.filter((id) => id !== productId)
         : [...formData.productIds, productId],
     });
+  };
+
+  // Select all filtered products
+  const handleSelectAllFiltered = () => {
+    const filteredIds = filteredProducts.map(p => p.id);
+    const allSelected = filteredIds.every(id => formData.productIds.includes(id));
+    
+    if (allSelected) {
+      // Deselect all filtered
+      setFormData({
+        ...formData,
+        productIds: formData.productIds.filter(id => !filteredIds.includes(id)),
+      });
+    } else {
+      // Select all filtered
+      const newIds = [...new Set([...formData.productIds, ...filteredIds])];
+      setFormData({
+        ...formData,
+        productIds: newIds,
+      });
+    }
+  };
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setProductSearchQuery('');
+    setSelectedProductCategory('all');
+    setSelectedProductBrand('all');
+    setSelectedProductStock('all');
+    setProductPage(1);
+  };
+
+  // Check if all filtered products are selected
+  const allFilteredSelected = useMemo(() => {
+    if (filteredProducts.length === 0) return false;
+    return filteredProducts.every(p => formData.productIds.includes(p.id));
+  }, [filteredProducts, formData.productIds]);
+
+  // Handle custom banner image upload
+  const handleBannerImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check if file is an image
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          bannerConfig: {
+            ...formData.bannerConfig,
+            image: reader.result, // Base64 data URL
+            customImage: true, // Flag to indicate custom image
+          },
+        });
+        toast.success('Banner image uploaded successfully');
+      };
+      reader.onerror = () => {
+        toast.error('Error reading image file');
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -95,15 +345,27 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
     try {
       const campaignData = {
         ...formData,
+        slug: formData.slug || generatedSlug,
         startDate: new Date(formData.startDate).toISOString(),
         endDate: new Date(formData.endDate).toISOString(),
         discountValue: parseFloat(formData.discountValue),
       };
 
+      let createdCampaign;
       if (isEdit) {
-        updateCampaign(campaign.id, campaignData);
+        createdCampaign = updateCampaign(campaign.id, campaignData);
       } else {
-        createCampaign(campaignData);
+        createdCampaign = createCampaign(campaignData);
+        
+        // Auto-create banner if enabled
+        if (campaignData.autoCreateBanner && createdCampaign) {
+          try {
+            createCampaignBanner(createdCampaign, campaignData.bannerConfig);
+          } catch (bannerError) {
+            console.error('Failed to create banner:', bannerError);
+            // Don't fail the campaign creation if banner fails
+          }
+        }
       }
       onSave?.();
       onClose();
@@ -213,6 +475,7 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                     { value: 'flash_sale', label: 'Flash Sale' },
                     { value: 'daily_deal', label: 'Daily Deal' },
                     { value: 'special_offer', label: 'Special Offer' },
+                    { value: 'festival', label: 'Festival Offer' },
                   ]}
                 />
               </div>
@@ -229,6 +492,39 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="Campaign description..."
                 />
+              </div>
+
+              {/* Slug and Route Preview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    URL Slug
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="slug"
+                      value={formData.slug}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="Auto-generated from name"
+                    />
+                    <FiLink className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">URL-friendly version of campaign name</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Page URL
+                  </label>
+                  <div className="relative">
+                    <div className="w-full px-4 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm text-gray-600 flex items-center gap-2">
+                      <FiEye className="text-gray-400" />
+                      <span>/sale/{formData.slug || generatedSlug || 'campaign-slug'}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Preview of the campaign page URL</p>
+                </div>
               </div>
             </div>
           </div>
@@ -312,45 +608,533 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
 
           {/* Products */}
           <div>
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Select Products</h3>
-            <div className="border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto scrollbar-admin">
-              {products.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No products available</p>
-              ) : (
-                <div className="space-y-2">
-                  {products.map((product) => (
-                    <label
-                      key={product.id}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800">Select Products</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">
+                  {formData.productIds.length} selected
+                </span>
+                {filteredProducts.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleSelectAllFiltered}
+                    className="flex items-center gap-1 px-3 py-1 text-sm text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                  >
+                    {allFilteredSelected ? (
+                      <>
+                        <FiCheckSquare className="text-base" />
+                        <span>Deselect All</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiSquare className="text-base" />
+                        <span>Select All ({filteredProducts.length})</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="space-y-3 mb-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={productSearchQuery}
+                  onChange={(e) => setProductSearchQuery(e.target.value)}
+                  placeholder="Search products by name..."
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+                {productSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setProductSearchQuery('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <FiXCircle />
+                  </button>
+                )}
+              </div>
+
+              {/* Filter Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {/* Category Filter - Only Parent Categories */}
+                <AnimatedSelect
+                  value={selectedProductCategory}
+                  onChange={(e) => setSelectedProductCategory(e.target.value)}
+                  options={[
+                    { value: 'all', label: 'All Categories' },
+                    ...getRootCategories()
+                      .filter((cat) => cat.isActive !== false)
+                      .map((cat) => ({ value: String(cat.id), label: cat.name })),
+                  ]}
+                />
+
+                {/* Brand Filter */}
+                <AnimatedSelect
+                  value={selectedProductBrand}
+                  onChange={(e) => setSelectedProductBrand(e.target.value)}
+                  options={[
+                    { value: 'all', label: 'All Brands' },
+                    ...(brands || [])
+                      .filter((brand) => brand.isActive !== false)
+                      .map((brand) => ({ value: String(brand.id), label: brand.name })),
+                  ]}
+                />
+
+                {/* Stock Filter */}
+                <AnimatedSelect
+                  value={selectedProductStock}
+                  onChange={(e) => setSelectedProductStock(e.target.value)}
+                  options={[
+                    { value: 'all', label: 'All Stock' },
+                    { value: 'in_stock', label: 'In Stock' },
+                    { value: 'low_stock', label: 'Low Stock' },
+                    { value: 'out_of_stock', label: 'Out of Stock' },
+                  ]}
+                />
+              </div>
+
+              {/* Clear Filters Button */}
+              {(productSearchQuery || selectedProductCategory !== 'all' || selectedProductBrand !== 'all' || selectedProductStock !== 'all') && (
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800"
+                >
+                  <FiXCircle className="text-xs" />
+                  <span>Clear all filters</span>
+                </button>
+              )}
+
+              {/* Results Count */}
+              <div className="text-sm text-gray-600">
+                Showing {paginatedProducts.length} of {filteredProducts.length} products
+                {filteredProducts.length !== products.length && ` (${products.length} total)`}
+              </div>
+            </div>
+
+            {/* Products List */}
+            <div className="border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto scrollbar-admin">
+              {filteredProducts.length === 0 ? (
+                <div className="text-center py-8">
+                  <FiSearch className="text-4xl text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500">No products found</p>
+                  {(productSearchQuery || selectedProductCategory !== 'all' || selectedProductBrand !== 'all' || selectedProductStock !== 'all') && (
+                    <button
+                      type="button"
+                      onClick={handleClearFilters}
+                      className="mt-2 text-sm text-primary-600 hover:text-primary-700"
                     >
+                      Clear filters to see all products
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    {paginatedProducts.map((product) => (
+                      <label
+                        key={product.id}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer border border-transparent hover:border-gray-200 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.productIds.includes(product.id)}
+                          onChange={() => handleProductToggle(product.id)}
+                          className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 flex-shrink-0"
+                        />
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/48x48?text=Product';
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-800 truncate">{product.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-sm font-medium text-gray-700">{formatPrice(product.price)}</p>
+                            {product.originalPrice && product.originalPrice > product.price && (
+                              <p className="text-xs text-gray-400 line-through">{formatPrice(product.originalPrice)}</p>
+                            )}
+                            {product.stock && (
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                product.stock === 'in_stock' ? 'bg-green-100 text-green-700' :
+                                product.stock === 'low_stock' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {product.stock.replace('_', ' ')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalProductPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                      <button
+                        type="button"
+                        onClick={() => setProductPage(p => Math.max(1, p - 1))}
+                        disabled={productPage === 1}
+                        className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      <span className="text-sm text-gray-600">
+                        Page {productPage} of {totalProductPages}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setProductPage(p => Math.min(totalProductPages, p + 1))}
+                        disabled={productPage === totalProductPages}
+                        className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Selected Products Summary */}
+            {formData.productIds.length > 0 && (
+              <div className="mt-3 p-3 bg-primary-50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-primary-800">
+                    {formData.productIds.length} product(s) selected
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, productIds: [] })}
+                    className="text-xs text-primary-600 hover:text-primary-700"
+                  >
+                    Clear selection
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Page Options */}
+          <div>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Page Options</h3>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="flex items-center gap-2 mb-2">
+                    <input
+                      type="checkbox"
+                      name="pageConfig.showCountdown"
+                      checked={formData.pageConfig.showCountdown}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">Show Countdown Timer</span>
+                  </label>
+                  {formData.pageConfig.showCountdown && (
+                    <div className="mt-2">
+                      <label className="block text-xs text-gray-600 mb-1">Countdown Type</label>
+                      <AnimatedSelect
+                        name="pageConfig.countdownType"
+                        value={formData.pageConfig.countdownType}
+                        onChange={handleChange}
+                        options={[
+                          { value: 'campaign_end', label: 'Campaign End' },
+                          { value: 'daily_reset', label: 'Daily Reset' },
+                        ]}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="flex items-center gap-2 mb-2">
+                    <input
+                      type="checkbox"
+                      name="pageConfig.showStats"
+                      checked={formData.pageConfig.showStats}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">Show Stats Banner</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    View Modes
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={formData.productIds.includes(product.id)}
-                        onChange={() => handleProductToggle(product.id)}
+                        name="viewMode"
+                        value="grid"
+                        checked={formData.pageConfig.viewModes.includes('grid')}
+                        onChange={handleChange}
                         className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
                       />
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-10 h-10 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-800">{product.name}</p>
-                        <p className="text-xs text-gray-500">{formatPrice(product.price)}</p>
-                      </div>
+                      <span className="text-sm text-gray-700">Grid View</span>
                     </label>
-                  ))}
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="viewMode"
+                        value="list"
+                        checked={formData.pageConfig.viewModes.includes('list')}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-gray-700">List View</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Default View Mode
+                  </label>
+                  <AnimatedSelect
+                    name="pageConfig.defaultViewMode"
+                    value={formData.pageConfig.defaultViewMode}
+                    onChange={handleChange}
+                    options={formData.pageConfig.viewModes.map(mode => ({
+                      value: mode,
+                      label: mode.charAt(0).toUpperCase() + mode.slice(1),
+                    }))}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="flex items-center gap-2 mb-2">
+                    <input
+                      type="checkbox"
+                      name="pageConfig.enableFilters"
+                      checked={formData.pageConfig.enableFilters}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">Enable Filters</span>
+                  </label>
+                </div>
+                <div>
+                  <label className="flex items-center gap-2 mb-2">
+                    <input
+                      type="checkbox"
+                      name="pageConfig.enableSorting"
+                      checked={formData.pageConfig.enableSorting}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">Enable Sorting</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Products Per Page
+                </label>
+                <input
+                  type="number"
+                  name="pageConfig.productsPerPage"
+                  value={formData.pageConfig.productsPerPage}
+                  onChange={handleChange}
+                  min="6"
+                  max="48"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Banner Settings */}
+          <div>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Banner Settings</h3>
+            <div className="space-y-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="autoCreateBanner"
+                  checked={formData.autoCreateBanner}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                />
+                <span className="text-sm font-semibold text-gray-700">Auto-create Banner</span>
+              </label>
+
+              {formData.autoCreateBanner && (
+                <div className="space-y-4 pl-6 border-l-2 border-gray-200">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Banner Title (Optional - defaults to campaign name)
+                    </label>
+                    <input
+                      type="text"
+                      name="bannerConfig.title"
+                      value={formData.bannerConfig.title}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="Leave empty to use campaign name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Banner Subtitle (Optional - defaults to discount info)
+                    </label>
+                    <input
+                      type="text"
+                      name="bannerConfig.subtitle"
+                      value={formData.bannerConfig.subtitle}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="Leave empty for auto-generated subtitle"
+                    />
+                  </div>
+                  
+                  {/* Banner Image Options */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Banner Image
+                    </label>
+                    <div className="space-y-3">
+                      {/* Option 1: Upload Custom Image */}
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-2">Option 1: Upload Custom Image</label>
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleBannerImageUpload}
+                            className="hidden"
+                            id="banner-image-upload"
+                          />
+                          <label
+                            htmlFor="banner-image-upload"
+                            className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors bg-white"
+                          >
+                            <FiUpload className="text-lg text-primary-600" />
+                            <span className="text-sm font-medium text-gray-700">
+                              {formData.bannerConfig.image && formData.bannerConfig.customImage
+                                ? 'Change Custom Banner Image'
+                                : 'Upload Custom Banner Image'}
+                            </span>
+                          </label>
+                        </div>
+                        {/* Preview for custom uploaded image */}
+                        {formData.bannerConfig.image && formData.bannerConfig.customImage && (
+                          <div className="mt-3">
+                            <div className="relative inline-block">
+                              <img
+                                src={formData.bannerConfig.image}
+                                alt="Banner preview"
+                                className="w-full max-w-xs h-32 object-cover rounded-lg border border-gray-200"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData({
+                                    ...formData,
+                                    bannerConfig: {
+                                      ...formData.bannerConfig,
+                                      image: '',
+                                      customImage: false,
+                                    },
+                                  });
+                                }}
+                                className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                title="Remove image"
+                              >
+                                <FiX className="text-sm" />
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">Custom uploaded image</p>
+                          </div>
+                        )}
+                        
+                        {/* Preview for URL image */}
+                        {formData.bannerConfig.image && !formData.bannerConfig.customImage && !formData.bannerConfig.image.startsWith('data:') && (
+                          <div className="mt-3">
+                            <div className="relative inline-block">
+                              <img
+                                src={formData.bannerConfig.image}
+                                alt="Banner preview"
+                                className="w-full max-w-xs h-32 object-cover rounded-lg border border-gray-200"
+                                onError={(e) => {
+                                  e.target.parentElement.style.display = 'none';
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFormData({
+                                    ...formData,
+                                    bannerConfig: {
+                                      ...formData.bannerConfig,
+                                      image: '',
+                                    },
+                                  });
+                                }}
+                                className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                title="Remove image"
+                              >
+                                <FiX className="text-sm" />
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">Image from URL</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Option 2: Image URL */}
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-2">Option 2: Use Image URL (Optional - defaults to promotional image)</label>
+                        <div className="relative">
+                          <FiImage className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                          <input
+                            type="text"
+                            name="bannerConfig.image"
+                            value={formData.bannerConfig.customImage ? '' : formData.bannerConfig.image}
+                            onChange={(e) => {
+                              setFormData({
+                                ...formData,
+                                bannerConfig: {
+                                  ...formData.bannerConfig,
+                                  image: e.target.value,
+                                  customImage: false,
+                                },
+                              });
+                            }}
+                            disabled={formData.bannerConfig.customImage}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            placeholder="/images/promotional/beauty.jpg"
+                          />
+                        </div>
+                        {formData.bannerConfig.image && !formData.bannerConfig.customImage && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Leave empty to use default promotional image
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
-            {formData.productIds.length > 0 && (
-              <p className="text-sm text-gray-600 mt-2">
-                {formData.productIds.length} product(s) selected
-              </p>
-            )}
           </div>
 
           {/* Settings */}

@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiClock, FiGrid, FiList, FiZap, FiX } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { getDailyDeals } from '../data/products';
+import { useCampaignStore } from '../store/campaignStore';
 import { formatPrice } from '../utils/helpers';
 import Header from '../components/Layout/Header';
 import Navbar from '../components/Layout/Navbar';
@@ -14,7 +16,40 @@ import Badge from '../components/Badge';
 import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const DailyDeals = () => {
-  const allDeals = getDailyDeals();
+  const navigate = useNavigate();
+  const { getCampaignsByType, initialize } = useCampaignStore();
+  
+  // Initialize campaigns
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get active daily deal campaigns
+  const dailyDealCampaigns = useMemo(() => {
+    const allCampaigns = getCampaignsByType('daily_deal');
+    const now = new Date();
+    return allCampaigns.filter(
+      campaign =>
+        campaign.isActive &&
+        new Date(campaign.startDate) <= now &&
+        new Date(campaign.endDate) >= now
+    );
+  }, [getCampaignsByType]);
+
+  // If there's exactly one active daily deal campaign, redirect to it
+  useEffect(() => {
+    if (dailyDealCampaigns.length === 1 && dailyDealCampaigns[0].route) {
+      navigate(dailyDealCampaigns[0].route, { replace: true });
+    }
+  }, [dailyDealCampaigns, navigate]);
+
+  // Fallback to static data if no campaigns
+  const allDeals = useMemo(() => {
+    if (dailyDealCampaigns.length > 0) {
+      return getDailyDeals();
+    }
+    return getDailyDeals();
+  }, [dailyDealCampaigns]);
   const { responsivePadding } = useResponsiveHeaderPadding();
   const [viewMode, setViewMode] = useState('grid');
   const [timeLeft, setTimeLeft] = useState({

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { FiFilter, FiGrid, FiList, FiTrendingDown, FiX, FiLoader } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { getOffers } from '../data/products';
+import { useCampaignStore } from '../store/campaignStore';
 import { formatPrice } from '../utils/helpers';
 import Header from '../components/Layout/Header';
 import Navbar from '../components/Layout/Navbar';
@@ -17,7 +18,32 @@ import useResponsiveHeaderPadding from '../hooks/useResponsiveHeaderPadding';
 
 const Offers = () => {
   const location = useLocation();
-  const allOffers = getOffers();
+  const { getCampaignsByType, initialize } = useCampaignStore();
+  
+  // Initialize campaigns
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  // Get active special offer campaigns
+  const specialOfferCampaigns = useMemo(() => {
+    const allCampaigns = getCampaignsByType('special_offer');
+    const now = new Date();
+    return allCampaigns.filter(
+      campaign =>
+        campaign.isActive &&
+        new Date(campaign.startDate) <= now &&
+        new Date(campaign.endDate) >= now
+    );
+  }, [getCampaignsByType]);
+
+  // Fallback to static data if no campaigns
+  const allOffers = useMemo(() => {
+    if (specialOfferCampaigns.length > 0) {
+      return getOffers();
+    }
+    return getOffers();
+  }, [specialOfferCampaigns]);
   const { responsivePadding } = useResponsiveHeaderPadding();
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('discount'); // discount, price-low, price-high, rating
