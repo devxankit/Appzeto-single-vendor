@@ -68,29 +68,29 @@ const OrdersCustomersSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-6 max-w-full overflow-x-hidden"
     >
       <div className="lg:hidden">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Orders & Customers</h1>
         <p className="text-sm sm:text-base text-gray-600">Configure order management and customer settings</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <div className="flex overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-full overflow-x-hidden">
+        <div className="border-b border-gray-200 overflow-x-hidden">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-1 px-1">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b-2 transition-colors whitespace-nowrap text-xs sm:text-sm ${
                     activeSection === section.id
                       ? 'border-primary-600 text-primary-600 font-semibold'
                       : 'border-transparent text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  <Icon />
+                  <Icon className="text-base sm:text-lg" />
                   <span>{section.label}</span>
                 </button>
               );
@@ -98,11 +98,11 @@ const OrdersCustomersSettings = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 md:p-6">
           {/* Orders Section */}
           {activeSection === 'orders' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Minimum Order Value
@@ -135,13 +135,13 @@ const OrdersCustomersSettings = () => {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800">Order Tracking</h4>
                     <p className="text-xs text-gray-600">Allow customers to track their orders</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                     <input
                       type="checkbox"
                       name="orderTrackingEnabled"
@@ -153,12 +153,12 @@ const OrdersCustomersSettings = () => {
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800">Order Confirmation Email</h4>
                     <p className="text-xs text-gray-600">Send email confirmation when order is placed</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                     <input
                       type="checkbox"
                       name="orderConfirmationEmail"
@@ -176,13 +176,13 @@ const OrdersCustomersSettings = () => {
           {/* Customers Section */}
           {activeSection === 'customers' && (
             <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800">Guest Checkout</h4>
                     <p className="text-xs text-gray-600">Allow customers to checkout without creating an account</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                     <input
                       type="checkbox"
                       name="guestCheckoutEnabled"
@@ -194,12 +194,12 @@ const OrdersCustomersSettings = () => {
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800">Registration Required</h4>
                     <p className="text-xs text-gray-600">Require customers to register before checkout</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                     <input
                       type="checkbox"
                       name="registrationRequired"
@@ -211,12 +211,12 @@ const OrdersCustomersSettings = () => {
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800">Email Verification Required</h4>
                     <p className="text-xs text-gray-600">Require customers to verify their email address</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                     <input
                       type="checkbox"
                       name="emailVerificationRequired"
@@ -232,9 +232,9 @@ const OrdersCustomersSettings = () => {
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Customer Account Features</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <span className="text-sm font-semibold text-gray-700">Order History</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <span className="text-sm font-semibold text-gray-700 flex-1 min-w-0">Order History</span>
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input
                         type="checkbox"
                         checked={customersData.customerAccountFeatures?.orderHistory !== false}
@@ -244,9 +244,9 @@ const OrdersCustomersSettings = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                     </label>
                   </div>
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <span className="text-sm font-semibold text-gray-700">Wishlist</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <span className="text-sm font-semibold text-gray-700 flex-1 min-w-0">Wishlist</span>
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input
                         type="checkbox"
                         checked={customersData.customerAccountFeatures?.wishlist !== false}
@@ -256,9 +256,9 @@ const OrdersCustomersSettings = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                     </label>
                   </div>
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <span className="text-sm font-semibold text-gray-700">Saved Addresses</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <span className="text-sm font-semibold text-gray-700 flex-1 min-w-0">Saved Addresses</span>
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input
                         type="checkbox"
                         checked={customersData.customerAccountFeatures?.addresses !== false}
@@ -273,10 +273,10 @@ const OrdersCustomersSettings = () => {
             </div>
           )}
 
-          <div className="flex justify-end pt-6 border-t border-gray-200 mt-6">
+          <div className="flex justify-end pt-4 sm:pt-6 border-t border-gray-200 mt-4 sm:mt-6">
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+              className="flex items-center gap-2 px-4 sm:px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base w-full sm:w-auto"
             >
               <FiSave />
               Save Settings

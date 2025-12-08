@@ -73,29 +73,29 @@ const NotificationsSEOSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-6 max-w-full overflow-x-hidden"
     >
       <div className="lg:hidden">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Notifications & SEO</h1>
         <p className="text-sm sm:text-base text-gray-600">Configure email, notifications, and SEO settings</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <div className="flex overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-full overflow-x-hidden">
+        <div className="border-b border-gray-200 overflow-x-hidden">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-1 px-1">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b-2 transition-colors whitespace-nowrap text-xs sm:text-sm ${
                     activeSection === section.id
                       ? 'border-primary-600 text-primary-600 font-semibold'
                       : 'border-transparent text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  <Icon />
+                  <Icon className="text-base sm:text-lg" />
                   <span>{section.label}</span>
                 </button>
               );
@@ -103,11 +103,11 @@ const NotificationsSEOSettings = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 md:p-6">
           {/* Email Section */}
           {activeSection === 'email' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     SMTP Host
@@ -196,12 +196,12 @@ const NotificationsSEOSettings = () => {
               <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Email Notifications</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800">Order Confirmation</h4>
                       <p className="text-xs text-gray-600">Send email when order is placed</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                       <input
                         type="checkbox"
                         checked={notificationsData.email?.orderConfirmation !== false}
@@ -212,12 +212,12 @@ const NotificationsSEOSettings = () => {
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800">Shipping Update</h4>
                       <p className="text-xs text-gray-600">Send email when order is shipped</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                       <input
                         type="checkbox"
                         checked={notificationsData.email?.shippingUpdate !== false}
@@ -228,12 +228,12 @@ const NotificationsSEOSettings = () => {
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800">Delivery Update</h4>
                       <p className="text-xs text-gray-600">Send email when order is delivered</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                       <input
                         type="checkbox"
                         checked={notificationsData.email?.deliveryUpdate !== false}
@@ -249,12 +249,12 @@ const NotificationsSEOSettings = () => {
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Other Notifications</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800">SMS Notifications</h4>
                       <p className="text-xs text-gray-600">Send SMS notifications to customers</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                       <input
                         type="checkbox"
                         checked={notificationsData.smsEnabled || false}
@@ -265,12 +265,12 @@ const NotificationsSEOSettings = () => {
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800">Push Notifications</h4>
                       <p className="text-xs text-gray-600">Send push notifications to app users</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                       <input
                         type="checkbox"
                         checked={notificationsData.pushEnabled || false}
@@ -286,12 +286,12 @@ const NotificationsSEOSettings = () => {
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Admin Notifications</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800">New Orders</h4>
                       <p className="text-xs text-gray-600">Notify admin when new order is placed</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                       <input
                         type="checkbox"
                         checked={notificationsData.admin?.newOrders !== false}
@@ -302,12 +302,12 @@ const NotificationsSEOSettings = () => {
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800">Low Stock Alerts</h4>
                       <p className="text-xs text-gray-600">Notify admin when products are low in stock</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                       <input
                         type="checkbox"
                         checked={notificationsData.admin?.lowStock !== false}
@@ -373,7 +373,7 @@ const NotificationsSEOSettings = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Open Graph Image URL
@@ -415,10 +415,10 @@ const NotificationsSEOSettings = () => {
             </div>
           )}
 
-          <div className="flex justify-end pt-6 border-t border-gray-200 mt-6">
+          <div className="flex justify-end pt-4 sm:pt-6 border-t border-gray-200 mt-4 sm:mt-6">
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+              className="flex items-center gap-2 px-4 sm:px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base w-full sm:w-auto"
             >
               <FiSave />
               Save Settings

@@ -74,7 +74,7 @@ const GeneralSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-6 max-w-full overflow-x-hidden"
     >
       <div className="lg:hidden">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">General Settings</h1>
@@ -82,22 +82,22 @@ const GeneralSettings = () => {
       </div>
 
       {/* Section Tabs */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <div className="flex overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-full overflow-x-hidden">
+        <div className="border-b border-gray-200 overflow-x-hidden">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-1 px-1">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b-2 transition-colors whitespace-nowrap text-xs sm:text-sm ${
                     activeSection === section.id
                       ? 'border-primary-600 text-primary-600 font-semibold'
                       : 'border-transparent text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  <Icon />
+                  <Icon className="text-base sm:text-lg" />
                   <span>{section.label}</span>
                 </button>
               );
@@ -105,11 +105,11 @@ const GeneralSettings = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 md:p-6">
           {/* Store Identity Section */}
           {activeSection === 'identity' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Store Name <span className="text-red-500">*</span>
@@ -170,7 +170,7 @@ const GeneralSettings = () => {
           {/* Contact Info Section */}
           {activeSection === 'contact' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Email
@@ -336,25 +336,25 @@ const GeneralSettings = () => {
           {/* Theme & Colors Section */}
           {activeSection === 'theme' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Primary Color
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <input
                       type="color"
                       name="primaryColor"
                       value={formData.primaryColor || '#10B981'}
                       onChange={handleChange}
-                      className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
+                      className="w-12 sm:w-16 h-9 sm:h-10 border border-gray-300 rounded cursor-pointer flex-shrink-0"
                     />
                     <input
                       type="text"
                       name="primaryColor"
                       value={formData.primaryColor || '#10B981'}
                       onChange={handleChange}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="flex-1 min-w-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                     />
                   </div>
                 </div>
@@ -363,20 +363,20 @@ const GeneralSettings = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Secondary Color
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <input
                       type="color"
                       name="secondaryColor"
                       value={formData.secondaryColor || '#3B82F6'}
                       onChange={handleChange}
-                      className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
+                      className="w-12 sm:w-16 h-9 sm:h-10 border border-gray-300 rounded cursor-pointer flex-shrink-0"
                     />
                     <input
                       type="text"
                       name="secondaryColor"
                       value={formData.secondaryColor || '#3B82F6'}
                       onChange={handleChange}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="flex-1 min-w-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                     />
                   </div>
                 </div>
@@ -385,20 +385,20 @@ const GeneralSettings = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Accent Color
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <input
                       type="color"
                       name="accentColor"
                       value={formData.accentColor || '#FFE11B'}
                       onChange={handleChange}
-                      className="w-16 h-10 border border-gray-300 rounded cursor-pointer"
+                      className="w-12 sm:w-16 h-9 sm:h-10 border border-gray-300 rounded cursor-pointer flex-shrink-0"
                     />
                     <input
                       type="text"
                       name="accentColor"
                       value={formData.accentColor || '#FFE11B'}
                       onChange={handleChange}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="flex-1 min-w-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                     />
                   </div>
                 </div>
@@ -442,10 +442,10 @@ const GeneralSettings = () => {
             </div>
           )}
 
-          <div className="flex justify-end pt-6 border-t border-gray-200 mt-6">
+          <div className="flex justify-end pt-4 sm:pt-6 border-t border-gray-200 mt-4 sm:mt-6">
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+              className="flex items-center gap-2 px-4 sm:px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base w-full sm:w-auto"
             >
               <FiSave />
               Save Settings

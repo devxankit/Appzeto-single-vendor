@@ -97,29 +97,29 @@ const ContentFeaturesSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-6 max-w-full overflow-x-hidden"
     >
       <div className="lg:hidden">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Content & Features</h1>
         <p className="text-sm sm:text-base text-gray-600">Manage policies, features, homepage, and reviews</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <div className="flex overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-full overflow-x-hidden">
+        <div className="border-b border-gray-200 overflow-x-hidden">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-1 px-1">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b-2 transition-colors whitespace-nowrap text-xs sm:text-sm ${
                     activeSection === section.id
                       ? 'border-primary-600 text-primary-600 font-semibold'
                       : 'border-transparent text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  <Icon />
+                  <Icon className="text-base sm:text-lg" />
                   <span>{section.label}</span>
                 </button>
               );
@@ -127,16 +127,16 @@ const ContentFeaturesSettings = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 md:p-6">
           {/* Features Section */}
           {activeSection === 'features' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Wishlist</h4>
                   <p className="text-xs text-gray-600">Allow customers to save products to wishlist</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     checked={featuresData.wishlistEnabled !== false}
@@ -147,12 +147,12 @@ const ContentFeaturesSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Product Reviews</h4>
                   <p className="text-xs text-gray-600">Allow customers to review products</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     checked={featuresData.reviewsEnabled !== false}
@@ -163,12 +163,12 @@ const ContentFeaturesSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Flash Sales</h4>
                   <p className="text-xs text-gray-600">Enable flash sale feature</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     checked={featuresData.flashSaleEnabled !== false}
@@ -179,12 +179,12 @@ const ContentFeaturesSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Daily Deals</h4>
                   <p className="text-xs text-gray-600">Enable daily deals feature</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     checked={featuresData.dailyDealsEnabled !== false}
@@ -195,12 +195,12 @@ const ContentFeaturesSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Live Chat</h4>
                   <p className="text-xs text-gray-600">Enable live chat support</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     checked={featuresData.liveChatEnabled || false}
@@ -211,12 +211,12 @@ const ContentFeaturesSettings = () => {
                 </label>
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Coupon Codes</h4>
                   <p className="text-xs text-gray-600">Allow customers to use coupon codes</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     checked={featuresData.couponCodesEnabled !== false}
@@ -232,12 +232,12 @@ const ContentFeaturesSettings = () => {
           {/* Homepage Section */}
           {activeSection === 'homepage' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Hero Banner</h4>
                   <p className="text-xs text-gray-600">Display hero banner on homepage</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     checked={homepageData.heroBannerEnabled !== false}
@@ -252,11 +252,11 @@ const ContentFeaturesSettings = () => {
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Homepage Sections</h3>
                 <div className="space-y-3">
                   {Object.entries(homepageData.sections || {}).map(([key, section]) => (
-                    <div key={key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <span className="text-sm font-semibold text-gray-700 capitalize">
+                    <div key={key} className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                      <span className="text-sm font-semibold text-gray-700 capitalize flex-1 min-w-0">
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </span>
-                      <label className="relative inline-flex items-center cursor-pointer">
+                      <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                         <input
                           type="checkbox"
                           checked={section.enabled !== false}
@@ -291,12 +291,12 @@ const ContentFeaturesSettings = () => {
                 <p className="text-xs text-gray-500 mt-1">How reviews are published</p>
               </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-800">Purchase Required</h4>
                   <p className="text-xs text-gray-600">Only allow reviews from verified purchasers</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 sm:ml-4">
                   <input
                     type="checkbox"
                     name="purchaseRequired"
@@ -311,9 +311,9 @@ const ContentFeaturesSettings = () => {
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Review Display Settings</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <span className="text-sm font-semibold text-gray-700">Show All Reviews</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <span className="text-sm font-semibold text-gray-700 flex-1 min-w-0">Show All Reviews</span>
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input
                         type="checkbox"
                         name="displaySettings.showAll"
@@ -324,9 +324,9 @@ const ContentFeaturesSettings = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                     </label>
                   </div>
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <span className="text-sm font-semibold text-gray-700">Verified Purchases Only</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <span className="text-sm font-semibold text-gray-700 flex-1 min-w-0">Verified Purchases Only</span>
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input
                         type="checkbox"
                         name="displaySettings.verifiedOnly"
@@ -337,9 +337,9 @@ const ContentFeaturesSettings = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                     </label>
                   </div>
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <span className="text-sm font-semibold text-gray-700">With Photos Only</span>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <span className="text-sm font-semibold text-gray-700 flex-1 min-w-0">With Photos Only</span>
+                    <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                       <input
                         type="checkbox"
                         name="displaySettings.withPhotosOnly"
@@ -355,10 +355,10 @@ const ContentFeaturesSettings = () => {
             </div>
           )}
 
-          <div className="flex justify-end pt-6 border-t border-gray-200 mt-6">
+          <div className="flex justify-end pt-4 sm:pt-6 border-t border-gray-200 mt-4 sm:mt-6">
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+              className="flex items-center gap-2 px-4 sm:px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base w-full sm:w-auto"
             >
               <FiSave />
               Save Settings

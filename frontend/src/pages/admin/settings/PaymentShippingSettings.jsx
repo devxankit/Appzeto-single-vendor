@@ -83,29 +83,29 @@ const PaymentShippingSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="space-y-6 max-w-full overflow-x-hidden"
     >
       <div className="lg:hidden">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Payment & Shipping</h1>
         <p className="text-sm sm:text-base text-gray-600">Configure payment methods and shipping options</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <div className="flex overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-full overflow-x-hidden">
+        <div className="border-b border-gray-200 overflow-x-hidden">
+          <div className="flex overflow-x-auto scrollbar-hide -mx-1 px-1">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b-2 transition-colors whitespace-nowrap text-xs sm:text-sm ${
                     activeSection === section.id
                       ? 'border-primary-600 text-primary-600 font-semibold'
                       : 'border-transparent text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  <Icon />
+                  <Icon className="text-base sm:text-lg" />
                   <span>{section.label}</span>
                 </button>
               );
@@ -113,26 +113,26 @@ const PaymentShippingSettings = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 md:p-6">
           {/* Payment Section */}
           {activeSection === 'payment' && (
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Payment Methods</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div className="flex items-center gap-3">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                       <input
                         type="checkbox"
                         name="codEnabled"
                         checked={paymentData.codEnabled || false}
                         onChange={handlePaymentChange}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 flex-shrink-0"
                       />
-                      <span className="text-sm font-semibold text-gray-700">Cash on Delivery (COD)</span>
+                      <span className="text-sm font-semibold text-gray-700 truncate">Cash on Delivery (COD)</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-600">Fee (%):</label>
+                    <div className="flex items-center gap-2 sm:ml-4">
+                      <label className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Fee (%):</label>
                       <input
                         type="number"
                         value={paymentData.paymentFees?.cod || 0}
@@ -140,24 +140,24 @@ const PaymentShippingSettings = () => {
                         step="0.1"
                         min="0"
                         max="10"
-                        className="w-20 px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-16 sm:w-20 px-2 sm:px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                       <input
                         type="checkbox"
                         name="cardEnabled"
                         checked={paymentData.cardEnabled || false}
                         onChange={handlePaymentChange}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 flex-shrink-0"
                       />
-                      <span className="text-sm font-semibold text-gray-700">Credit/Debit Card</span>
+                      <span className="text-sm font-semibold text-gray-700 truncate">Credit/Debit Card</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-600">Fee (%):</label>
+                    <div className="flex items-center gap-2 sm:ml-4">
+                      <label className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Fee (%):</label>
                       <input
                         type="number"
                         value={paymentData.paymentFees?.card || 2.5}
@@ -165,24 +165,24 @@ const PaymentShippingSettings = () => {
                         step="0.1"
                         min="0"
                         max="10"
-                        className="w-20 px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-16 sm:w-20 px-2 sm:px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                       <input
                         type="checkbox"
                         name="walletEnabled"
                         checked={paymentData.walletEnabled || false}
                         onChange={handlePaymentChange}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 flex-shrink-0"
                       />
-                      <span className="text-sm font-semibold text-gray-700">Digital Wallet</span>
+                      <span className="text-sm font-semibold text-gray-700 truncate">Digital Wallet</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-600">Fee (%):</label>
+                    <div className="flex items-center gap-2 sm:ml-4">
+                      <label className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Fee (%):</label>
                       <input
                         type="number"
                         value={paymentData.paymentFees?.wallet || 1.5}
@@ -190,24 +190,24 @@ const PaymentShippingSettings = () => {
                         step="0.1"
                         min="0"
                         max="10"
-                        className="w-20 px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-16 sm:w-20 px-2 sm:px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                       />
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 p-3 sm:p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                       <input
                         type="checkbox"
                         name="upiEnabled"
                         checked={paymentData.upiEnabled || false}
                         onChange={handlePaymentChange}
-                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                        className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 flex-shrink-0"
                       />
-                      <span className="text-sm font-semibold text-gray-700">UPI</span>
+                      <span className="text-sm font-semibold text-gray-700 truncate">UPI</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-600">Fee (%):</label>
+                    <div className="flex items-center gap-2 sm:ml-4">
+                      <label className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">Fee (%):</label>
                       <input
                         type="number"
                         value={paymentData.paymentFees?.upi || 0.5}
@@ -215,7 +215,7 @@ const PaymentShippingSettings = () => {
                         step="0.1"
                         min="0"
                         max="10"
-                        className="w-20 px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-16 sm:w-20 px-2 sm:px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                       />
                     </div>
                   </div>
@@ -279,7 +279,7 @@ const PaymentShippingSettings = () => {
           {/* Shipping Section */}
           {activeSection === 'shipping' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Free Shipping Threshold
@@ -339,10 +339,10 @@ const PaymentShippingSettings = () => {
             </div>
           )}
 
-          <div className="flex justify-end pt-6 border-t border-gray-200 mt-6">
+          <div className="flex justify-end pt-4 sm:pt-6 border-t border-gray-200 mt-4 sm:mt-6">
             <button
               type="submit"
-              className="flex items-center gap-2 px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold"
+              className="flex items-center gap-2 px-4 sm:px-6 py-2 gradient-green text-white rounded-lg hover:shadow-glow-green transition-all font-semibold text-sm sm:text-base w-full sm:w-auto"
             >
               <FiSave />
               Save Settings

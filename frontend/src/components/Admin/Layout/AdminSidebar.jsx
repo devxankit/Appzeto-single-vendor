@@ -28,7 +28,6 @@ import {
   FiUser,
 } from "react-icons/fi";
 import { useAdminAuthStore } from "../../../store/adminAuthStore";
-import { appLogo } from "../../../data/logos";
 import adminMenu from "../../../config/adminMenu.json";
 
 // Icon mapping for menu items
@@ -356,52 +355,35 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     <div className="h-full flex flex-col bg-slate-800 shadow-xl">
       {/* Header Section */}
       <div className="p-4 border-b border-slate-700 bg-slate-900">
-        {/* Close Button - Mobile Only */}
-        <div className="flex items-center justify-between mb-4 lg:hidden">
-          <div className="flex items-center gap-2">
-            <img
-              src={appLogo.src}
-              alt={appLogo.alt}
-              className="h-8 w-auto object-contain"
-              onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/120x40/2874F0/FFFFFF?text=LOGO";
-              }}
-            />
+        {/* Header with Close Button and Admin Info */}
+        <div className="flex items-center justify-between gap-3">
+          {/* Admin User Info */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+              <FiUser className="text-white text-xl" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-semibold text-white text-sm truncate">
+                {admin?.name || "Admin User"}
+              </h2>
+              <p className="text-xs text-gray-400 truncate">
+                {admin?.email || "admin@admin.com"}
+              </p>
+            </div>
           </div>
+          
+          {/* Close Button - Mobile Only */}
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0 lg:hidden"
             aria-label="Close sidebar">
             <FiX className="text-xl text-gray-300" />
           </button>
         </div>
-
-        {/* Admin User Info */}
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-            <FiUser className="text-white text-xl" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-white text-sm truncate">
-              {admin?.name || "Admin User"}
-            </h2>
-            <p className="text-xs text-gray-400 truncate">
-              {admin?.email || "admin@admin.com"}
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Navigation Menu */}
-      <nav
-        className="flex-1 overflow-y-auto p-3 scrollbar-admin lg:pb-3"
-        style={{
-          // On mobile, add extra bottom padding to account for bottom nav (64px) + safe area
-          paddingBottom: isMobile
-            ? `calc(64px + env(safe-area-inset-bottom, 0px))`
-            : undefined,
-        }}>
+      <nav className="flex-1 overflow-y-auto p-3 scrollbar-admin lg:pb-3">
         {adminMenu.map((item) => renderMenuItem(item))}
       </nav>
     </div>
@@ -417,7 +399,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/50 z-[9998] lg:hidden"
           />
         )}
       </AnimatePresence>
@@ -430,7 +412,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 bottom-0 w-64 z-50 lg:hidden">
+            className="fixed left-0 top-0 bottom-0 w-64 z-[10000] lg:hidden">
             {sidebarContent}
           </motion.div>
         )}
