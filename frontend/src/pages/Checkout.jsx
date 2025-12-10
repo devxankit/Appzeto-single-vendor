@@ -25,7 +25,6 @@ const Checkout = () => {
   const { responsivePadding } = useResponsiveHeaderPadding();
   
   const [step, setStep] = useState(1);
-  const [isGuest, setIsGuest] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [couponCode, setCouponCode] = useState('');
@@ -45,7 +44,7 @@ const Checkout = () => {
 
   // Pre-fill form data from user profile
   useEffect(() => {
-    if (isAuthenticated && user && !isGuest) {
+    if (isAuthenticated && user) {
       setFormData((prev) => ({
         ...prev,
         name: user.name || '',
@@ -70,7 +69,7 @@ const Checkout = () => {
         }));
       }
     }
-  }, [isAuthenticated, user, isGuest, getDefaultAddress]);
+  }, [isAuthenticated, user, getDefaultAddress]);
 
   // Calculate shipping cost
   const calculateShipping = () => {
@@ -185,6 +184,14 @@ const Checkout = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Check if user is authenticated before placing order
+    if (!isAuthenticated) {
+      toast.error('Please login to place an order');
+      navigate('/login', { state: { from: '/checkout' } });
+      return;
+    }
+    
     if (step === 1) {
       setStep(2);
     } else if (step === 2) {
@@ -192,7 +199,7 @@ const Checkout = () => {
     } else {
       // Place order
       const order = createOrder({
-        userId: isAuthenticated ? user?.id : null,
+        userId: user?.id,
         items: items,
         shippingAddress: {
           name: formData.name,
@@ -237,30 +244,22 @@ const Checkout = () => {
               <Breadcrumbs />
               <h1 className="text-3xl font-bold text-gray-800 mb-8">Checkout</h1>
 
-              {/* Guest Checkout Option */}
-              {!isAuthenticated && !isGuest && (
+              {/* Login Required Notice */}
+              {!isAuthenticated && (
                 <div className="glass-card rounded-2xl p-6 mb-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">Have an account?</h3>
-                  <p className="text-sm text-gray-600">Sign in for faster checkout and order tracking</p>
-                </div>
-                <div className="flex gap-3">
-                  <Link
-                    to="/login"
-                    className="px-6 py-3 gradient-green text-white rounded-xl font-semibold hover:shadow-glow-green transition-all duration-300"
-                  >
-                    Sign In
-                  </Link>
-                  <button
-                    onClick={() => setIsGuest(true)}
-                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
-                  >
-                    Continue as Guest
-                  </button>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-800 mb-2">Login Required</h3>
+                      <p className="text-sm text-gray-600">Please sign in to complete your purchase</p>
+                    </div>
+                    <Link
+                      to="/login"
+                      className="px-6 py-3 gradient-green text-white rounded-xl font-semibold hover:shadow-glow-green transition-all duration-300"
+                    >
+                      Sign In
+                    </Link>
                   </div>
                 </div>
-              </div>
               )}
 
               {/* Progress Steps */}

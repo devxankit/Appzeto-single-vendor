@@ -9,7 +9,6 @@ import { useWishlistStore } from "../../store/wishlistStore";
 import { useCartStore } from "../../store/useStore";
 import toast from "react-hot-toast";
 import PageTransition from "../../components/PageTransition";
-import ProtectedRoute from "../../components/Auth/ProtectedRoute";
 
 const MobileWishlist = () => {
   const navigate = useNavigate();
@@ -41,76 +40,74 @@ const MobileWishlist = () => {
   };
 
   return (
-    <ProtectedRoute>
-      <PageTransition>
-        <MobileLayout showBottomNav={true} showCartBar={true}>
-          <div className="w-full pb-24">
-            {/* Header */}
-            <div className="px-4 py-4 bg-white border-b border-gray-200 sticky top-1 z-40 shadow-sm">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
-                  <FiArrowLeft className="text-xl text-gray-700" />
-                </button>
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-lg font-bold text-gray-800 truncate">
-                    My Wishlist
-                  </h1>
-                  <p className="text-xs text-gray-600">
-                    {items.length} {items.length === 1 ? "item" : "items"} saved
-                  </p>
-                </div>
-                {items.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    {/* View Toggle Buttons */}
-                    <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                      <button
-                        onClick={() => setViewMode("list")}
-                        className={`p-1.5 rounded transition-colors ${
-                          viewMode === "list"
-                            ? "bg-white text-primary-600 shadow-sm"
-                            : "text-gray-600"
-                        }`}>
-                        <FiList className="text-lg" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode("grid")}
-                        className={`p-1.5 rounded transition-colors ${
-                          viewMode === "grid"
-                            ? "bg-white text-primary-600 shadow-sm"
-                            : "text-gray-600"
-                        }`}>
-                        <FiGrid className="text-lg" />
-                      </button>
-                    </div>
+    <PageTransition>
+      <MobileLayout showBottomNav={true} showCartBar={true}>
+        <div className="w-full pb-24">
+          {/* Header */}
+          <div className="px-4 py-4 bg-white border-b border-gray-200 sticky top-1 z-40 shadow-sm">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
+                <FiArrowLeft className="text-xl text-gray-700" />
+              </button>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg font-bold text-gray-800 truncate">
+                  My Wishlist
+                </h1>
+                <p className="text-xs text-gray-600">
+                  {items.length} {items.length === 1 ? "item" : "items"} saved
+                </p>
+              </div>
+              {items.length > 0 && (
+                <div className="flex items-center gap-2">
+                  {/* View Toggle Buttons */}
+                  <div className="flex items-center bg-gray-100 rounded-lg p-1">
                     <button
-                      onClick={handleClearAll}
-                      className="text-xs text-red-600 font-semibold px-2 py-1 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0">
-                      Clear All
+                      onClick={() => setViewMode("list")}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === "list"
+                          ? "bg-white text-primary-600 shadow-sm"
+                          : "text-gray-600"
+                      }`}>
+                      <FiList className="text-lg" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === "grid"
+                          ? "bg-white text-primary-600 shadow-sm"
+                          : "text-gray-600"
+                      }`}>
+                      <FiGrid className="text-lg" />
                     </button>
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="px-4 py-4">
-              {items.length === 0 ? (
-                <EmptyWishlistState />
-              ) : (
-                <WishlistItems
-                  items={items}
-                  viewMode={viewMode}
-                  onMoveToCart={handleMoveToCart}
-                  onRemove={handleRemove}
-                />
+                  <button
+                    onClick={handleClearAll}
+                    className="text-xs text-red-600 font-semibold px-2 py-1 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0">
+                    Clear All
+                  </button>
+                </div>
               )}
             </div>
           </div>
-        </MobileLayout>
-      </PageTransition>
-    </ProtectedRoute>
+
+          {/* Content */}
+          <div className="px-4 py-4">
+            {items.length === 0 ? (
+              <EmptyWishlistState />
+            ) : (
+              <WishlistItems
+                items={items}
+                viewMode={viewMode}
+                onMoveToCart={handleMoveToCart}
+                onRemove={handleRemove}
+              />
+            )}
+          </div>
+        </div>
+      </MobileLayout>
+    </PageTransition>
   );
 };
 

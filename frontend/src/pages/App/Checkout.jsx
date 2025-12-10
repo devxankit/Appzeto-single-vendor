@@ -21,7 +21,6 @@ const MobileCheckout = () => {
   const { createOrder } = useOrderStore();
   
   const [step, setStep] = useState(1);
-  const [isGuest, setIsGuest] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [couponCode, setCouponCode] = useState('');
@@ -40,7 +39,7 @@ const MobileCheckout = () => {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user && !isGuest) {
+    if (isAuthenticated && user) {
       setFormData((prev) => ({
         ...prev,
         name: user.name || '',
@@ -64,7 +63,7 @@ const MobileCheckout = () => {
         }));
       }
     }
-  }, [isAuthenticated, user, isGuest, getDefaultAddress]);
+  }, [isAuthenticated, user, getDefaultAddress]);
 
   const calculateShipping = () => {
     const total = getTotal();
@@ -159,11 +158,19 @@ const MobileCheckout = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Check if user is authenticated before placing order
+    if (!isAuthenticated) {
+      toast.error('Please login to place an order');
+      navigate('/app/login', { state: { from: '/app/checkout' } });
+      return;
+    }
+    
     if (step === 1) {
       setStep(2);
     } else if (step === 2) {
       const order = createOrder({
-        userId: isAuthenticated ? user?.id : null,
+        userId: user?.id,
         items: items,
         shippingAddress: {
           name: formData.name,
@@ -219,26 +226,18 @@ const MobileCheckout = () => {
             </div>
           </div>
 
-          {/* Guest Checkout Option */}
-          {!isAuthenticated && !isGuest && (
+          {/* Login Required Notice */}
+          {!isAuthenticated && (
             <div className="px-4 py-4 bg-white border-b border-gray-200">
               <div className="glass-card rounded-xl p-4">
-                <h3 className="text-base font-bold text-gray-800 mb-2">Have an account?</h3>
-                <p className="text-sm text-gray-600 mb-4">Sign in for faster checkout</p>
-                <div className="flex gap-3">
-                  <Link
-                    to="/app/login"
-                    className="flex-1 py-2.5 gradient-green text-white rounded-xl font-semibold text-center hover:shadow-glow-green transition-all"
-                  >
-                    Sign In
-                  </Link>
-                  <button
-                    onClick={() => setIsGuest(true)}
-                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
-                  >
-                    Continue as Guest
-                  </button>
-                </div>
+                <h3 className="text-base font-bold text-gray-800 mb-2">Login Required</h3>
+                <p className="text-sm text-gray-600 mb-4">Please sign in to complete your purchase</p>
+                <Link
+                  to="/app/login"
+                  className="block w-full py-2.5 gradient-green text-white rounded-xl font-semibold text-center hover:shadow-glow-green transition-all"
+                >
+                  Sign In
+                </Link>
               </div>
             </div>
           )}
