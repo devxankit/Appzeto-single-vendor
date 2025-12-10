@@ -9,6 +9,7 @@ import Badge from '../../components/Badge';
 import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
+import LazyImage from '../../components/LazyImage';
 
 const Inventory = () => {
   const location = useLocation();
@@ -156,7 +157,7 @@ const Inventory = () => {
       sortable: true,
       render: (value, row) => (
         <div className="flex items-center gap-3">
-          <img
+          <LazyImage
             src={row.image}
             alt={value}
             className="w-10 h-10 object-cover rounded-lg"
@@ -556,7 +557,7 @@ const StockManagementModal = ({ isOpen, product, lowStockThreshold, onClose, onU
               className="bg-gray-50 rounded-xl p-4 mb-6"
             >
               <div className="flex items-center gap-3 mb-3">
-                <img
+                <LazyImage
                   src={product.image}
                   alt={product.name}
                   className="w-16 h-16 object-cover rounded-lg"

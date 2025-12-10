@@ -6,6 +6,7 @@ import { useBannerStore } from "../../../store/bannerStore";
 import AnimatedSelect from "../AnimatedSelect";
 import toast from "react-hot-toast";
 import Button from "../Button";
+import LazyImage from "../../LazyImage";
 
 const BannerForm = ({ banner, onClose, onSave }) => {
   const location = useLocation();
@@ -247,7 +248,7 @@ const BannerForm = ({ banner, onClose, onSave }) => {
                   />
                   {formData.image && (
                     <div className="mt-4">
-                      <img
+                      <LazyImage
                         src={formData.image}
                         alt="Preview"
                         className="w-full h-48 object-cover rounded-lg border border-gray-200"

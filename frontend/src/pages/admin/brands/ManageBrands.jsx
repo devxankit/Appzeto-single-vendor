@@ -8,6 +8,7 @@ import ExportButton from "../../../components/Admin/ExportButton";
 import ConfirmModal from "../../../components/Admin/ConfirmModal";
 import AnimatedSelect from "../../../components/Admin/AnimatedSelect";
 import toast from "react-hot-toast";
+import LazyImage from "../../../components/LazyImage";
 
 const ManageBrands = () => {
   const { brands, initialize, deleteBrand } = useBrandStore();
@@ -62,7 +63,7 @@ const ManageBrands = () => {
       render: (value, row) => (
         <div className="flex items-center gap-3">
           {row.image && (
-            <img
+            <LazyImage
               src={row.image}
               alt={value}
               className="w-10 h-10 object-cover rounded-lg"

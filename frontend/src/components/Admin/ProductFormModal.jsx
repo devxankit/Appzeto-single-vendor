@@ -9,6 +9,7 @@ import CategorySelector from "./CategorySelector";
 import AnimatedSelect from "./AnimatedSelect";
 import toast from "react-hot-toast";
 import Button from "./Button";
+import LazyImage from "../LazyImage";
 
 const ProductFormModal = ({ isOpen, onClose, productId, onSuccess }) => {
   const location = useLocation();
@@ -628,7 +629,7 @@ const ProductFormModal = ({ isOpen, onClose, productId, onSuccess }) => {
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                 {formData.images.map((img, index) => (
                                   <div key={index} className="relative group">
-                                    <img
+                                    <LazyImage
                                       src={img}
                                       alt={`Gallery ${index + 1}`}
                                       className="w-full h-24 object-cover rounded-lg border-2 border-primary-300 shadow-md"

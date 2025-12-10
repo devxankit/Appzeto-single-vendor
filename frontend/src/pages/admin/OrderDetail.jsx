@@ -22,6 +22,7 @@ import { formatCurrency, formatDateTime } from '../../utils/adminHelpers';
 import { mockOrders } from '../../data/adminMockData';
 import { products, getProductById } from '../../data/products';
 import toast from 'react-hot-toast';
+import LazyImage from '../../components/LazyImage';
 
 const OrderDetail = () => {
   const navigate = useNavigate();
@@ -230,7 +231,7 @@ const OrderDetail = () => {
               <div className="space-y-2">
                 {itemsArray.map((item) => (
                   <div key={item.id || item.name} className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
-                    <img
+                    <LazyImage
                       src={getProductImage(item)}
                       alt={item.name || 'Product'}
                       className="w-12 h-12 rounded-lg object-cover flex-shrink-0"

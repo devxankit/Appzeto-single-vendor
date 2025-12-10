@@ -6,6 +6,7 @@ import Checkout from "./pages/Checkout";
 import Search from "./pages/Search";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Verification from "./pages/Verification";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Addresses from "./pages/Addresses";
@@ -120,6 +121,7 @@ import MobileCheckout from "./pages/App/Checkout";
 import MobileSearch from "./pages/App/Search";
 import MobileLogin from "./pages/App/Login";
 import MobileRegister from "./pages/App/Register";
+import MobileVerification from "./pages/App/Verification";
 import MobileProfile from "./pages/App/Profile";
 import MobileOrders from "./pages/App/Orders";
 import MobileOrderDetail from "./pages/App/OrderDetail";
@@ -150,6 +152,7 @@ const AppRoutes = () => {
       <Route path="/search" element={<RouteWrapper><Search /></RouteWrapper>} />
       <Route path="/login" element={<RouteWrapper><Login /></RouteWrapper>} />
       <Route path="/register" element={<RouteWrapper><Register /></RouteWrapper>} />
+      <Route path="/verification" element={<RouteWrapper><Verification /></RouteWrapper>} />
       <Route path="/wishlist" element={<RouteWrapper><Wishlist /></RouteWrapper>} />
       <Route path="/offers" element={<RouteWrapper><Offers /></RouteWrapper>} />
       <Route path="/daily-deals" element={<RouteWrapper><DailyDeals /></RouteWrapper>} />
@@ -306,6 +309,7 @@ const AppRoutes = () => {
         <Route path="/app/search" element={<RouteWrapper><MobileSearch /></RouteWrapper>} />
         <Route path="/app/login" element={<RouteWrapper><MobileLogin /></RouteWrapper>} />
         <Route path="/app/register" element={<RouteWrapper><MobileRegister /></RouteWrapper>} />
+        <Route path="/app/verification" element={<RouteWrapper><MobileVerification /></RouteWrapper>} />
         <Route path="/app/wishlist" element={<RouteWrapper><MobileWishlist /></RouteWrapper>} />
         <Route path="/app/offers" element={<RouteWrapper><MobileOffers /></RouteWrapper>} />
         <Route path="/app/daily-deals" element={<RouteWrapper><MobileDailyDeals /></RouteWrapper>} />

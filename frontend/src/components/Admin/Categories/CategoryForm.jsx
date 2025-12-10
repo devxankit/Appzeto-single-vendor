@@ -6,6 +6,7 @@ import { useCategoryStore } from '../../../store/categoryStore';
 import AnimatedSelect from '../AnimatedSelect';
 import toast from 'react-hot-toast';
 import Button from '../Button';
+import LazyImage from '../../LazyImage';
 
 const CategoryForm = ({ category, parentId, onClose, onSave }) => {
   const location = useLocation();
@@ -248,7 +249,7 @@ const CategoryForm = ({ category, parentId, onClose, onSave }) => {
               />
               {formData.image && (
                 <div className="mt-4">
-                  <img
+                  <LazyImage
                     src={formData.image}
                     alt="Preview"
                     className="w-32 h-32 object-cover rounded-lg border border-gray-200"

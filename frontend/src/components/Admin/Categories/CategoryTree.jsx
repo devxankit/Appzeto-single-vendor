@@ -4,6 +4,7 @@ import { useCategoryStore } from '../../../store/categoryStore';
 import Badge from '../../Badge';
 import toast from 'react-hot-toast';
 import Button from '../Button';
+import LazyImage from '../../LazyImage';
 
 const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 0 }) => {
   const { toggleCategoryStatus } = useCategoryStore();
@@ -46,7 +47,7 @@ const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 
 
               {/* Category Image */}
               {category.image ? (
-                <img
+                <LazyImage
                   src={category.image}
                   alt={category.name}
                   className="w-14 h-14 object-cover rounded-xl flex-shrink-0 border border-gray-100"
@@ -156,7 +157,7 @@ const CategoryTree = ({ categories, onEdit, onDelete, onAddSubcategory, level = 
 
           <div className="flex-1 flex items-center gap-3">
             {category.image && (
-              <img
+              <LazyImage
                 src={category.image}
                 alt={category.name}
                 className="w-10 h-10 object-cover rounded-lg"

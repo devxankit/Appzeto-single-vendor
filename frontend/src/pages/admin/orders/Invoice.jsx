@@ -6,6 +6,7 @@ import { formatCurrency, formatDateTime } from '../../../utils/adminHelpers';
 import { mockOrders } from '../../../data/adminMockData';
 import { useSettingsStore } from '../../../store/settingsStore';
 import toast from 'react-hot-toast';
+import LazyImage from '../../../components/LazyImage';
 
 const Invoice = () => {
   const navigate = useNavigate();
@@ -164,7 +165,7 @@ ${order.trackingNumber ? `Tracking Number: ${order.trackingNumber}` : ''}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-6">
             {/* Logo */}
             <div className="flex items-center justify-start sm:justify-start">
-              <img
+              <LazyImage
                 src={storeLogo}
                 alt={storeName}
                 className="h-24 sm:h-32 md:h-40 w-auto object-contain"

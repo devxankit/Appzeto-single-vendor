@@ -23,14 +23,13 @@ const BrandLogosScroll = () => {
                 style={{ width: '64px' }}
               >
                 <div className="bg-gray-50 rounded-lg p-2 shadow-sm transition-all duration-300 flex items-center justify-center w-16 h-16 group cursor-pointer border border-gray-100 mb-2">
-                  <img
+                  <LazyImage
                     src={brand.logo}
                     alt={brand.name}
                     className="w-full h-full object-contain"
                     onError={(e) => {
                       e.target.src = 'https://via.placeholder.com/120x80?text=Brand';
                     }}
-                    loading="lazy"
                   />
                 </div>
                 <p className="text-xs font-medium text-gray-700 text-center truncate w-full">
@@ -77,14 +76,13 @@ const BrandLogosScroll = () => {
                 }}
               >
                 <div className="bg-white rounded-lg sm:rounded-xl lg:rounded-lg p-1.5 sm:p-2 md:p-2 lg:p-1.5 xl:p-2 shadow-md transition-all duration-300 flex items-center justify-center w-full aspect-square group cursor-pointer border border-gray-100 mb-1.5 lg:mb-1">
-                  <img
+                  <LazyImage
                     src={brand.logo}
                     alt={brand.name}
                     className="w-[85%] h-[85%] lg:w-[80%] lg:h-[80%] object-contain"
                     onError={(e) => {
                       e.target.src = 'https://via.placeholder.com/120x80?text=Brand';
                     }}
-                    loading="lazy"
                   />
                 </div>
                 <p className="text-xs sm:text-sm lg:text-xs font-semibold text-black text-center transition-colors truncate w-full px-1">

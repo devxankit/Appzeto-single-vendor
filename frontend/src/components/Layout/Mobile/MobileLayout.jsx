@@ -9,10 +9,19 @@ import useMobileHeaderHeight from '../../../hooks/useMobileHeaderHeight';
 const MobileLayout = ({ children, showBottomNav = true, showCartBar = true }) => {
   const location = useLocation();
   const headerHeight = useMobileHeaderHeight();
-  // Always show bottom nav on /app routes
-  const shouldShowBottomNav = location.pathname.startsWith('/app') ? true : showBottomNav;
-  // Hide header on categories, search, wishlist, and profile pages
-  const shouldShowHeader = location.pathname !== '/app/categories' && location.pathname !== '/app/search' && location.pathname !== '/app/wishlist' && location.pathname !== '/app/profile';
+  // Hide header and bottom nav on login, register, and verification pages
+  const isAuthPage = location.pathname === '/app/login' || 
+                     location.pathname === '/app/register' || 
+                     location.pathname === '/app/verification';
+  
+  // Always show bottom nav on /app routes, except auth pages
+  const shouldShowBottomNav = location.pathname.startsWith('/app') && !isAuthPage ? true : (showBottomNav && !isAuthPage);
+  // Hide header on categories, search, wishlist, profile, and auth pages
+  const shouldShowHeader = !isAuthPage && 
+                           location.pathname !== '/app/categories' && 
+                           location.pathname !== '/app/search' && 
+                           location.pathname !== '/app/wishlist' && 
+                           location.pathname !== '/app/profile';
   
   // Ensure body scroll is restored when component mounts
   useEffect(() => {

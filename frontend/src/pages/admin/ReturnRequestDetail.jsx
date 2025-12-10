@@ -18,6 +18,7 @@ import { motion } from 'framer-motion';
 import Badge from '../../components/Badge';
 import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency, formatDateTime } from '../../utils/adminHelpers';
+import LazyImage from '../../components/LazyImage';
 import { mockReturnRequests } from '../../data/adminMockData';
 import toast from 'react-hot-toast';
 
@@ -274,7 +275,7 @@ const ReturnRequestDetail = () => {
               {returnRequest.items.map((item, index) => (
                 <div key={item.id || index} className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg">
                   {item.image && (
-                    <img
+                    <LazyImage
                       src={item.image}
                       alt={item.name || 'Product'}
                       className="w-12 h-12 rounded-lg object-cover flex-shrink-0"

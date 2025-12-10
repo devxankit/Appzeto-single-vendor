@@ -10,6 +10,7 @@ import AnimatedSelect from '../../components/Admin/AnimatedSelect';
 import { formatCurrency } from '../../utils/adminHelpers';
 import toast from 'react-hot-toast';
 import Button from '../../components/Admin/Button';
+import LazyImage from '../../components/LazyImage';
 
 const Categories = () => {
   const {
@@ -324,7 +325,7 @@ const Categories = () => {
                     className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
                   />
                   {category.image && (
-                    <img
+                    <LazyImage
                       src={category.image}
                       alt={category.name}
                       className="w-10 h-10 object-cover rounded-lg"

@@ -8,6 +8,7 @@ import Pagination from '../../components/Admin/Pagination';
 import Badge from '../../components/Badge';
 import toast from 'react-hot-toast';
 import Button from '../../components/Admin/Button';
+import LazyImage from '../../components/LazyImage';
 
 const Brands = () => {
   const {
@@ -270,7 +271,7 @@ const Brands = () => {
 
                 {brand.logo && (
                   <div className="mb-3 sm:mb-4 flex justify-center">
-                    <img
+                    <LazyImage
                       src={brand.logo}
                       alt={brand.name}
                       className="h-12 sm:h-20 w-auto object-contain"

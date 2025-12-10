@@ -135,7 +135,7 @@ const ImageGallery = ({ images, productName = 'Product' }) => {
               onClick={(e) => e.stopPropagation()}
               className="relative max-w-7xl max-h-[90vh] w-full"
             >
-              <img
+              <LazyImage
                 src={imageArray[selectedIndex]}
                 alt={`${productName} - Full view`}
                 className="w-full h-full object-contain max-h-[90vh] rounded-lg"

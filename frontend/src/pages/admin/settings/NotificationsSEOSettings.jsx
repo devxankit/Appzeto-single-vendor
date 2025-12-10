@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useSettingsStore } from '../../../store/settingsStore';
 import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
+import LazyImage from '../../../components/LazyImage';
 
 const NotificationsSEOSettings = () => {
   const { settings, updateSettings, initialize } = useSettingsStore();
@@ -387,7 +388,7 @@ const NotificationsSEOSettings = () => {
                     placeholder="/images/og-image.png"
                   />
                   {seoData.ogImage && (
-                    <img
+                    <LazyImage
                       src={seoData.ogImage}
                       alt="OG Preview"
                       className="mt-4 w-32 h-32 object-cover rounded-lg border border-gray-200"

@@ -8,6 +8,7 @@ import ExportButton from '../../../components/Admin/ExportButton';
 import Pagination from '../../../components/Admin/Pagination';
 import AnimatedSelect from '../../../components/Admin/AnimatedSelect';
 import toast from 'react-hot-toast';
+import LazyImage from '../../../components/LazyImage';
 
 const ManageCategories = () => {
   const {
@@ -197,7 +198,7 @@ const ManageCategories = () => {
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   {category.image && (
-                    <img
+                    <LazyImage
                       src={category.image}
                       alt={category.name}
                       className="w-10 h-10 object-cover rounded-lg"

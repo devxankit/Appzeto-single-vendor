@@ -12,6 +12,7 @@ import AnimatedSelect from '../AnimatedSelect';
 import { formatPrice } from '../../../utils/helpers';
 import toast from 'react-hot-toast';
 import Button from '../Button';
+import LazyImage from '../../LazyImage';
 
 const CampaignForm = ({ campaign, onClose, onSave }) => {
   const location = useLocation();
@@ -752,7 +753,7 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                           onChange={() => handleProductToggle(product.id)}
                           className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 flex-shrink-0"
                         />
-                        <img
+                        <LazyImage
                           src={product.image}
                           alt={product.name}
                           className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
@@ -1041,7 +1042,7 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                         {formData.bannerConfig.image && formData.bannerConfig.customImage && (
                           <div className="mt-3">
                             <div className="relative inline-block">
-                              <img
+                              <LazyImage
                                 src={formData.bannerConfig.image}
                                 alt="Banner preview"
                                 className="w-full max-w-xs h-32 object-cover rounded-lg border border-gray-200"
@@ -1075,7 +1076,7 @@ const CampaignForm = ({ campaign, onClose, onSave }) => {
                         {formData.bannerConfig.image && !formData.bannerConfig.customImage && !formData.bannerConfig.image.startsWith('data:') && (
                           <div className="mt-3">
                             <div className="relative inline-block">
-                              <img
+                              <LazyImage
                                 src={formData.bannerConfig.image}
                                 alt="Banner preview"
                                 className="w-full max-w-xs h-32 object-cover rounded-lg border border-gray-200"

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBrandStore } from '../../../store/brandStore';
 import toast from 'react-hot-toast';
 import Button from '../Button';
+import LazyImage from '../../LazyImage';
 
 const BrandForm = ({ brand, onClose, onSave }) => {
   const location = useLocation();
@@ -196,7 +197,7 @@ const BrandForm = ({ brand, onClose, onSave }) => {
               />
               {formData.logo && (
                 <div className="mt-4">
-                  <img
+                  <LazyImage
                     src={formData.logo}
                     alt="Preview"
                     className="w-32 h-32 object-contain rounded-lg border border-gray-200 bg-gray-50 p-2"

@@ -3,6 +3,7 @@ import { FiArrowUp, FiArrowDown, FiSave } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useCategoryStore } from '../../../store/categoryStore';
 import toast from 'react-hot-toast';
+import LazyImage from '../../../components/LazyImage';
 
 const CategoryOrder = () => {
   const { categories, initialize } = useCategoryStore();
@@ -96,7 +97,7 @@ const CategoryOrder = () => {
                     {index + 1}
                   </span>
                   {category.image && (
-                    <img
+                    <LazyImage
                       src={category.image}
                       alt={category.name}
                       className="w-10 h-10 object-cover rounded-lg"
