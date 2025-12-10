@@ -63,7 +63,7 @@ const Login = () => {
                     <button
                       type="button"
                       onClick={() => setLoginMethod('phone')}
-                      className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
                         loginMethod === 'phone'
                           ? 'bg-primary-500 text-white shadow-sm'
                           : 'text-gray-600 hover:text-gray-900'
@@ -86,7 +86,7 @@ const Login = () => {
                 </div>
 
                 {/* Login Form */}
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   {/* Phone or Email Input */}
                   {loginMethod === 'phone' ? (
                     <div>
@@ -96,7 +96,7 @@ const Login = () => {
                       <div className="flex gap-2">
                         <select
                           {...register('countryCode', { required: loginMethod === 'phone' })}
-                          className="w-24 px-3 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none text-sm"
+                          className="w-24 px-3 py-2 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none text-sm"
                         >
                           <option value="+880">+880</option>
                           <option value="+1">+1</option>
@@ -112,7 +112,7 @@ const Login = () => {
                               validate: (value) =>
                                 !value || isValidPhone(value) || 'Please enter a valid phone number',
                             })}
-                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${
+                            className={`w-full pl-12 pr-4 py-2 rounded-xl border-2 ${
                               errors.phone
                                 ? 'border-red-300 focus:border-red-500'
                                 : 'border-gray-200 focus:border-primary-500'
@@ -169,7 +169,7 @@ const Login = () => {
                             message: 'Password must be at least 6 characters',
                           },
                         })}
-                        className={`w-full pl-12 pr-12 py-3 rounded-xl border-2 ${
+                        className={`w-full pl-12 pr-12 py-2 rounded-xl border-2 ${
                           errors.password
                             ? 'border-red-300 focus:border-red-500'
                             : 'border-gray-200 focus:border-primary-500'
@@ -212,7 +212,7 @@ const Login = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-primary-500 hover:bg-primary-600 text-white py-3.5 rounded-xl font-semibold text-base sm:text-lg transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-primary-500 hover:bg-primary-600 text-white py-2.5 rounded-xl font-semibold text-base sm:text-lg transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? 'Logging in...' : 'Log In'}
                   </button>
@@ -226,7 +226,7 @@ const Login = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 bg-white text-gray-700 font-medium transition-all duration-300 hover:shadow-md"
+                      className="flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 bg-white text-gray-700 font-medium transition-all duration-300 hover:shadow-md"
                     >
                       <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path
@@ -250,7 +250,7 @@ const Login = () => {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 bg-white text-gray-700 font-medium transition-all duration-300 hover:shadow-md"
+                      className="flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 bg-white text-gray-700 font-medium transition-all duration-300 hover:shadow-md"
                     >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />

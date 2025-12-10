@@ -52,18 +52,18 @@ const MobileRegister = () => {
         <div className="w-full min-h-screen flex items-center justify-center px-6 py-8">
           <div className="w-full max-w-md mx-4">
             {/* Header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Get Started Now</h1>
                 <p className="text-sm text-gray-600">Create an account or log in to explore about our app</p>
               </div>
 
               {/* Sign Up / Log In Toggle */}
-              <div className="mb-6">
+              <div className="mb-5">
                 <div className="flex bg-gray-100 rounded-lg p-1">
                   <button
                     type="button"
                     onClick={() => handleModeChange('signup')}
-                    className={`flex-1 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
                       formMode === 'signup'
                         ? 'bg-primary-500 text-white shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
@@ -86,7 +86,7 @@ const MobileRegister = () => {
               </div>
 
               {/* Register Form */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* First Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -103,7 +103,7 @@ const MobileRegister = () => {
                           message: 'First name must be at least 2 characters',
                         },
                       })}
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${
+                      className={`w-full pl-12 pr-4 py-2 rounded-xl border-2 ${
                         errors.firstName
                           ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-200 focus:border-primary-500'
@@ -132,7 +132,7 @@ const MobileRegister = () => {
                           message: 'Last name must be at least 2 characters',
                         },
                       })}
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${
+                      className={`w-full pl-12 pr-4 py-2 rounded-xl border-2 ${
                         errors.lastName
                           ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-200 focus:border-primary-500'
@@ -159,7 +159,7 @@ const MobileRegister = () => {
                         validate: (value) =>
                           isValidEmail(value) || 'Please enter a valid email',
                       })}
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${
+                      className={`w-full pl-12 pr-4 py-2 rounded-xl border-2 ${
                         errors.email
                           ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-200 focus:border-primary-500'
@@ -184,7 +184,7 @@ const MobileRegister = () => {
                       {...register('birthDate', {
                         required: 'Birth date is required',
                       })}
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${
+                      className={`w-full pl-12 pr-4 py-2 rounded-xl border-2 ${
                         errors.birthDate
                           ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-200 focus:border-primary-500'
@@ -204,7 +204,7 @@ const MobileRegister = () => {
                   <div className="flex gap-2">
                     <select
                       {...register('countryCode', { required: true })}
-                      className="w-24 px-3 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none text-sm"
+                      className="w-24 px-3 py-2 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none text-sm"
                     >
                       <option value="+880">+880</option>
                       <option value="+1">+1</option>
@@ -220,7 +220,7 @@ const MobileRegister = () => {
                           validate: (value) =>
                             isValidPhone(value) || 'Please enter a valid phone number',
                         })}
-                        className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 ${
+                        className={`w-full pl-12 pr-4 py-2 rounded-xl border-2 ${
                           errors.phone
                             ? 'border-red-300 focus:border-red-500'
                             : 'border-gray-200 focus:border-primary-500'
@@ -250,7 +250,7 @@ const MobileRegister = () => {
                           message: 'Password must be at least 6 characters',
                         },
                       })}
-                      className={`w-full pl-12 pr-12 py-3 rounded-xl border-2 ${
+                      className={`w-full pl-12 pr-12 py-2 rounded-xl border-2 ${
                         errors.password
                           ? 'border-red-300 focus:border-red-500'
                           : 'border-gray-200 focus:border-primary-500'
@@ -274,7 +274,7 @@ const MobileRegister = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-primary-500 hover:bg-primary-600 text-white py-3.5 rounded-xl font-semibold text-base transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary-500 hover:bg-primary-600 text-white py-2.5 rounded-xl font-semibold text-base transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Creating Account...' : 'Sign Up'}
                 </button>
