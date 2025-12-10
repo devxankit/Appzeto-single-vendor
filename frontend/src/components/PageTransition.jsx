@@ -39,14 +39,14 @@ const PageTransition = ({ children }) => {
     const previousDepth = pathDepth(prevPath);
 
     startTransition(() => {
-      if (currentDepth > previousDepth) {
-        setDirection('forward');
-      } else if (currentDepth < previousDepth) {
-        setDirection('back');
-      } else {
-        setDirection('none');
-      }
-      setPrevPath(location.pathname);
+    if (currentDepth > previousDepth) {
+      setDirection('forward');
+    } else if (currentDepth < previousDepth) {
+      setDirection('back');
+    } else {
+      setDirection('none');
+    }
+    setPrevPath(location.pathname);
     });
   }, [location.pathname, prevPath, startTransition]);
 
@@ -60,7 +60,7 @@ const PageTransition = ({ children }) => {
     // Use requestAnimationFrame for smooth scroll
     scrollTimeoutRef.current = setTimeout(() => {
       requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       });
     }, 0);
 

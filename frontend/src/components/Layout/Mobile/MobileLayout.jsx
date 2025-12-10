@@ -23,11 +23,43 @@ const MobileLayout = ({ children, showBottomNav = true, showCartBar = true }) =>
                            location.pathname !== '/app/wishlist' && 
                            location.pathname !== '/app/profile';
   
-  // Ensure body scroll is restored when component mounts
+  // Ensure body scroll is restored and scrollbar is hidden when component mounts
   useEffect(() => {
-    document.body.style.overflowY = '';
+    // Allow vertical scrolling but hide scrollbar
+    document.body.style.overflowY = 'auto';
+    document.body.style.overflowX = 'hidden';
+    // Hide scrollbar
+    document.body.style.scrollbarWidth = 'none';
+    document.body.style.msOverflowStyle = 'none';
+    
+    // Webkit scrollbar hiding with data attribute for cleanup
+    const style = document.createElement('style');
+    style.setAttribute('data-mobile-scrollbar', 'true');
+    style.textContent = `
+      body::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+      body::-webkit-scrollbar-track {
+        display: none !important;
+      }
+      body::-webkit-scrollbar-thumb {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
     return () => {
       document.body.style.overflowY = '';
+      document.body.style.overflowX = '';
+      document.body.style.scrollbarWidth = '';
+      document.body.style.msOverflowStyle = '';
+      // Remove style tag if it exists
+      const styleTag = document.head.querySelector('style[data-mobile-scrollbar]');
+      if (styleTag) {
+        styleTag.remove();
+      }
     };
   }, []);
 
