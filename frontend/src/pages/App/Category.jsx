@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FiFilter, FiArrowLeft, FiGrid, FiList, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -99,18 +99,19 @@ const MobileCategory = () => {
 
   const filterButtonRef = useRef(null);
 
-  const handleFilterChange = (name, value) => {
-    setFilters({ ...filters, [name]: value });
-  };
+  // Memoize filter handlers to prevent unnecessary re-renders
+  const handleFilterChange = useCallback((name, value) => {
+    setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters({
       category: "",
       minPrice: "",
       maxPrice: "",
       minRating: "",
     });
-  };
+  }, []);
 
   // Check if any filter is active
   const hasActiveFilters =

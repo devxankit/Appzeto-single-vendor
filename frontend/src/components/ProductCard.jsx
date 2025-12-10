@@ -6,10 +6,11 @@ import { useWishlistStore } from "../store/wishlistStore";
 import { formatPrice } from "../utils/helpers";
 import toast from "react-hot-toast";
 import LazyImage from "./LazyImage";
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import useLongPress from "../hooks/useLongPress";
 import LongPressMenu from "./Mobile/LongPressMenu";
 import FlyingItem from "./Mobile/FlyingItem";
+import useReducedMotion from "../hooks/useReducedMotion";
 
 const ProductCard = ({ product, hideRating = false }) => {
   const location = useLocation();
@@ -114,6 +115,7 @@ const ProductCard = ({ product, hideRating = false }) => {
   };
 
   const longPressHandlers = useLongPress(handleLongPress, 500);
+  const prefersReducedMotion = useReducedMotion();
 
   const handleFavorite = (e) => {
     e.stopPropagation();
@@ -131,11 +133,18 @@ const ProductCard = ({ product, hideRating = false }) => {
     }
   };
 
+  // Only apply will-change when actively animating
+  const motionProps = prefersReducedMotion
+    ? {}
+    : {
+        whileTap: { scale: 0.98 },
+        style: { transform: "translateZ(0)" },
+      };
+
   return (
     <>
       <motion.div
-        whileTap={{ scale: 0.98 }}
-        style={{ willChange: "transform", transform: "translateZ(0)" }}
+        {...motionProps}
         className="glass-card rounded-lg overflow-hidden group cursor-pointer h-full flex flex-col"
         {...longPressHandlers}>
         <div className="relative">
@@ -220,31 +229,41 @@ const ProductCard = ({ product, hideRating = false }) => {
             ref={buttonRef}
             onClick={handleAddToCart}
             disabled={product.stock === "out_of_stock" || isAdding}
-            whileTap={{ scale: 0.95 }}
-            animate={
-              isAdding
-                ? {
-                    scale: [1, 1.1, 1],
-                  }
-                : {}
-            }
-            style={{ willChange: "transform", transform: "translateZ(0)" }}
+            {...(prefersReducedMotion
+              ? {}
+              : {
+                  whileTap: { scale: 0.95 },
+                  animate: isAdding
+                    ? {
+                        scale: [1, 1.1, 1],
+                      }
+                    : {},
+                  style: isAdding
+                    ? { willChange: "transform", transform: "translateZ(0)" }
+                    : { transform: "translateZ(0)" },
+                })}
             className={`w-full py-1.5 rounded-md font-semibold text-[10px] transition-all duration-300 flex items-center justify-center gap-1 mt-auto ${
               product.stock === "out_of_stock"
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "gradient-green text-white group/btn"
             }`}>
-            <motion.div
-              animate={
-                isAdding
-                  ? {
-                      rotate: [0, -10, 10, -10, 0],
-                    }
-                  : {}
-              }
-              transition={{ duration: 0.5 }}>
+            {prefersReducedMotion ? (
               <FiShoppingBag className="text-xs transition-transform" />
-            </motion.div>
+            ) : (
+              <motion.div
+                animate={
+                  isAdding
+                    ? {
+                        rotate: [0, -10, 10, -10, 0],
+                      }
+                    : {}
+                }
+                transition={{ duration: 0.5 }}
+                style={isAdding ? { willChange: "transform" } : {}}
+              >
+                <FiShoppingBag className="text-xs transition-transform" />
+              </motion.div>
+            )}
             <span>
               {product.stock === "out_of_stock"
                 ? "Out of Stock"
@@ -278,4 +297,14 @@ const ProductCard = ({ product, hideRating = false }) => {
   );
 };
 
-export default ProductCard;
+// Memoize ProductCard to prevent unnecessary re-renders
+// Only re-render if product or hideRating changes
+export default memo(ProductCard, (prevProps, nextProps) => {
+  return (
+    prevProps.product.id === nextProps.product.id &&
+    prevProps.product.price === nextProps.product.price &&
+    prevProps.product.image === nextProps.product.image &&
+    prevProps.product.name === nextProps.product.name &&
+    prevProps.hideRating === nextProps.hideRating
+  );
+});

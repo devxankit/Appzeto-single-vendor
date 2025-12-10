@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FiHeart } from "react-icons/fi";
@@ -14,6 +14,7 @@ import { getMostPopular, getTrending, getFlashSale } from "../../data/products";
 import { categories } from "../../data/categories";
 import PageTransition from "../../components/PageTransition";
 import usePullToRefresh from "../../hooks/usePullToRefresh";
+import useImagePreloader from "../../hooks/useImagePreloader";
 import toast from "react-hot-toast";
 
 const MobileHome = () => {
@@ -30,9 +31,24 @@ const MobileHome = () => {
     { image: "/images/hero/slide4.png" },
   ];
 
-  const mostPopular = getMostPopular();
-  const trending = getTrending();
-  const flashSale = getFlashSale();
+  const mostPopular = useMemo(() => getMostPopular(), []);
+  const trending = useMemo(() => getTrending(), []);
+  const flashSale = useMemo(() => getFlashSale(), []);
+
+  // Get critical images for preloading (above-the-fold images)
+  const criticalImages = useMemo(() => {
+    const images = [
+      ...slides.map(slide => slide.image),
+      ...mostPopular.slice(0, 4).map(product => product.image),
+      "/images/banners/babycare-WEB.avif",
+      "/images/banners/pharmacy-WEB.avif",
+      "/images/banners/Pet-Care_WEB.avif",
+    ];
+    return images.filter(Boolean);
+  }, [slides, mostPopular]);
+
+  // Preload critical images with high priority
+  useImagePreloader(criticalImages, true, 'high');
 
   // Preload next slide images for smoother transitions
   useEffect(() => {

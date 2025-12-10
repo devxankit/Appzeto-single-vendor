@@ -1,353 +1,1355 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { Suspense, lazy } from "react";
 import { Toaster } from "react-hot-toast";
-import Home from "./pages/Home";
-import ProductDetail from "./pages/ProductDetail";
-import Checkout from "./pages/Checkout";
-import Search from "./pages/Search";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Verification from "./pages/Verification";
-import Profile from "./pages/Profile";
-import Orders from "./pages/Orders";
-import Addresses from "./pages/Addresses";
-import Wishlist from "./pages/Wishlist";
-import Offers from "./pages/Offers";
-import DailyDeals from "./pages/DailyDeals";
-import FlashSale from "./pages/FlashSale";
-import CampaignPage from "./pages/CampaignPage";
-import Category from "./pages/Category";
 import CartDrawer from "./components/Cart/CartDrawer";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
-import AdminLogin from "./pages/admin/Login";
 import AdminProtectedRoute from "./components/Admin/AdminProtectedRoute";
-import AdminLayout from "./components/Admin/Layout/AdminLayout";
-import Dashboard from "./pages/admin/Dashboard";
-import Products from "./pages/admin/Products";
-import ProductForm from "./pages/admin/ProductForm";
-import AdminOrders from "./pages/admin/Orders";
-import OrderDetail from "./pages/admin/OrderDetail";
-import ReturnRequests from "./pages/admin/ReturnRequests";
-import ReturnRequestDetail from "./pages/admin/ReturnRequestDetail";
-import Categories from "./pages/admin/Categories";
-import Brands from "./pages/admin/Brands";
-import Customers from "./pages/admin/Customers";
-import Inventory from "./pages/admin/Inventory";
-import Campaigns from "./pages/admin/Campaigns";
-import Banners from "./pages/admin/Banners";
-import Reviews from "./pages/admin/Reviews";
-import Analytics from "./pages/admin/Analytics";
-import Content from "./pages/admin/Content";
-import Settings from "./pages/admin/Settings";
-import More from "./pages/admin/More";
-import PromoCodes from "./pages/admin/PromoCodes";
-// Orders child pages
-import AllOrders from "./pages/admin/orders/AllOrders";
-import OrderTracking from "./pages/admin/orders/OrderTracking";
-import OrderNotifications from "./pages/admin/orders/OrderNotifications";
-import Invoice from "./pages/admin/orders/Invoice";
-// Products child pages
-import ManageProducts from "./pages/admin/products/ManageProducts";
-import AddProduct from "./pages/admin/products/AddProduct";
-import BulkUpload from "./pages/admin/products/BulkUpload";
-import TaxPricing from "./pages/admin/products/TaxPricing";
-import ProductRatings from "./pages/admin/products/ProductRatings";
-import ProductFAQs from "./pages/admin/products/ProductFAQs";
-// Attribute Management child pages
-import AttributeSets from "./pages/admin/attributes/AttributeSets";
-import Attributes from "./pages/admin/attributes/Attributes";
-import AttributeValues from "./pages/admin/attributes/AttributeValues";
-// Categories child pages
-import ManageCategories from "./pages/admin/categories/ManageCategories";
-import CategoryOrder from "./pages/admin/categories/CategoryOrder";
-// Brands child pages
-import ManageBrands from "./pages/admin/brands/ManageBrands";
-// Customers child pages
-import ViewCustomers from "./pages/admin/customers/ViewCustomers";
-import CustomerAddresses from "./pages/admin/customers/Addresses";
-import Transactions from "./pages/admin/customers/Transactions";
-import CustomerDetailPage from "./pages/admin/customers/CustomerDetailPage";
-// Delivery Management child pages
-import DeliveryBoys from "./pages/admin/delivery/DeliveryBoys";
-import CashCollection from "./pages/admin/delivery/CashCollection";
-// Locations child pages
-import Cities from "./pages/admin/locations/Cities";
-import Zipcodes from "./pages/admin/locations/Zipcodes";
-// Offers & Sliders child pages
-import HomeSliders from "./pages/admin/offers/HomeSliders";
-import FestivalOffers from "./pages/admin/offers/FestivalOffers";
-// Notifications child pages
-import PushNotifications from "./pages/admin/notifications/PushNotifications";
-import CustomMessages from "./pages/admin/notifications/CustomMessages";
-// Support Desk child pages
-import LiveChat from "./pages/admin/support/LiveChat";
-import TicketTypes from "./pages/admin/support/TicketTypes";
-import Tickets from "./pages/admin/support/Tickets";
-// Reports child pages
-import SalesReport from "./pages/admin/reports/SalesReport";
-import InventoryReport from "./pages/admin/reports/InventoryReport";
-// Analytics & Finance child pages
-import RevenueOverview from "./pages/admin/finance/RevenueOverview";
-import ProfitLoss from "./pages/admin/finance/ProfitLoss";
-import OrderTrends from "./pages/admin/finance/OrderTrends";
-import PaymentBreakdown from "./pages/admin/finance/PaymentBreakdown";
-import TaxReports from "./pages/admin/finance/TaxReports";
-import RefundReports from "./pages/admin/finance/RefundReports";
-// Consolidated Settings pages
-import GeneralSettings from "./pages/admin/settings/GeneralSettings";
-import PaymentShippingSettings from "./pages/admin/settings/PaymentShippingSettings";
-import OrdersCustomersSettings from "./pages/admin/settings/OrdersCustomersSettings";
-import ProductsInventorySettings from "./pages/admin/settings/ProductsInventorySettings";
-import ContentFeaturesSettings from "./pages/admin/settings/ContentFeaturesSettings";
-import NotificationsSEOSettings from "./pages/admin/settings/NotificationsSEOSettings";
-// Policies child pages
-import PrivacyPolicy from "./pages/admin/policies/PrivacyPolicy";
-import RefundPolicy from "./pages/admin/policies/RefundPolicy";
-import TermsConditions from "./pages/admin/policies/TermsConditions";
-// Firebase child pages
-import PushConfig from "./pages/admin/firebase/PushConfig";
-import Authentication from "./pages/admin/firebase/Authentication";
+import DeliveryProtectedRoute from "./components/Delivery/DeliveryProtectedRoute";
 import RouteWrapper from "./components/RouteWrapper";
 import ScrollToTop from "./components/ScrollToTop";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import OrderDetailPage from "./pages/OrderDetail";
-import TrackOrder from "./pages/TrackOrder";
+import RouteSkeleton from "./components/Skeletons/RouteSkeleton";
+
+// Lazy load all route components for code splitting
+// Public routes
+const Home = lazy(() => import("./pages/Home"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Search = lazy(() => import("./pages/Search"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Verification = lazy(() => import("./pages/Verification"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Addresses = lazy(() => import("./pages/Addresses"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Offers = lazy(() => import("./pages/Offers"));
+const DailyDeals = lazy(() => import("./pages/DailyDeals"));
+const FlashSale = lazy(() => import("./pages/FlashSale"));
+const CampaignPage = lazy(() => import("./pages/CampaignPage"));
+const Category = lazy(() => import("./pages/Category"));
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const OrderDetailPage = lazy(() => import("./pages/OrderDetail"));
+const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+
+// Admin routes
+const AdminLogin = lazy(() => import("./pages/admin/Login"));
+const AdminLayout = lazy(() => import("./components/Admin/Layout/AdminLayout"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const Products = lazy(() => import("./pages/admin/Products"));
+const ProductForm = lazy(() => import("./pages/admin/ProductForm"));
+const AdminOrders = lazy(() => import("./pages/admin/Orders"));
+const OrderDetail = lazy(() => import("./pages/admin/OrderDetail"));
+const ReturnRequests = lazy(() => import("./pages/admin/ReturnRequests"));
+const ReturnRequestDetail = lazy(() =>
+  import("./pages/admin/ReturnRequestDetail")
+);
+const Categories = lazy(() => import("./pages/admin/Categories"));
+const Brands = lazy(() => import("./pages/admin/Brands"));
+const Customers = lazy(() => import("./pages/admin/Customers"));
+const Inventory = lazy(() => import("./pages/admin/Inventory"));
+const Campaigns = lazy(() => import("./pages/admin/Campaigns"));
+const Banners = lazy(() => import("./pages/admin/Banners"));
+const Reviews = lazy(() => import("./pages/admin/Reviews"));
+const Analytics = lazy(() => import("./pages/admin/Analytics"));
+const Content = lazy(() => import("./pages/admin/Content"));
+const Settings = lazy(() => import("./pages/admin/Settings"));
+const More = lazy(() => import("./pages/admin/More"));
+const PromoCodes = lazy(() => import("./pages/admin/PromoCodes"));
+
+// Admin child routes - Orders
+const AllOrders = lazy(() => import("./pages/admin/orders/AllOrders"));
+const OrderTracking = lazy(() => import("./pages/admin/orders/OrderTracking"));
+const OrderNotifications = lazy(() =>
+  import("./pages/admin/orders/OrderNotifications")
+);
+const Invoice = lazy(() => import("./pages/admin/orders/Invoice"));
+
+// Admin child routes - Products
+const ManageProducts = lazy(() =>
+  import("./pages/admin/products/ManageProducts")
+);
+const AddProduct = lazy(() => import("./pages/admin/products/AddProduct"));
+const BulkUpload = lazy(() => import("./pages/admin/products/BulkUpload"));
+const TaxPricing = lazy(() => import("./pages/admin/products/TaxPricing"));
+const ProductRatings = lazy(() =>
+  import("./pages/admin/products/ProductRatings")
+);
+const ProductFAQs = lazy(() => import("./pages/admin/products/ProductFAQs"));
+
+// Admin child routes - Attributes
+const AttributeSets = lazy(() =>
+  import("./pages/admin/attributes/AttributeSets")
+);
+const Attributes = lazy(() => import("./pages/admin/attributes/Attributes"));
+const AttributeValues = lazy(() =>
+  import("./pages/admin/attributes/AttributeValues")
+);
+
+// Admin child routes - Categories
+const ManageCategories = lazy(() =>
+  import("./pages/admin/categories/ManageCategories")
+);
+const CategoryOrder = lazy(() =>
+  import("./pages/admin/categories/CategoryOrder")
+);
+
+// Admin child routes - Brands
+const ManageBrands = lazy(() => import("./pages/admin/brands/ManageBrands"));
+
+// Admin child routes - Customers
+const ViewCustomers = lazy(() =>
+  import("./pages/admin/customers/ViewCustomers")
+);
+const CustomerAddresses = lazy(() =>
+  import("./pages/admin/customers/Addresses")
+);
+const Transactions = lazy(() => import("./pages/admin/customers/Transactions"));
+const CustomerDetailPage = lazy(() =>
+  import("./pages/admin/customers/CustomerDetailPage")
+);
+
+// Admin child routes - Delivery
+const DeliveryBoys = lazy(() => import("./pages/admin/delivery/DeliveryBoys"));
+const CashCollection = lazy(() =>
+  import("./pages/admin/delivery/CashCollection")
+);
+
+// Admin child routes - Locations
+const Cities = lazy(() => import("./pages/admin/locations/Cities"));
+const Zipcodes = lazy(() => import("./pages/admin/locations/Zipcodes"));
+
+// Admin child routes - Offers
+const HomeSliders = lazy(() => import("./pages/admin/offers/HomeSliders"));
+const FestivalOffers = lazy(() =>
+  import("./pages/admin/offers/FestivalOffers")
+);
+
+// Admin child routes - Notifications
+const PushNotifications = lazy(() =>
+  import("./pages/admin/notifications/PushNotifications")
+);
+const CustomMessages = lazy(() =>
+  import("./pages/admin/notifications/CustomMessages")
+);
+
+// Admin child routes - Support
+const LiveChat = lazy(() => import("./pages/admin/support/LiveChat"));
+const TicketTypes = lazy(() => import("./pages/admin/support/TicketTypes"));
+const Tickets = lazy(() => import("./pages/admin/support/Tickets"));
+
+// Admin child routes - Reports
+const SalesReport = lazy(() => import("./pages/admin/reports/SalesReport"));
+const InventoryReport = lazy(() =>
+  import("./pages/admin/reports/InventoryReport")
+);
+
+// Admin child routes - Finance
+const RevenueOverview = lazy(() =>
+  import("./pages/admin/finance/RevenueOverview")
+);
+const ProfitLoss = lazy(() => import("./pages/admin/finance/ProfitLoss"));
+const OrderTrends = lazy(() => import("./pages/admin/finance/OrderTrends"));
+const PaymentBreakdown = lazy(() =>
+  import("./pages/admin/finance/PaymentBreakdown")
+);
+const TaxReports = lazy(() => import("./pages/admin/finance/TaxReports"));
+const RefundReports = lazy(() => import("./pages/admin/finance/RefundReports"));
+
+// Admin child routes - Settings
+const GeneralSettings = lazy(() =>
+  import("./pages/admin/settings/GeneralSettings")
+);
+const PaymentShippingSettings = lazy(() =>
+  import("./pages/admin/settings/PaymentShippingSettings")
+);
+const OrdersCustomersSettings = lazy(() =>
+  import("./pages/admin/settings/OrdersCustomersSettings")
+);
+const ProductsInventorySettings = lazy(() =>
+  import("./pages/admin/settings/ProductsInventorySettings")
+);
+const ContentFeaturesSettings = lazy(() =>
+  import("./pages/admin/settings/ContentFeaturesSettings")
+);
+const NotificationsSEOSettings = lazy(() =>
+  import("./pages/admin/settings/NotificationsSEOSettings")
+);
+
+// Admin child routes - Policies
+const PrivacyPolicy = lazy(() =>
+  import("./pages/admin/policies/PrivacyPolicy")
+);
+const RefundPolicy = lazy(() => import("./pages/admin/policies/RefundPolicy"));
+const TermsConditions = lazy(() =>
+  import("./pages/admin/policies/TermsConditions")
+);
+
+// Admin child routes - Firebase
+const PushConfig = lazy(() => import("./pages/admin/firebase/PushConfig"));
+const Authentication = lazy(() =>
+  import("./pages/admin/firebase/Authentication")
+);
+
 // Mobile App Routes
-import MobileHome from "./pages/App/Home";
-import MobileProductDetail from "./pages/App/ProductDetail";
-import MobileCategory from "./pages/App/Category";
-import MobileCategories from "./pages/App/categories";
-import MobileCheckout from "./pages/App/Checkout";
-import MobileSearch from "./pages/App/Search";
-import MobileLogin from "./pages/App/Login";
-import MobileRegister from "./pages/App/Register";
-import MobileVerification from "./pages/App/Verification";
-import MobileProfile from "./pages/App/Profile";
-import MobileOrders from "./pages/App/Orders";
-import MobileOrderDetail from "./pages/App/OrderDetail";
-import MobileAddresses from "./pages/App/Addresses";
-import MobileWishlist from "./pages/App/Wishlist";
-import MobileOffers from "./pages/App/Offers";
-import MobileDailyDeals from "./pages/App/DailyDeals";
-import MobileFlashSale from "./pages/App/FlashSale";
-import MobileTrackOrder from "./pages/App/TrackOrder";
-import MobileOrderConfirmation from "./pages/App/OrderConfirmation";
+const MobileHome = lazy(() => import("./pages/App/Home"));
+const MobileProductDetail = lazy(() => import("./pages/App/ProductDetail"));
+const MobileCategory = lazy(() => import("./pages/App/Category"));
+const MobileCategories = lazy(() => import("./pages/App/categories"));
+const MobileCheckout = lazy(() => import("./pages/App/Checkout"));
+const MobileSearch = lazy(() => import("./pages/App/Search"));
+const MobileLogin = lazy(() => import("./pages/App/Login"));
+const MobileRegister = lazy(() => import("./pages/App/Register"));
+const MobileVerification = lazy(() => import("./pages/App/Verification"));
+const MobileProfile = lazy(() => import("./pages/App/Profile"));
+const MobileOrders = lazy(() => import("./pages/App/Orders"));
+const MobileOrderDetail = lazy(() => import("./pages/App/OrderDetail"));
+const MobileAddresses = lazy(() => import("./pages/App/Addresses"));
+const MobileWishlist = lazy(() => import("./pages/App/Wishlist"));
+const MobileOffers = lazy(() => import("./pages/App/Offers"));
+const MobileDailyDeals = lazy(() => import("./pages/App/DailyDeals"));
+const MobileFlashSale = lazy(() => import("./pages/App/FlashSale"));
+const MobileTrackOrder = lazy(() => import("./pages/App/TrackOrder"));
+const MobileOrderConfirmation = lazy(() =>
+  import("./pages/App/OrderConfirmation")
+);
+
 // Delivery Routes
-import DeliveryLogin from "./pages/delivery/Login";
-import DeliveryProtectedRoute from "./components/Delivery/DeliveryProtectedRoute";
-import DeliveryLayout from "./components/Delivery/Layout/DeliveryLayout";
-import DeliveryDashboard from "./pages/delivery/Dashboard";
-import DeliveryOrders from "./pages/delivery/Orders";
-import DeliveryOrderDetail from "./pages/delivery/OrderDetail";
-import DeliveryProfile from "./pages/delivery/Profile";
+const DeliveryLogin = lazy(() => import("./pages/delivery/Login"));
+const DeliveryLayout = lazy(() =>
+  import("./components/Delivery/Layout/DeliveryLayout")
+);
+const DeliveryDashboard = lazy(() => import("./pages/delivery/Dashboard"));
+const DeliveryOrders = lazy(() => import("./pages/delivery/Orders"));
+const DeliveryOrderDetail = lazy(() => import("./pages/delivery/OrderDetail"));
+const DeliveryProfile = lazy(() => import("./pages/delivery/Profile"));
+
+// Wrapper component for lazy-loaded routes with Suspense
+const LazyRoute = ({ children }) => (
+  <Suspense fallback={<RouteSkeleton />}>{children}</Suspense>
+);
 
 // Inner component that has access to useLocation
 const AppRoutes = () => {
   return (
-      <Routes>
-      <Route path="/" element={<RouteWrapper><Home /></RouteWrapper>} />
-      <Route path="/product/:id" element={<RouteWrapper><ProductDetail /></RouteWrapper>} />
-      <Route path="/category/:id" element={<RouteWrapper><Category /></RouteWrapper>} />
-      <Route path="/checkout" element={<RouteWrapper><Checkout /></RouteWrapper>} />
-      <Route path="/search" element={<RouteWrapper><Search /></RouteWrapper>} />
-      <Route path="/login" element={<RouteWrapper><Login /></RouteWrapper>} />
-      <Route path="/register" element={<RouteWrapper><Register /></RouteWrapper>} />
-      <Route path="/verification" element={<RouteWrapper><Verification /></RouteWrapper>} />
-      <Route path="/wishlist" element={<RouteWrapper><Wishlist /></RouteWrapper>} />
-      <Route path="/offers" element={<RouteWrapper><Offers /></RouteWrapper>} />
-      <Route path="/daily-deals" element={<RouteWrapper><DailyDeals /></RouteWrapper>} />
-      <Route path="/flash-sale" element={<RouteWrapper><FlashSale /></RouteWrapper>} />
-      <Route path="/sale/:slug" element={<RouteWrapper><CampaignPage /></RouteWrapper>} />
-      <Route path="/campaign/:id" element={<RouteWrapper><CampaignPage /></RouteWrapper>} />
-      <Route path="/order-confirmation/:orderId" element={<RouteWrapper><OrderConfirmation /></RouteWrapper>} />
-      <Route path="/orders/:orderId" element={<RouteWrapper><OrderDetailPage /></RouteWrapper>} />
-      <Route path="/track-order/:orderId" element={<RouteWrapper><TrackOrder /></RouteWrapper>} />
-        <Route
-          path="/profile"
-          element={
-          <RouteWrapper>
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          </RouteWrapper>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-          <RouteWrapper>
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          </RouteWrapper>
-          }
-        />
-        <Route
-          path="/addresses"
-          element={
-          <RouteWrapper>
-            <ProtectedRoute>
-              <Addresses />
-            </ProtectedRoute>
-          </RouteWrapper>
-          }
-        />
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route
-          path="/admin"
-          element={
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Home />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/product/:id"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <ProductDetail />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/category/:id"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Category />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Checkout />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Search />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Login />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Register />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/verification"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Verification />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/wishlist"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Wishlist />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/offers"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <Offers />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/daily-deals"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <DailyDeals />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/flash-sale"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <FlashSale />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/sale/:slug"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <CampaignPage />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/campaign/:id"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <CampaignPage />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/order-confirmation/:orderId"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <OrderConfirmation />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/orders/:orderId"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <OrderDetailPage />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/track-order/:orderId"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <TrackOrder />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/addresses"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <ProtectedRoute>
+                <Addresses />
+              </ProtectedRoute>
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      {/* Admin Routes */}
+      <Route
+        path="/admin/login"
+        element={
+          <LazyRoute>
+            <AdminLogin />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <LazyRoute>
             <AdminProtectedRoute>
               <AdminLayout />
             </AdminProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="products" element={<Products />} />
-          <Route path="products/:id" element={<ProductForm />} />
-          <Route path="products/manage-products" element={<ManageProducts />} />
-          <Route path="products/add-product" element={<AddProduct />} />
-          <Route path="products/bulk-upload" element={<BulkUpload />} />
-          <Route path="products/tax-pricing" element={<TaxPricing />} />
-          <Route path="products/product-ratings" element={<ProductRatings />} />
-          <Route path="products/product-faqs" element={<ProductFAQs />} />
-          <Route path="more" element={<More />} />
-          <Route path="categories" element={<Categories />} />
-          <Route path="categories/manage-categories" element={<ManageCategories />} />
-          <Route path="categories/category-order" element={<CategoryOrder />} />
-          <Route path="brands" element={<Brands />} />
-          <Route path="brands/manage-brands" element={<ManageBrands />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="orders/:id" element={<OrderDetail />} />
-          <Route path="orders/:id/invoice" element={<Invoice />} />
-          <Route path="orders/all-orders" element={<AllOrders />} />
-          <Route path="orders/order-tracking" element={<OrderTracking />} />
-          <Route path="orders/order-notifications" element={<OrderNotifications />} />
-          <Route path="return-requests" element={<ReturnRequests />} />
-          <Route path="return-requests/:id" element={<ReturnRequestDetail />} />
-          <Route path="customers" element={<Customers />} />
-          <Route path="customers/view-customers" element={<ViewCustomers />} />
-          <Route path="customers/addresses" element={<CustomerAddresses />} />
-          <Route path="customers/transactions" element={<Transactions />} />
-          <Route path="customers/:id" element={<CustomerDetailPage />} />
-          <Route path="attributes" element={<AttributeSets />} />
-          <Route path="attributes/attribute-sets" element={<AttributeSets />} />
-          <Route path="attributes/attributes" element={<Attributes />} />
-          <Route path="attributes/attribute-values" element={<AttributeValues />} />
-          <Route path="stock" element={<Inventory />} />
-          <Route path="inventory" element={<Inventory />} />
-          <Route path="delivery" element={<DeliveryBoys />} />
-          <Route path="delivery/delivery-boys" element={<DeliveryBoys />} />
-          <Route path="delivery/cash-collection" element={<CashCollection />} />
-          <Route path="locations" element={<Cities />} />
-          <Route path="locations/cities" element={<Cities />} />
-          <Route path="locations/zipcodes" element={<Zipcodes />} />
-          <Route path="offers" element={<HomeSliders />} />
-          <Route path="offers/home-sliders" element={<HomeSliders />} />
-          <Route path="offers/festival-offers" element={<FestivalOffers />} />
-          <Route path="promocodes" element={<PromoCodes />} />
-          <Route path="notifications" element={<PushNotifications />} />
-          <Route path="notifications/push-notifications" element={<PushNotifications />} />
-          <Route path="notifications/custom-messages" element={<CustomMessages />} />
-          <Route path="support" element={<Tickets />} />
-          <Route path="support/live-chat" element={<LiveChat />} />
-          <Route path="support/ticket-types" element={<TicketTypes />} />
-          <Route path="support/tickets" element={<Tickets />} />
-          <Route path="reports" element={<SalesReport />} />
-          <Route path="reports/sales-report" element={<SalesReport />} />
-          <Route path="reports/inventory-report" element={<InventoryReport />} />
-          <Route path="finance" element={<RevenueOverview />} />
-          <Route path="finance/revenue-overview" element={<RevenueOverview />} />
-          <Route path="finance/profit-loss" element={<ProfitLoss />} />
-          <Route path="finance/order-trends" element={<OrderTrends />} />
-          <Route path="finance/payment-breakdown" element={<PaymentBreakdown />} />
-          <Route path="finance/tax-reports" element={<TaxReports />} />
-          <Route path="finance/refund-reports" element={<RefundReports />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="settings" element={<Navigate to="/admin/settings/general" replace />} />
-          <Route path="settings/general" element={<Settings />} />
-          <Route path="settings/payment-shipping" element={<Settings />} />
-          <Route path="settings/orders-customers" element={<Settings />} />
-          <Route path="settings/products-inventory" element={<Settings />} />
-          <Route path="settings/content-features" element={<Settings />} />
-          <Route path="settings/notifications-seo" element={<Settings />} />
-          <Route path="policies" element={<PrivacyPolicy />} />
-          <Route path="policies/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="policies/refund-policy" element={<RefundPolicy />} />
-          <Route path="policies/terms-conditions" element={<TermsConditions />} />
-          <Route path="firebase" element={<PushConfig />} />
-          <Route path="firebase/push-config" element={<PushConfig />} />
-          <Route path="firebase/authentication" element={<Authentication />} />
-          <Route path="campaigns" element={<Campaigns />} />
-          <Route path="banners" element={<Banners />} />
-          <Route path="reviews" element={<Reviews />} />
-          <Route path="content" element={<Content />} />
-        </Route>
-        {/* Delivery Routes */}
-        <Route path="/delivery/login" element={<DeliveryLogin />} />
+          </LazyRoute>
+        }>
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route
-          path="/delivery"
+          path="dashboard"
           element={
+            <LazyRoute>
+              <Dashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products"
+          element={
+            <LazyRoute>
+              <Products />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products/:id"
+          element={
+            <LazyRoute>
+              <ProductForm />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products/manage-products"
+          element={
+            <LazyRoute>
+              <ManageProducts />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products/add-product"
+          element={
+            <LazyRoute>
+              <AddProduct />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products/bulk-upload"
+          element={
+            <LazyRoute>
+              <BulkUpload />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products/tax-pricing"
+          element={
+            <LazyRoute>
+              <TaxPricing />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products/product-ratings"
+          element={
+            <LazyRoute>
+              <ProductRatings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="products/product-faqs"
+          element={
+            <LazyRoute>
+              <ProductFAQs />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="more"
+          element={
+            <LazyRoute>
+              <More />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="categories"
+          element={
+            <LazyRoute>
+              <Categories />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="categories/manage-categories"
+          element={
+            <LazyRoute>
+              <ManageCategories />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="categories/category-order"
+          element={
+            <LazyRoute>
+              <CategoryOrder />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="brands"
+          element={
+            <LazyRoute>
+              <Brands />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="brands/manage-brands"
+          element={
+            <LazyRoute>
+              <ManageBrands />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders"
+          element={
+            <LazyRoute>
+              <AdminOrders />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders/:id"
+          element={
+            <LazyRoute>
+              <OrderDetail />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders/:id/invoice"
+          element={
+            <LazyRoute>
+              <Invoice />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders/all-orders"
+          element={
+            <LazyRoute>
+              <AllOrders />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders/order-tracking"
+          element={
+            <LazyRoute>
+              <OrderTracking />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders/order-notifications"
+          element={
+            <LazyRoute>
+              <OrderNotifications />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="return-requests"
+          element={
+            <LazyRoute>
+              <ReturnRequests />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="return-requests/:id"
+          element={
+            <LazyRoute>
+              <ReturnRequestDetail />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="customers"
+          element={
+            <LazyRoute>
+              <Customers />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="customers/view-customers"
+          element={
+            <LazyRoute>
+              <ViewCustomers />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="customers/addresses"
+          element={
+            <LazyRoute>
+              <CustomerAddresses />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="customers/transactions"
+          element={
+            <LazyRoute>
+              <Transactions />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="customers/:id"
+          element={
+            <LazyRoute>
+              <CustomerDetailPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="attributes"
+          element={
+            <LazyRoute>
+              <AttributeSets />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="attributes/attribute-sets"
+          element={
+            <LazyRoute>
+              <AttributeSets />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="attributes/attributes"
+          element={
+            <LazyRoute>
+              <Attributes />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="attributes/attribute-values"
+          element={
+            <LazyRoute>
+              <AttributeValues />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="stock"
+          element={
+            <LazyRoute>
+              <Inventory />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="inventory"
+          element={
+            <LazyRoute>
+              <Inventory />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="delivery"
+          element={
+            <LazyRoute>
+              <DeliveryBoys />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="delivery/delivery-boys"
+          element={
+            <LazyRoute>
+              <DeliveryBoys />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="delivery/cash-collection"
+          element={
+            <LazyRoute>
+              <CashCollection />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="locations"
+          element={
+            <LazyRoute>
+              <Cities />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="locations/cities"
+          element={
+            <LazyRoute>
+              <Cities />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="locations/zipcodes"
+          element={
+            <LazyRoute>
+              <Zipcodes />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="offers"
+          element={
+            <LazyRoute>
+              <HomeSliders />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="offers/home-sliders"
+          element={
+            <LazyRoute>
+              <HomeSliders />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="offers/festival-offers"
+          element={
+            <LazyRoute>
+              <FestivalOffers />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="promocodes"
+          element={
+            <LazyRoute>
+              <PromoCodes />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="notifications"
+          element={
+            <LazyRoute>
+              <PushNotifications />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="notifications/push-notifications"
+          element={
+            <LazyRoute>
+              <PushNotifications />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="notifications/custom-messages"
+          element={
+            <LazyRoute>
+              <CustomMessages />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="support"
+          element={
+            <LazyRoute>
+              <Tickets />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="support/live-chat"
+          element={
+            <LazyRoute>
+              <LiveChat />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="support/ticket-types"
+          element={
+            <LazyRoute>
+              <TicketTypes />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="support/tickets"
+          element={
+            <LazyRoute>
+              <Tickets />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="reports"
+          element={
+            <LazyRoute>
+              <SalesReport />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="reports/sales-report"
+          element={
+            <LazyRoute>
+              <SalesReport />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="reports/inventory-report"
+          element={
+            <LazyRoute>
+              <InventoryReport />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="finance"
+          element={
+            <LazyRoute>
+              <RevenueOverview />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="finance/revenue-overview"
+          element={
+            <LazyRoute>
+              <RevenueOverview />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="finance/profit-loss"
+          element={
+            <LazyRoute>
+              <ProfitLoss />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="finance/order-trends"
+          element={
+            <LazyRoute>
+              <OrderTrends />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="finance/payment-breakdown"
+          element={
+            <LazyRoute>
+              <PaymentBreakdown />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="finance/tax-reports"
+          element={
+            <LazyRoute>
+              <TaxReports />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="finance/refund-reports"
+          element={
+            <LazyRoute>
+              <RefundReports />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="analytics"
+          element={
+            <LazyRoute>
+              <Analytics />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="settings"
+          element={<Navigate to="/admin/settings/general" replace />}
+        />
+        <Route
+          path="settings/general"
+          element={
+            <LazyRoute>
+              <Settings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="settings/payment-shipping"
+          element={
+            <LazyRoute>
+              <Settings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="settings/orders-customers"
+          element={
+            <LazyRoute>
+              <Settings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="settings/products-inventory"
+          element={
+            <LazyRoute>
+              <Settings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="settings/content-features"
+          element={
+            <LazyRoute>
+              <Settings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="settings/notifications-seo"
+          element={
+            <LazyRoute>
+              <Settings />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="policies"
+          element={
+            <LazyRoute>
+              <PrivacyPolicy />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="policies/privacy-policy"
+          element={
+            <LazyRoute>
+              <PrivacyPolicy />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="policies/refund-policy"
+          element={
+            <LazyRoute>
+              <RefundPolicy />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="policies/terms-conditions"
+          element={
+            <LazyRoute>
+              <TermsConditions />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="firebase"
+          element={
+            <LazyRoute>
+              <PushConfig />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="firebase/push-config"
+          element={
+            <LazyRoute>
+              <PushConfig />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="firebase/authentication"
+          element={
+            <LazyRoute>
+              <Authentication />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="campaigns"
+          element={
+            <LazyRoute>
+              <Campaigns />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="banners"
+          element={
+            <LazyRoute>
+              <Banners />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="reviews"
+          element={
+            <LazyRoute>
+              <Reviews />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="content"
+          element={
+            <LazyRoute>
+              <Content />
+            </LazyRoute>
+          }
+        />
+      </Route>
+      {/* Delivery Routes */}
+      <Route
+        path="/delivery/login"
+        element={
+          <LazyRoute>
+            <DeliveryLogin />
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/delivery"
+        element={
+          <LazyRoute>
             <DeliveryProtectedRoute>
               <DeliveryLayout />
             </DeliveryProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="/delivery/dashboard" replace />} />
-          <Route path="dashboard" element={<DeliveryDashboard />} />
-          <Route path="orders" element={<DeliveryOrders />} />
-          <Route path="orders/:id" element={<DeliveryOrderDetail />} />
-          <Route path="profile" element={<DeliveryProfile />} />
-        </Route>
-        {/* Mobile App Routes */}
-        <Route path="/app" element={<RouteWrapper><MobileHome /></RouteWrapper>} />
-        <Route path="/app/product/:id" element={<RouteWrapper><MobileProductDetail /></RouteWrapper>} />
-        <Route path="/app/category/:id" element={<RouteWrapper><MobileCategory /></RouteWrapper>} />
-        <Route path="/app/categories" element={<RouteWrapper><MobileCategories /></RouteWrapper>} />
-        <Route path="/app/checkout" element={<RouteWrapper><MobileCheckout /></RouteWrapper>} />
-        <Route path="/app/search" element={<RouteWrapper><MobileSearch /></RouteWrapper>} />
-        <Route path="/app/login" element={<RouteWrapper><MobileLogin /></RouteWrapper>} />
-        <Route path="/app/register" element={<RouteWrapper><MobileRegister /></RouteWrapper>} />
-        <Route path="/app/verification" element={<RouteWrapper><MobileVerification /></RouteWrapper>} />
-        <Route path="/app/wishlist" element={<RouteWrapper><MobileWishlist /></RouteWrapper>} />
-        <Route path="/app/offers" element={<RouteWrapper><MobileOffers /></RouteWrapper>} />
-        <Route path="/app/daily-deals" element={<RouteWrapper><MobileDailyDeals /></RouteWrapper>} />
-        <Route path="/app/flash-sale" element={<RouteWrapper><MobileFlashSale /></RouteWrapper>} />
-        <Route path="/app/order-confirmation/:orderId" element={<RouteWrapper><MobileOrderConfirmation /></RouteWrapper>} />
-        <Route path="/app/orders/:orderId" element={<RouteWrapper><MobileOrderDetail /></RouteWrapper>} />
-        <Route path="/app/track-order/:orderId" element={<RouteWrapper><MobileTrackOrder /></RouteWrapper>} />
+          </LazyRoute>
+        }>
+        <Route index element={<Navigate to="/delivery/dashboard" replace />} />
         <Route
-          path="/app/profile"
+          path="dashboard"
           element={
+            <LazyRoute>
+              <DeliveryDashboard />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders"
+          element={
+            <LazyRoute>
+              <DeliveryOrders />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="orders/:id"
+          element={
+            <LazyRoute>
+              <DeliveryOrderDetail />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path="profile"
+          element={
+            <LazyRoute>
+              <DeliveryProfile />
+            </LazyRoute>
+          }
+        />
+      </Route>
+      {/* Mobile App Routes */}
+      <Route
+        path="/app"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileHome />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/product/:id"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileProductDetail />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/category/:id"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileCategory />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/categories"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileCategories />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/checkout"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileCheckout />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/search"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileSearch />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/login"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileLogin />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/register"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileRegister />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/verification"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileVerification />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/wishlist"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileWishlist />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/offers"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileOffers />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/daily-deals"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileDailyDeals />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/flash-sale"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileFlashSale />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/order-confirmation/:orderId"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileOrderConfirmation />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/orders/:orderId"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileOrderDetail />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/track-order/:orderId"
+        element={
+          <LazyRoute>
+            <RouteWrapper>
+              <MobileTrackOrder />
+            </RouteWrapper>
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/profile"
+        element={
+          <LazyRoute>
             <RouteWrapper>
               <ProtectedRoute>
                 <MobileProfile />
               </ProtectedRoute>
             </RouteWrapper>
-          }
-        />
-        <Route
-          path="/app/orders"
-          element={
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/orders"
+        element={
+          <LazyRoute>
             <RouteWrapper>
               <ProtectedRoute>
                 <MobileOrders />
               </ProtectedRoute>
             </RouteWrapper>
-          }
-        />
-        <Route
-          path="/app/addresses"
-          element={
+          </LazyRoute>
+        }
+      />
+      <Route
+        path="/app/addresses"
+        element={
+          <LazyRoute>
             <RouteWrapper>
               <ProtectedRoute>
                 <MobileAddresses />
               </ProtectedRoute>
             </RouteWrapper>
-          }
-        />
-      </Routes>
+          </LazyRoute>
+        }
+      />
+    </Routes>
   );
 };
 
@@ -358,35 +1360,34 @@ function App() {
         future={{
           v7_startTransition: true,
           v7_relativeSplatPath: true,
-        }}
-      >
+        }}>
         <ScrollToTop />
         <AppRoutes />
-      <CartDrawer />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: "#212121",
-            color: "#fff",
-          },
-          success: {
+        <CartDrawer />
+        <Toaster
+          position="top-right"
+          toastOptions={{
             duration: 3000,
-            iconTheme: {
-              primary: "#388E3C",
-              secondary: "#fff",
+            style: {
+              background: "#212121",
+              color: "#fff",
             },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: "#FF6161",
-              secondary: "#fff",
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: "#388E3C",
+                secondary: "#fff",
+              },
             },
-          },
-        }}
-      />
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: "#FF6161",
+                secondary: "#fff",
+              },
+            },
+          }}
+        />
       </Router>
     </ErrorBoundary>
   );
