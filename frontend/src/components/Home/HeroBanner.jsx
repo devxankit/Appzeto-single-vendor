@@ -30,6 +30,23 @@ const HeroBanner = () => {
     return () => clearInterval(interval);
   }, [slides.length]);
 
+  // Preload adjacent slide images for smoother transitions
+  useEffect(() => {
+    const preloadImages = () => {
+      // Preload next slide
+      const nextIndex = (currentSlide + 1) % slides.length;
+      const nextImg = new Image();
+      nextImg.src = slides[nextIndex].image;
+      
+      // Preload previous slide (for backward navigation)
+      const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+      const prevImg = new Image();
+      prevImg.src = slides[prevIndex].image;
+    };
+
+    preloadImages();
+  }, [currentSlide, slides]);
+
   return (
     <>
       {/* Desktop Layout - White card wrapper with proper aspect ratio */}
@@ -67,44 +84,57 @@ const HeroBanner = () => {
                 width: `${100 / slides.length}%`,
                 height: "100%",
               }}>
-              {index === 0 ? (
-                <img
-                  src={slide.image}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center",
-                  }}
-                  loading="eager"
-                  onError={(e) => {
-                    console.error(`Failed to load image: ${slide.image}`);
-                    e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
-                      index + 1
-                    }`;
-                  }}
-                />
-              ) : (
-                <LazyImage
-                  src={slide.image}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center",
-                  }}
-                  onError={(e) => {
-                    console.error(`Failed to load image: ${slide.image}`);
-                    e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
-                      index + 1
-                    }`;
-                  }}
-                />
-              )}
+              {(() => {
+                const isCurrent = index === currentSlide;
+                const isNext = index === (currentSlide + 1) % slides.length;
+                const isFirst = index === 0;
+                
+                // First slide or current/next slides should be eager
+                if (isFirst || isCurrent || isNext) {
+                  return (
+                    <img
+                      src={slide.image}
+                      alt={`Slide ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "center",
+                      }}
+                      loading="eager"
+                      {...(isCurrent || isNext ? { fetchpriority: "high" } : {})}
+                      onError={(e) => {
+                        console.error(`Failed to load image: ${slide.image}`);
+                        e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
+                          index + 1
+                        }`;
+                      }}
+                    />
+                  );
+                }
+                
+                return (
+                  <LazyImage
+                    src={slide.image}
+                    alt={`Slide ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: "center",
+                    }}
+                    eager={false}
+                    onError={(e) => {
+                      console.error(`Failed to load image: ${slide.image}`);
+                      e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
+                        index + 1
+                      }`;
+                    }}
+                  />
+                );
+              })()}
             </div>
           ))}
         </motion.div>
@@ -161,44 +191,57 @@ const HeroBanner = () => {
                   width: `${100 / slides.length}%`,
                   height: "100%",
                 }}>
-                {index === 0 ? (
-                  <img
-                    src={slide.image}
-                    alt={`Slide ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      objectPosition: "center",
-                    }}
-                    loading="eager"
-                    onError={(e) => {
-                      console.error(`Failed to load image: ${slide.image}`);
-                      e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
-                        index + 1
-                      }`;
-                    }}
-                  />
-                ) : (
-                  <LazyImage
-                    src={slide.image}
-                    alt={`Slide ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      objectPosition: "center",
-                    }}
-                    onError={(e) => {
-                      console.error(`Failed to load image: ${slide.image}`);
-                      e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
-                        index + 1
-                      }`;
-                    }}
-                  />
-                )}
+                {(() => {
+                  const isCurrent = index === currentSlide;
+                  const isNext = index === (currentSlide + 1) % slides.length;
+                  const isFirst = index === 0;
+                  
+                  // First slide or current/next slides should be eager
+                  if (isFirst || isCurrent || isNext) {
+                    return (
+                      <img
+                        src={slide.image}
+                        alt={`Slide ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          objectPosition: "center",
+                        }}
+                        loading="eager"
+                        fetchPriority={isCurrent ? "high" : isNext ? "high" : undefined}
+                        onError={(e) => {
+                          console.error(`Failed to load image: ${slide.image}`);
+                          e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
+                            index + 1
+                          }`;
+                        }}
+                      />
+                    );
+                  }
+                  
+                  return (
+                    <LazyImage
+                      src={slide.image}
+                      alt={`Slide ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "center",
+                      }}
+                      eager={false}
+                      onError={(e) => {
+                        console.error(`Failed to load image: ${slide.image}`);
+                        e.target.src = `https://via.placeholder.com/1200x650?text=Slide+${
+                          index + 1
+                        }`;
+                      }}
+                    />
+                  );
+                })()}
               </div>
             ))}
           </motion.div>

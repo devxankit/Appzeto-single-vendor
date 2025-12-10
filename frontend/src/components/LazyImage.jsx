@@ -1,12 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 
-const LazyImage = ({ src, alt, className, onError, ...props }) => {
-  const [imageSrc, setImageSrc] = useState(null);
+const LazyImage = ({ src, alt, className, onError, eager = false, fetchpriority, ...props }) => {
+  const [imageSrc, setImageSrc] = useState(eager ? src : null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef(null);
 
   useEffect(() => {
+    // If eager mode, load immediately
+    if (eager) {
+      setImageSrc(src);
+      return;
+    }
+
+    // Otherwise use IntersectionObserver for lazy loading
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -32,7 +39,7 @@ const LazyImage = ({ src, alt, className, onError, ...props }) => {
       }
       observer.disconnect();
     };
-  }, [src]);
+  }, [src, eager]);
 
   const handleLoad = () => {
     setIsLoaded(true);
@@ -63,7 +70,8 @@ const LazyImage = ({ src, alt, className, onError, ...props }) => {
           } ${className || ''}`}
           onLoad={handleLoad}
           onError={handleError}
-          loading="lazy"
+          loading={eager ? 'eager' : 'lazy'}
+          {...(fetchpriority && { fetchpriority })}
           {...props}
         />
       )}

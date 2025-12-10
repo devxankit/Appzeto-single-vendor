@@ -34,6 +34,25 @@ const MobileHome = () => {
   const trending = getTrending();
   const flashSale = getFlashSale();
 
+  // Preload next slide images for smoother transitions
+  useEffect(() => {
+    const preloadImages = () => {
+      // Preload current and next slide
+      const currentIndex = currentSlide;
+      const nextIndex = (currentSlide + 1) % slides.length;
+      
+      // Preload current slide if not already loaded
+      const currentImg = new Image();
+      currentImg.src = slides[currentIndex].image;
+      
+      // Preload next slide
+      const nextImg = new Image();
+      nextImg.src = slides[nextIndex].image;
+    };
+
+    preloadImages();
+  }, [currentSlide, slides]);
+
   // Auto-slide functionality (pauses when user is dragging)
   useEffect(() => {
     if (autoSlidePaused) return;
@@ -163,27 +182,37 @@ const MobileHome = () => {
                   ease: [0.25, 0.46, 0.45, 0.94], // Smooth easing
                   type: "tween",
                 }}>
-                {slides.map((slide, index) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0"
-                    style={{
-                      width: `${100 / slides.length}%`,
-                      height: "100%",
-                    }}>
-                    <LazyImage
-                      src={slide.image}
-                      alt={`Slide ${index + 1}`}
-                      className="w-full h-full object-cover pointer-events-none select-none"
-                      draggable={false}
-                      onError={(e) => {
-                        e.target.src = `https://via.placeholder.com/400x200?text=Slide+${
-                          index + 1
-                        }`;
-                      }}
-                    />
-                  </div>
-                ))}
+                {slides.map((slide, index) => {
+                  // Determine if this slide should be eagerly loaded
+                  // First slide (index 0) and next slide should be eager
+                  const isEager = index === 0 || index === 1;
+                  const isCurrent = index === currentSlide;
+                  const isNext = index === (currentSlide + 1) % slides.length;
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="flex-shrink-0"
+                      style={{
+                        width: `${100 / slides.length}%`,
+                        height: "100%",
+                      }}>
+                      <LazyImage
+                        src={slide.image}
+                        alt={`Slide ${index + 1}`}
+                        className="w-full h-full object-cover pointer-events-none select-none"
+                        draggable={false}
+                        eager={isEager || isCurrent || isNext}
+                        {...(isCurrent || isNext ? { fetchpriority: "high" } : {})}
+                        onError={(e) => {
+                          e.target.src = `https://via.placeholder.com/400x200?text=Slide+${
+                            index + 1
+                          }`;
+                        }}
+                      />
+                    </div>
+                  );
+                })}
               </motion.div>
               <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10 pointer-events-none">
                 {slides.map((_, index) => (
