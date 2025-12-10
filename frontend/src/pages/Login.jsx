@@ -43,8 +43,8 @@ const Login = () => {
     <PageTransition>
       <div className="min-h-screen bg-white w-full overflow-x-hidden">
         <main className="w-full overflow-x-hidden">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12">
-            <div className="max-w-md mx-auto">
+          <div className="container mx-auto px-6 sm:px-8 lg:px-10 pt-6 sm:pt-8 pb-12">
+            <div className="max-w-md w-full mx-6 sm:mx-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

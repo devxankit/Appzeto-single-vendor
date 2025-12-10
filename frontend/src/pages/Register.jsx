@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiUser, FiPhone, FiCalendar } from 'react-icons/fi';
-import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
 import { isValidEmail, isValidPhone } from '../utils/helpers';
 import toast from 'react-hot-toast';
@@ -50,16 +49,10 @@ const Register = () => {
     <PageTransition>
       <div className="min-h-screen bg-white w-full overflow-x-hidden">
         <main className="w-full overflow-x-hidden">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12">
-            <div className="max-w-md mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm"
-              >
-                {/* Header */}
-                <div className="text-center mb-8">
+          <div className="container mx-auto px-6 sm:px-8 lg:px-10 min-h-screen flex items-center justify-center py-8">
+            <div className="max-w-md w-full mx-6 sm:mx-8">
+              {/* Header */}
+              <div className="text-center mb-8">
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Get Started Now</h1>
                   <p className="text-sm sm:text-base text-gray-600">Create an account or log in to explore about our app</p>
                 </div>
@@ -296,10 +289,9 @@ const Register = () => {
                       className="text-primary-600 hover:text-primary-700 font-semibold"
                     >
                       Sign In
-                    </Link>
-                  </p>
-                </div>
-              </motion.div>
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
         </main>

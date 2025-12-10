@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiUser, FiPhone, FiCalendar } from 'react-icons/fi';
-import { motion } from 'framer-motion';
 import { useAuthStore } from '../../store/authStore';
 import { isValidEmail, isValidPhone } from '../../utils/helpers';
 import toast from 'react-hot-toast';
@@ -50,16 +49,10 @@ const MobileRegister = () => {
   return (
     <PageTransition>
       <MobileLayout showBottomNav={false} showCartBar={false}>
-        <div className="w-full min-h-screen flex items-start justify-center px-4 pt-6 pb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full max-w-md"
-          >
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              {/* Header */}
-              <div className="text-center mb-8">
+        <div className="w-full min-h-screen flex items-center justify-center px-6 py-8">
+          <div className="w-full max-w-md mx-4">
+            {/* Header */}
+            <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Get Started Now</h1>
                 <p className="text-sm text-gray-600">Create an account or log in to explore about our app</p>
               </div>
@@ -299,8 +292,7 @@ const MobileRegister = () => {
                   </Link>
                 </p>
               </div>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </MobileLayout>
     </PageTransition>
